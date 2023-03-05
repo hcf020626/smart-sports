@@ -1,54 +1,56 @@
 {
+	"easycom": {	//配置easycom组件模式
+		"^u-(.*)": "@/uview-ui/components/u-$1/u-$1.vue"
+	},
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
 			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "首页"
 			}
+		}, {
+			"path": "pages/user-center/user-center",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"enablePullDownRefresh": false
+			}
+		}, {
+			"path": "pages/auth/login/login",
+			"style": {
+				"navigationBarTitleText": "登录",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/auth/reg/reg",
+			"style": {
+				"navigationBarTitleText": "注册",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/auth/forget/forget",
+			"style": {
+				"navigationBarTitleText": "忘记密码",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/auth/agreement/agreement",
+			"style": {
+				"navigationBarTitleText": "用户协议",
+				"enablePullDownRefresh": false
+			}
+
 		}
 	    ,{
-            "path" : "pages/user-center/user-center",
+            "path" : "pages/user-center/settings/settings",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "我的",
-                "enablePullDownRefresh": false
-            }
-        }
-        ,{
-            "path" : "pages/auth/login/login",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "登录",
-				"navigationBarBackgroundColor":"#FFFFFF",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/auth/reg/reg",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "注册",
-				"navigationBarBackgroundColor":"#FFFFFF",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/auth/forget/forget",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "忘记密码",
-				"navigationBarBackgroundColor":"#FFFFFF",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/auth/agreement/agreement",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "用户协议",
+                "navigationBarTitleText": "设置",
                 "enablePullDownRefresh": false
             }
             
