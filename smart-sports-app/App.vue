@@ -2,7 +2,7 @@
 	export default {
 		onLaunch: function() {
 			console.log('App Launch')
-			console.log('uView的版本：', this.$u.config.v);
+			
 		},
 		onShow: function() {
 			console.log('App Show')
