@@ -1,21 +1,23 @@
 <template>
-	<view>
-		<view class="wrap">
+	<view class="container">
+		<view class="wrap" hover-class="cell-hover-class" @tap="goToProfile">
 			<view class="wrap-item item1">
 				<u-avatar :src="src" size="150"></u-avatar>
 			</view>
 			<view class="wrap-item item2">
-				<text>{{userInfo.username}}</text>
+				<text>{{userInfo.realname?userInfo.realname:'亲，您还未设置真实姓名'}}</text>
 			</view>
 			<view class="wrap-item item3" >
 				<text>主页</text><u-icon name="arrow-right"></u-icon>
 			</view>
 		</view>
 
-		<u-cell-group>
-				<u-cell-item icon="integral-fill" title="会员等级" value="新版本" hover-class="cell-hover-class" ></u-cell-item>
-				<u-cell-item icon="setting-fill" title="设置" hover-class="cell-hover-class" @click="goToSettingsPage"></u-cell-item>
+		<view class="cell-group">
+			<u-cell-group>
+					<u-cell-item icon="integral-fill" title="会员等级" value="新版本" hover-class="cell-hover-class" :border-bottom="false" :arrow="false"></u-cell-item>
+					<u-cell-item icon="setting-fill" title="设置" hover-class="cell-hover-class" @click="goToSettingsPage" :border-bottom="false" :arrow="false"></u-cell-item>
 			</u-cell-group>
+		</view>
 	</view>
 </template>
 
@@ -32,24 +34,33 @@
 				uni.navigateTo({
 					url: '/pages/user-center/settings/settings'
 				})
+			},
+			goToProfile(){
+				uni.navigateTo({
+					url: '/pages/user-center/profile/profile'
+				})
 			}
 		},
 		computed: {
 			...mapState('accountModule', ['userInfo'])
 		},
 		onLoad() {
-			console.log("this.userInfo.username: ",this.userInfo.username);
+			console.log("this.userInfo.realname: ",this.userInfo.realname);
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
+	.container {
+		width: 100vw;
+		height: 100vh;
+		background-color: WhiteSmoke ;
+	}
 	.wrap {
 		width: 100vw;
 		height: 200rpx;
 		display: flex;
 		align-items: center;
-		border-bottom: 1px solid $u-border-color;
 	}
 	.wrap-item {
 		margin: auto 20rpx;
@@ -69,4 +80,10 @@
 	.item3 .u-icon {
 		margin: 0 12rpx;
 	}
+	
+	.cell-group{
+		width: 95vw;
+		margin: 0 auto;
+	}
+	
 </style>

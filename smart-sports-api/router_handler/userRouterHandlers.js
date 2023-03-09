@@ -1,3 +1,4 @@
+// 导入数据库连接池
 const pool = require('../utils/DBHelper')
 //导入对用户密码进行 md5 加密的模块
 const md5 = require('md5')
@@ -5,23 +6,25 @@ const md5 = require('md5')
 const jwt = require('jwt-simple')
 //导入时间处理模块
 const moment = require('moment')
+// 将 .env 文件中配置的环境变量加载到 process.env 中
 require('dotenv').config()
 
 // 用户注册的处理函数
 userReg = (req, resp, next) => {
+	//接收表单数据
 	const user = req.body;
 
-	//判断用户名和密码是否为空
-	if (user.username === '' || user.password === '') {
+	//判断用户手机号码和密码是否为空
+	if (user.phone === '' || user.password === '') {
 		return resp.json({
 			status: 1,
-			msg: '用户名或密码不能为空'
+			msg: '手机号码或密码不能为空'
 		})
 	}
 
-	//检测用户名是否被占用
-	const sql = 'select * from t_parents where username=?';
-	pool.query(sql, [user.username], (err, results, fields) => {
+	//检测手机号码是否被占用
+	const sql = 'select * from t_parents where phone=?';
+	pool.query(sql, [user.phone], (err, results, fields) => {
 		//执行 sql 语句失败
 		if (err) {
 			return resp.json({
@@ -30,56 +33,64 @@ userReg = (req, resp, next) => {
 			})
 		}
 
-		//查询记录不止一条，说明用户名被占用
+		//如果查询记录不止一条，说明手机号码被占用
 		if (results.length > 0) {
 			return resp.json({
 				status: 1,
-				msg: '用户名被占用，请更换其他用户名！'
+				msg: '手机号码被占用，请更换其他手机号码！'
 			})
 		}
 
 		// ? 表示占位符
-		const sql = 'insert into t_parents(`username`, `password`, `reg_time`)values(?, ?, ?)';
-		// 使用数组的形式为占位符指定具体的值
-		pool.query(sql, [user.username, md5(md5(user.password) + process.env.SECRET_KEY), moment().format(
-			'YYYY-MM-DD HH:mm:ss')], function(error, results, fields) {
-			//执行 sql 语句失败
-			if (error) {
-				return resp.json({
-					status: 1,
-					msg: err.message
-				})
-			}
+		const sql = 'insert into t_parents(`phone`, `password`, `reg_time`)values(?, ?, ?)';
 
-			if (results.affectedRows !== 1) {
-				return resp.json({
-					status: 1,
-					msg: '用户注册失败，请稍后再试'
-				})
-			}
+		pool.query(
+			sql,
+			// 使用数组的形式为占位符指定具体的值
+			[
+				user.phone,
+				md5(md5(user.password) + process.env.SECRET_KEY),
+				moment().format('YYYY-MM-DD HH:mm:ss')
+			],
+			function(error, results, fields) {
+				//执行 sql 语句失败
+				if (error) {
+					return resp.json({
+						status: 1,
+						msg: err.message
+					})
+				}
 
-			resp.json({
-				status: 0,
-				msg: '注册成功！'
-			})
-		});
+				if (results.affectedRows !== 1) {
+					return resp.json({
+						status: 1,
+						msg: '用户注册失败，请稍后再试'
+					})
+				}
+
+				resp.json({
+					status: 0,
+					msg: '注册成功！'
+				})
+			});
 	})
 }
 
 // 用户登录的处理函数
 userLogin = (req, resp, next) => {
+	// 接收表单数据：
 	const user = req.body;
 
-	//判断用户名和密码是否为空
-	if (user.username === '' || user.password === '') {
+	//判断用户手机号码和密码是否为空
+	if (user.phone === '' || user.password === '') {
 		return resp.json({
 			status: 1,
-			msg: '用户名或密码不能为空'
+			msg: '手机号码或密码不能为空'
 		})
 	}
 
-	const sql = 'select * from t_parents where username=?'
-	pool.query(sql, [user.username], (err, results, fields) => {
+	const sql = 'select * from t_parents where phone=?'
+	pool.query(sql, [user.phone], (err, results, fields) => {
 		// sql 语句执行出错
 		if (err) {
 			return resp.json({
@@ -87,23 +98,23 @@ userLogin = (req, resp, next) => {
 				msg: err.message
 			})
 		}
-		
+
 		//执行 SQL 语句成功，但是查询到数据条数不等于 1
-		if(results.length !== 1){
+		if (results.length !== 1) {
 			return resp.json({
 				status: 1,
 				msg: '用户不存在'
 			})
 		}
-		
+
 		// 判断用户输入的登录密码是否和数据库中的密码一致
-		if(md5(md5(user.password) + process.env.SECRET_KEY) !== results[0].password){
+		if (md5(md5(user.password) + process.env.SECRET_KEY) !== results[0].password) {
 			return resp.json({
 				status: 1,
-				msg: '用户名或密码错误'
+				msg: '手机号码或密码错误'
 			})
 		}
-		
+
 		resp.json({
 			status: 0,
 			msg: '登录成功!',

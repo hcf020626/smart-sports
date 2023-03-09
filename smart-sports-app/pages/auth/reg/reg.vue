@@ -1,17 +1,18 @@
 <template>
-	<view class="content">
+	<view class="container">
+		<!-- 消息提示组件，用于提示用户在登录时碰到的问题 -->
+		<u-toast ref="uToast"></u-toast>
+		
 		<!-- 头部 logo -->
 		<view class="header">
 			<image src="@/static/logo.png"></image>
 		</view>
-
-		<view>
-			<u-toast ref="uToast" />
-		</view>
+		
+		<!-- 主体 表单 -->
 		<view class="body">
 			<u-form :model="form" ref="uForm">
-				<u-form-item prop="userName" left-icon="account" :left-icon-style="leftIconStyle">
-					<u-input type="text" v-model="form.userName" placeholder="请输入用户名" />
+				<u-form-item prop="phone" left-icon="account" :left-icon-style="leftIconStyle">
+					<u-input type="text" v-model="form.phone" placeholder="请输入用户名" />
 				</u-form-item>
 				<u-form-item prop="password" left-icon="lock" :left-icon-style="leftIconStyle">
 					<u-input type="password" v-model="form.password" placeholder="请输入密码" />
@@ -23,6 +24,7 @@
 			<u-button type="primary" @tap="regHandler" :disabled="!form.agree">注册</u-button>
 		</view>
 
+		<!-- 尾部 忘记密码和注册账户 -->
 		<view class="footer">
 			<u-checkbox v-model="form.agree" shape="circle"></u-checkbox><text>勾选代表同意</text>
 			<navigator url="./agreement/agreement" open-type="navigate">《软件用户协议》</navigator>
@@ -38,55 +40,29 @@
 			return {
 				leftIconStyle: {'fontSize':'35rpx'},
 				form: {
-					userName: '',
+					phone: '',
 					password: '',
 					password2: '',
 					agree: false
 				},
 				rules: {
-					userName: [
-						// 以英文字母开头，只能包含英文字母、数字、下划线和短横线
+					phone: [
 						{
-							pattern: /^[a-zA-Z][a-zA-Z0-9_-]*$/g,
+							pattern: /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/g,
 							// 正则检验前先将值转为字符串
 							transform(value) {
 								return String(value);
 							},
-							message: '用户名必须以英文字母开头，只能包含英文字母、数字、下划线和短横线',
+							message: '手机号码格式不正确',
 							trigger: ['change', 'blur']
 						},
-						// 对userName字段进行长度验证
-						{
-							min: 5,
-							max: 15,
-							message: '用户名长度在5-15个字符之间',
-							trigger: ['change', 'blur']
-						},
-						// 对userName字段进行必填验证
+						// 对 phone 字段进行必填验证
 						{
 							required: true,
-							message: '请输入用户名',
+							message: '请输入手机号码',
 							// 可以单个或者同时写两个触发验证方式 
 							trigger: ['change', 'blur'],
 						},
-						// // 校验用户名是否已经被注册了
-						// {
-						// 	asyncValidator: (rule, value, callback) => {
-						// 		this.$u.post('/xxx/xxx', {
-						// 			name: value
-						// 		}).then(res => {
-						// 			// 如果验证不通过，需要在callback()抛出new Error('错误提示信息')
-						// 			if (res.error) {
-						// 				callback(new Error('姓名重复'));
-						// 			} else {
-						// 				// 如果校验通过，也要执行callback()回调
-						// 				callback();
-						// 			}
-						// 		})
-						// 	},
-						// 	// 如果是异步校验，无需写message属性，错误的信息通过Error抛出即可
-						// 	// message: 'xxx'
-						// }
 					],
 					password: [{
 							min: 6,
@@ -124,16 +100,25 @@
 				this.$refs.uForm.validate(valid => {
 					if (valid) {
 						console.log('注册验证通过');
-						api.account.reg({username: this.form.userName, password: this.form.password2}).then(res=>{
-							console.log("res: ",res);
+						console.log("this.form: ",this.form);
+						api.account.reg({phone: this.form.phone, password: this.form.password2}).then(res=>{
 							const {data: {status, msg}} = res;
 							if(!status){
+								// 弹出注册成功的提示框，并清空表单数据
 								this.$refs.uToast.show({
 									type: 'success',
 									title: msg,
 									position: 'top'
 								})
+								
+								this.form = {
+									userName: '',
+									password: '',
+									password2: '',
+									agree: false
+								}
 							}else{
+								// 弹出注册失败的提示框
 								this.$refs.uToast.show({
 									type: 'error',
 									title: msg,
@@ -141,32 +126,17 @@
 								})
 							}
 						}).catch((err)=>{
+							// 弹出注册失败的提示框
 							this.$refs.uToast.show({
 								type: 'error',
 								title: err.errMsg,
 								position: 'top'
 							})
 						})
-						
-						this.form = {
-							userName: '',
-							password: '',
-							password2: '',
-							agree: false
-						}
 					} else {
 						console.log('注册验证失败');
 					}
 				});
-				
-				
-				
-				// this.$refs.uToast.show({
-				// 	title: '注册成功',
-				// 	type: 'success',
-				// 	position: 'top'
-				// })
-				
 			},
 		},
 		// 必须要在onReady生命周期，因为onLoad生命周期组件可能尚未创建完毕
@@ -177,7 +147,7 @@
 </script>
 
 <style lang="scss" scoped>
-	.content {
+	.container {
 		width: 100vw;
 		height: 100vh;
 		display: flex;

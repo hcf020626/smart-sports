@@ -6,7 +6,8 @@ const http = new Request({
 	baseURL: baseURL,
 	header: {
 		'content-type': 'application/x-www-form-urlencoded',
-	}
+	},
+	timeout: 6000
 });
 
 

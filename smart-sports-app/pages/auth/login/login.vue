@@ -1,5 +1,6 @@
 <template>
-	<view class="content">
+	<view class="container">
+		<!-- 消息提示组件，用于提示用户在登录时碰到的问题 -->
 		<u-toast ref="uToast"></u-toast>
 		
 		<!-- 头部 logo -->
@@ -7,10 +8,11 @@
 			<image src="@/static/logo.png"></image>
 		</view>
 
+		<!-- 主体 表单 -->
 		<view class="body">
 			<u-form :model="form" ref="uForm">
-				<u-form-item prop="userName" left-icon="account" :left-icon-style="leftIconStyle">
-					<u-input type="text" v-model="form.userName" placeholder="请输入用户名" />
+				<u-form-item prop="phone" left-icon="account" :left-icon-style="leftIconStyle">
+					<u-input type="text" v-model="form.phone" placeholder="请输入手机号码" />
 				</u-form-item>
 				<u-form-item prop="password" left-icon="lock" :left-icon-style="leftIconStyle">
 					<u-input type="password" v-model="form.password" placeholder="请输入密码" />
@@ -22,6 +24,7 @@
 			<u-button type="primary" @tap="loginHandler">登录</u-button>
 		</view>
 
+		<!-- 尾部 忘记密码和注册账户 -->
 		<view class="footer">
 			<navigator class="link" url="../forget/forget" open-type="navigate">忘记密码</navigator>
 			<text>|</text>
@@ -40,33 +43,25 @@
 				status: '',
 				leftIconStyle: {'fontSize':'35rpx'},
 				form: {
-					userName: '',
+					phone: '',
 					password: '',
 					captcha: ''
 				},
 				rules: {
-					userName: [
-						// 以英文字母开头，只能包含英文字母、数字、下划线和短横线
+					phone: [
 						{
-							pattern: /^[a-zA-Z][a-zA-Z0-9_-]*$/g,
+							pattern: /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/g,
 							// 正则检验前先将值转为字符串
 							transform(value) {
 								return String(value);
 							},
-							message: '用户名必须以英文字母开头，只能包含英文字母、数字、下划线和短横线',
+							message: '手机号码格式不正确',
 							trigger: ['change', 'blur']
 						},
-						// 对userName字段进行长度验证
-						{
-							min: 5,
-							max: 15,
-							message: '用户名长度在5-15个字符之间',
-							trigger: ['change', 'blur']
-						},
-						// 对userName字段进行必填验证
+						// 对 phone 字段进行必填验证
 						{
 							required: true,
-							message: '请输入用户名',
+							message: '请输入手机号码',
 							// 可以单个或者同时写两个触发验证方式 
 							trigger: ['change', 'blur'],
 						},
@@ -94,19 +89,17 @@
 			}
 		},
 		methods: {
-			// ...mapActions('accountModule', ['userlogin']),
+			...mapActions('accountModule', ['userLogin']),
 			loginHandler() {
 				this.$refs.uForm.validate(valid => {
 					if (valid) {
 						console.log('登录验证通过');
-						api.account.login({username: this.form.userName, password: this.form.password}).then(res=>{
+						api.account.login({phone: this.form.phone, password: this.form.password}).then(res=>{
 							const {data: {status, msg, data, token}} = res;
 							if(!status){
-								// console.log("this.userlogin: ",this.userlogin);
-								this.$store.dispatch('accountModule/userLogin', {token, userInfo: data})
-								// this.$store.commit('accountModule/USER_LOGIN', {token, userInfo: data})
-								// uni.setStorageSync('token', token);
-								// uni.setStorageSync('userInfo', JSON.stringify(data))
+								// 将用户信息和 token 保存到Vuex和本地存储中
+								this.userLogin({token, userInfo: data})
+								// 弹出登录成功的提示框，并稍后跳转到首页
 								this.$refs.uToast.show({
 									type: 'success',
 									title: msg,
@@ -118,6 +111,7 @@
 									}
 								})
 							}else{
+								// 弹出登录失败的提示框
 								this.$refs.uToast.show({
 									type: 'error',
 									title: msg,
@@ -125,6 +119,7 @@
 								})
 							}
 						}).catch((err)=>{
+							// 弹出登录失败的提示框
 							this.$refs.uToast.show({
 								type: 'error',
 								title: err.errMsg,
@@ -146,7 +141,6 @@
 			this.$refs.uForm.setRules(this.rules);
 			
 			if(this.status === '1'){
-				console.log('in here');
 				this.$refs.uToast.show({
 					type: 'success',
 					title: '您已经退出登录',
@@ -158,7 +152,7 @@
 </script>
 
 <style lang="scss" scoped>
-	.content {
+	.container {
 		width: 100vw;
 		height: 100vh;
 		display: flex;
@@ -189,8 +183,6 @@
 		flex-direction: column;
 		margin: 120rpx auto 0 auto;
 	}
-
-	.body .u-form {}
 
 	.body .u-btn {
 		width: 100%;

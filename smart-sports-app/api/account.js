@@ -1,11 +1,11 @@
 import http from '@/utils/request.js'
 
-const login = ({username, password})=>{
+const login = ({phone, password})=>{
 	return http.request({
 		method: 'POST',
 		url: '/account/login',
 		data: {
-			username,
+			phone,
 			password
 		},
 		//可以加一些自定义参数，在拦截器等地方使用。比如这里我加了一个auth，可在拦截器里拿到，如果true就传token
@@ -13,12 +13,12 @@ const login = ({username, password})=>{
 	})
 }
 
-const reg = ({username, password})=>{
+const reg = ({phone, password})=>{
 	return http.request({
 		method: 'POST',
 		url: '/account/reg',
 		data: {
-			username,
+			phone,
 			password
 		},
 		//可以加一些自定义参数，在拦截器等地方使用。比如这里我加了一个auth，可在拦截器里拿到，如果true就传token

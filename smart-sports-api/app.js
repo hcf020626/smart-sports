@@ -5,16 +5,17 @@ const app = express()
 // 指定服务启动的端口号
 const port = 3000
 
-// 导入并使用全局生效的自定义权限验证中间件
+// 导入自定义的身份验证中间件
 const {auth} = require('./utils/auth')
+// 将自定义的身份验证中间件注册为全局中间件
 app.use(auth(['/account/login', '/account/reg']))
 
-// 导入 cors 中间件
+// 导入解决跨域资源共享（Cross Origin Resource Sharing，简称 cors）的中间件
 const cors = require('cors')
 // 将 cors 注册为全局中间件
 app.use(cors())
 
-//导入并使用 express 内置的解析 application/x-www-form-urlencoded 格式的表单数据的中间件
+//导入并使用 express 内置的解析类型为 application/x-www-form-urlencoded 的请求体的中间件
 app.use(express.urlencoded({ extended: false }))
 
 app.use((req, resp, next)=>{

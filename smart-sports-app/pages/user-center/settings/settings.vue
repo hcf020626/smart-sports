@@ -19,6 +19,7 @@
 </template>
 
 <script>
+	import {mapActions} from 'vuex'
 	export default {
 		data() {
 			return {
@@ -30,11 +31,12 @@
 			}
 		},
 		methods: {
+			...mapActions('accountModule', ['userLogout']),
 			showModal() {
 				this.modalInfo.show = true;
 			},
 			logout() {
-				uni.clearStorageSync();
+				this.userLogout()
 				uni.reLaunch({
 					url: '/pages/auth/login/login?status=1'
 				})

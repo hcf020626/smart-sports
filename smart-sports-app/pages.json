@@ -44,13 +44,23 @@
 				"navigationBarTitleText": "用户协议",
 				"enablePullDownRefresh": false
 			}
-
+			
 		}
 	    ,{
             "path" : "pages/user-center/settings/settings",
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "设置",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/user-center/profile/profile",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "个人中心",
+				// "navigationStyle": "custom",
                 "enablePullDownRefresh": false
             }
             
