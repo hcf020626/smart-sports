@@ -1,21 +1,24 @@
-import Request from '@/utils/luch-request/index.js'
+import Request from '@/utils/luch-request/luch-request/index.js'
 import {baseURL} from '@/config.js'
 
 // 创建实例
 const http = new Request({
-	baseURL
+	baseURL: baseURL,
+	header: {
+		'content-type': 'application/x-www-form-urlencoded',
+	}
 });
+
 
 // 配置请求拦截器
 http.interceptors.request.use((config) => { // 可使用async await 做异步操作
   config.header = {
     ...config.header,
-    a: 1 // 演示拦截器header加参
   }
-  // 演示custom 用处
-  // if (config.custom.auth) {
-  //   config.header.token = 'token'
-  // }
+  
+  if (config.custom.auth) {
+    config.header.token = uni.getStorageSync('token')
+  }
   // if (config.custom.loading) {
   //  uni.showLoading()
   // }

@@ -5,7 +5,7 @@
 				<u-avatar :src="src" size="150"></u-avatar>
 			</view>
 			<view class="wrap-item item2">
-				<text>{{nickName}}</text>
+				<text>{{userInfo.username}}</text>
 			</view>
 			<view class="wrap-item item3" >
 				<text>主页</text><u-icon name="arrow-right"></u-icon>
@@ -20,11 +20,11 @@
 </template>
 
 <script>
+	import {mapState} from 'vuex'
 	export default {
 		data() {
 			return {
 				src: 'D:\\Learning\\Graduation Design\\基于 Android 的智慧体育平台家长模块设计与实现\\smart-sports-app\\static\\avatar.png',
-				nickName: 'Leo He'
 			}
 		},
 		methods: {
@@ -33,6 +33,12 @@
 					url: '/pages/user-center/settings/settings'
 				})
 			}
+		},
+		computed: {
+			...mapState('accountModule', ['userInfo'])
+		},
+		onLoad() {
+			console.log("this.userInfo.username: ",this.userInfo.username);
 		}
 	}
 </script>

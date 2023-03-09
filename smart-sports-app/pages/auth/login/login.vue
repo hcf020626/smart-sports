@@ -1,5 +1,7 @@
 <template>
 	<view class="content">
+		<u-toast ref="uToast"></u-toast>
+		
 		<!-- 头部 logo -->
 		<view class="header">
 			<image src="@/static/logo.png"></image>
@@ -30,9 +32,12 @@
 </template>
 
 <script>
+	import api from '@/api/index.js'
+	import {mapActions} from 'vuex'
 	export default {
 		data() {
 			return {
+				status: '',
 				leftIconStyle: {'fontSize':'35rpx'},
 				form: {
 					userName: '',
@@ -89,19 +94,65 @@
 			}
 		},
 		methods: {
+			// ...mapActions('accountModule', ['userlogin']),
 			loginHandler() {
 				this.$refs.uForm.validate(valid => {
 					if (valid) {
-						console.log('验证通过');
+						console.log('登录验证通过');
+						api.account.login({username: this.form.userName, password: this.form.password}).then(res=>{
+							const {data: {status, msg, data, token}} = res;
+							if(!status){
+								// console.log("this.userlogin: ",this.userlogin);
+								this.$store.dispatch('accountModule/userLogin', {token, userInfo: data})
+								// this.$store.commit('accountModule/USER_LOGIN', {token, userInfo: data})
+								// uni.setStorageSync('token', token);
+								// uni.setStorageSync('userInfo', JSON.stringify(data))
+								this.$refs.uToast.show({
+									type: 'success',
+									title: msg,
+									position: 'top',
+									callback(){
+										uni.switchTab({
+											url: '/pages/index/index'
+										})
+									}
+								})
+							}else{
+								this.$refs.uToast.show({
+									type: 'error',
+									title: msg,
+									position: 'top'
+								})
+							}
+						}).catch((err)=>{
+							this.$refs.uToast.show({
+								type: 'error',
+								title: err.errMsg,
+								position: 'top'
+							})
+						})
 					} else {
-						console.log('验证失败');
+						console.log('登录验证失败');
 					}
 				});
 			}
 		},
+		onLoad({status}) {
+			// 如果 status 等于 1，说明点击退出登录来到登录页面的，则弹出消息提示框
+			this.status = status
+		},
 		// 必须要在onReady生命周期，因为onLoad生命周期组件可能尚未创建完毕
 		onReady() {
 			this.$refs.uForm.setRules(this.rules);
+			
+			if(this.status === '1'){
+				console.log('in here');
+				this.$refs.uToast.show({
+					type: 'success',
+					title: '您已经退出登录',
+					position: 'top'
+				})
+			}
 		}
 	}
 </script>

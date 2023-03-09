@@ -32,6 +32,7 @@
 </template>
 
 <script>
+	import api from '@/api/index.js'
 	export default {
 		data() {
 			return {
@@ -122,11 +123,43 @@
 			regHandler() {
 				this.$refs.uForm.validate(valid => {
 					if (valid) {
-						console.log('验证通过');
+						console.log('注册验证通过');
+						api.account.reg({username: this.form.userName, password: this.form.password2}).then(res=>{
+							console.log("res: ",res);
+							const {data: {status, msg}} = res;
+							if(!status){
+								this.$refs.uToast.show({
+									type: 'success',
+									title: msg,
+									position: 'top'
+								})
+							}else{
+								this.$refs.uToast.show({
+									type: 'error',
+									title: msg,
+									position: 'top'
+								})
+							}
+						}).catch((err)=>{
+							this.$refs.uToast.show({
+								type: 'error',
+								title: err.errMsg,
+								position: 'top'
+							})
+						})
+						
+						this.form = {
+							userName: '',
+							password: '',
+							password2: '',
+							agree: false
+						}
 					} else {
-						console.log('验证失败');
+						console.log('注册验证失败');
 					}
 				});
+				
+				
 				
 				// this.$refs.uToast.show({
 				// 	title: '注册成功',
@@ -134,12 +167,6 @@
 				// 	position: 'top'
 				// })
 				
-				this.form = {
-					userName: '',
-					password: '',
-					password2: '',
-					agree: false
-				}
 			},
 		},
 		// 必须要在onReady生命周期，因为onLoad生命周期组件可能尚未创建完毕

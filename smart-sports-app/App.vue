@@ -2,7 +2,11 @@
 	export default {
 		onLaunch: function() {
 			console.log('App Launch')
-			
+			if(!uni.getStorageSync('token')){
+				uni.reLaunch({
+					url: '/pages/auth/login/login'
+				})
+			}
 		},
 		onShow: function() {
 			console.log('App Show')

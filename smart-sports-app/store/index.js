@@ -5,22 +5,13 @@ import Vuex from 'vuex'
 //应用Vuex插件
 Vue.use(Vuex)
 
-const actions = {
-	
-}
-
-const mutations = {
-	
-}
-
-const state = {
-	
-}
+import accountModule from './accountModule.js'
 
 //创建 store 对象
 const store =  new Vuex.Store({
-	actions,
-	mutations,
-	state
+	modules: {
+		accountModule
+	}
 })
 
+export default store;
