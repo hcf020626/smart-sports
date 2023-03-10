@@ -1,1 +1,0 @@
-exports.baseURL = 'http://192.168.104.83:3000'

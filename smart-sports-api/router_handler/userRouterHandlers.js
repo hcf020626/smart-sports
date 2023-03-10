@@ -14,17 +14,17 @@ userReg = (req, resp, next) => {
 	//接收表单数据
 	const user = req.body;
 
-	//判断用户手机号码和密码是否为空
-	if (user.phone === '' || user.password === '') {
+	//判断邮箱和密码是否为空
+	if (user.email === '' || user.password === '') {
 		return resp.json({
 			status: 1,
-			msg: '手机号码或密码不能为空'
+			msg: '邮箱或密码不能为空'
 		})
 	}
 
-	//检测手机号码是否被占用
-	const sql = 'select * from t_parents where phone=?';
-	pool.query(sql, [user.phone], (err, results, fields) => {
+	//检测邮箱是否被占用
+	const sql = 'select * from t_parents where email=?';
+	pool.query(sql, [user.email], (err, results, fields) => {
 		//执行 sql 语句失败
 		if (err) {
 			return resp.json({
@@ -33,22 +33,22 @@ userReg = (req, resp, next) => {
 			})
 		}
 
-		//如果查询记录不止一条，说明手机号码被占用
+		//如果查询记录不止一条，说明邮箱被占用
 		if (results.length > 0) {
 			return resp.json({
 				status: 1,
-				msg: '手机号码被占用，请更换其他手机号码！'
+				msg: '邮箱被占用，请更换其他邮箱！'
 			})
 		}
 
 		// ? 表示占位符
-		const sql = 'insert into t_parents(`phone`, `password`, `reg_time`)values(?, ?, ?)';
+		const sql = 'insert into t_parents(`email`, `password`, `reg_time`)values(?, ?, ?)';
 
 		pool.query(
 			sql,
 			// 使用数组的形式为占位符指定具体的值
 			[
-				user.phone,
+				user.email,
 				md5(md5(user.password) + process.env.SECRET_KEY),
 				moment().format('YYYY-MM-DD HH:mm:ss')
 			],
@@ -81,16 +81,16 @@ userLogin = (req, resp, next) => {
 	// 接收表单数据：
 	const user = req.body;
 
-	//判断用户手机号码和密码是否为空
-	if (user.phone === '' || user.password === '') {
+	//判断邮箱和密码是否为空
+	if (user.email === '' || user.password === '') {
 		return resp.json({
 			status: 1,
-			msg: '手机号码或密码不能为空'
+			msg: '邮箱或密码不能为空'
 		})
 	}
 
-	const sql = 'select * from t_parents where phone=?'
-	pool.query(sql, [user.phone], (err, results, fields) => {
+	const sql = 'select * from t_parents where email=?'
+	pool.query(sql, [user.email], (err, results, fields) => {
 		// sql 语句执行出错
 		if (err) {
 			return resp.json({
@@ -111,7 +111,7 @@ userLogin = (req, resp, next) => {
 		if (md5(md5(user.password) + process.env.SECRET_KEY) !== results[0].password) {
 			return resp.json({
 				status: 1,
-				msg: '手机号码或密码错误'
+				msg: '邮箱或密码错误'
 			})
 		}
 
