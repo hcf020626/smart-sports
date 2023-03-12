@@ -4,11 +4,14 @@ const express = require('express')
 // 创建路由对象
 const userRouter = express.Router()
 
-// 处理用户注册
+// 用户注册
 userRouter.post('/reg', require('../router_handler/userRouterHandlers').userReg)
 
-// 处理用户登录
+// 用户登录
 userRouter.post('/login', require('../router_handler/userRouterHandlers').userLogin)
+
+// 发送邮箱验证码
+userRouter.post('/send-verification-code', require('../router_handler/userRouterHandlers').sendVerificationCode)
 
 // 向外导出路由对象
 module.exports = userRouter

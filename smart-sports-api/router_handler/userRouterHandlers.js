@@ -9,8 +9,72 @@ const moment = require('moment')
 // 将 .env 文件中配置的环境变量加载到 process.env 中
 require('dotenv').config()
 
+// 发送邮箱验证码的处理函数
+exports.sendVerificationCode = (req, resp) => {
+
+	try {
+		// 接收表单数据
+		const email = req.body.email;
+
+		const {
+			transporter,
+			generateVerificationCode
+		} = require('../utils/MailTransporter')
+
+		// 生成验证码
+		const code = generateVerificationCode()
+
+		// 将 email 和 code 进行加密保存到 token 中
+		const token = jwt.encode({
+			email,
+			code,
+			exp: Date.now() + 120000
+		}, process.env.SECRET_KEY);
+		console.log("code: ", code);
+
+		resp.status(200).json({
+			status: 0,
+			msg: '验证码已发送',
+			token
+		})
+	} catch (e) {
+		console.log("e: ", e);
+		resp.status(500).json({
+			status: 1,
+			msg: '服务器发生错误，验证码发送失败'
+		})
+	}
+
+	// // 填写一封邮件
+	// const mailOptions = {
+	// 	from: process.env.QQ_EMAIL,
+	// 	to: email,
+	// 	subject: '智慧体育平台注册验证码',
+	// 	text: `你的验证码是 ${code}`
+	// }
+
+	// // 发送邮件
+	// transporter.sendMail(mailOptions, (error, info) => {
+	// 	if (error) {
+	// 		console.log(error);
+	// 		resp.json({
+	// 			status: 1,
+	// 			msg: '服务器故障，邮件发送失败：' + error 
+	// 		})
+	// 	} else {
+	// 		console.log('Email sent: ' + info.response);
+	// 		// 发送成功，则将验证码保存到 Session 中
+	// 		req.session.code = code
+	// 		resp.json({
+	// 			status: 0,
+	// 			msg: '验证码已发送'
+	// 		})
+	// 	}
+	// })
+}
+
 // 用户注册的处理函数
-userReg = (req, resp, next) => {
+exports.userReg = (req, resp, next) => {
 	//接收表单数据
 	const user = req.body;
 
@@ -22,62 +86,82 @@ userReg = (req, resp, next) => {
 		})
 	}
 
-	//检测邮箱是否被占用
-	const sql = 'select * from t_parents where email=?';
-	pool.query(sql, [user.email], (err, results, fields) => {
-		//执行 sql 语句失败
-		if (err) {
-			return resp.json({
-				status: 1,
-				msg: err.message
-			})
-		}
+	try {
+		// 对 token 进行解密，取出其中保存的 email 和 token
+		const {
+			email,
+			code
+		} = jwt.decode(req.body.token, process.env.SECRET_KEY);
 
-		//如果查询记录不止一条，说明邮箱被占用
-		if (results.length > 0) {
-			return resp.json({
-				status: 1,
-				msg: '邮箱被占用，请更换其他邮箱！'
-			})
-		}
-
-		// ? 表示占位符
-		const sql = 'insert into t_parents(`email`, `password`, `reg_time`)values(?, ?, ?)';
-
-		pool.query(
-			sql,
-			// 使用数组的形式为占位符指定具体的值
-			[
-				user.email,
-				md5(md5(user.password) + process.env.SECRET_KEY),
-				moment().format('YYYY-MM-DD HH:mm:ss')
-			],
-			function(error, results, fields) {
+		if (user.code === code.toString() && user.email === email) {
+			//检测邮箱是否被占用
+			const sql = 'select * from t_parents where email=?';
+			pool.query(sql, [user.email], (err, results, fields) => {
 				//执行 sql 语句失败
-				if (error) {
+				if (err) {
 					return resp.json({
 						status: 1,
 						msg: err.message
 					})
 				}
 
-				if (results.affectedRows !== 1) {
+				//如果查询记录不止一条，说明邮箱被占用
+				if (results.length > 0) {
 					return resp.json({
 						status: 1,
-						msg: '用户注册失败，请稍后再试'
+						msg: '邮箱被占用，请更换其他邮箱！'
 					})
 				}
 
-				resp.json({
-					status: 0,
-					msg: '注册成功！'
-				})
+				// ? 表示占位符
+				const sql = 'insert into t_parents(`email`, `password`, `reg_time`)values(?, ?, ?)';
+				pool.query(
+					sql,
+					// 使用数组的形式为占位符指定具体的值
+					[
+						user.email,
+						md5(md5(user.password) + process.env.SECRET_KEY),
+						moment().format('YYYY-MM-DD HH:mm:ss')
+					],
+					function(error, results, fields) {
+						//执行 sql 语句失败
+						if (error) {
+							return resp.json({
+								status: 1,
+								msg: error.message
+							})
+						}
+
+						if (results.affectedRows !== 1) {
+							return resp.json({
+								status: 1,
+								msg: '用户注册失败，请稍后再试'
+							})
+						}
+
+						resp.json({
+							status: 0,
+							msg: '注册成功！'
+						})
+					});
+			})
+		} else {
+			resp.status(400).json({
+				status: 1,
+				msg: '验证码错误'
 			});
-	})
+		}
+	} catch (e) {
+		//TODO handle the exception
+		return resp.status(400).json({
+			status: 1,
+			msg: '验证码已经过期'
+		})
+	}
 }
 
 // 用户登录的处理函数
-userLogin = (req, resp, next) => {
+exports.userLogin = (req, resp, next) => {
 	// 接收表单数据：
 	const user = req.body;
 
@@ -120,30 +204,28 @@ userLogin = (req, resp, next) => {
 			msg: '登录成功!',
 			data: results[0],
 			// 为了方便客户端使用 Token，在服务器端直接拼接上 Bearer 的前缀
-			token: 'Bearer ' + jwt.encode(results[0], process.env.SECRET_KEY)
+			token: 'Bearer ' + jwt.encode(results[0].email, process.env.SECRET_KEY)
 		})
 
 	})
 
 }
 
-module.exports = {
-	userReg,
-	userLogin
-}
-
 /*
-create table `t_parents`(
-	`id` int(11) primary key auto_increment comment 'id',
-	`username` varchar(255) not null unique comment '用户名',
-	`password` varchar(255) not null comment '密码',
-	`nickname` varchar(255) default null comment '昵称',
-	`realname` varchar(255) default null comment '真实姓名',
-	`gender` varchar(10) default null comment '性别',
-	`idcard` varchar(20) default null comment '身份证号',
-	`phone_number` varchar(20) default null comment '电话号码',
-	`email` varchar(255) default null comment '电子邮箱',
-	`status` char(1) default '1' comment '状态:1可用,0不可用',
-	`reg_time` datetime not null comment '注册时间'
-) comment='家长信息表';
+DROP TABLE IF EXISTS `t_parents`;
+
+CREATE TABLE `t_parents` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '用户id',
+  `email` varchar(255) DEFAULT NULL COMMENT '电子邮箱',
+  `password` varchar(255) NOT NULL COMMENT '密码',
+  `realname` varchar(255) DEFAULT NULL COMMENT '真实姓名',
+  `gender` varchar(10) DEFAULT NULL COMMENT '性别',
+  `idcard` varchar(20) DEFAULT NULL COMMENT '身份证号',
+  `phone` varchar(255) DEFAULT NULL COMMENT '手机号码',
+  `avatar_url` varchar(255) DEFAULT NULL COMMENT '用户头像地址',
+  `status` char(1) DEFAULT '1' COMMENT '状态:1可用,0不可用',
+  `reg_time` datetime NOT NULL COMMENT '注册时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='家长信息表'
 */

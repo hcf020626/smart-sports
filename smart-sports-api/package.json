@@ -11,11 +11,13 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "crypto-js": "^4.1.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jwt-simple": "^0.5.6",
     "md5": "^2.3.0",
     "moment": "^2.29.4",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "nodemailer": "^6.9.1"
   }
 }

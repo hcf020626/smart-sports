@@ -31,9 +31,9 @@ module.exports = {
 					jwt.decode(token, process.env.SECRET_KEY)
 					next()
 				} catch (error) {
-					res.json({
+					resp.json({
 						msg: "您的token失效,请重新登录",
-						code: 401
+						status: 401
 					})
 				}
 			}
