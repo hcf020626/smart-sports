@@ -67,6 +67,14 @@
             }
             
         }
+        ,{
+            "path" : "pages/user-center/edit-profile/edit-profile",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "编辑个人资料 ",
+                "enablePullDownRefresh": false
+            }
+		}
     ],
 	"tabBar": {
 		"color": "#303133 ",

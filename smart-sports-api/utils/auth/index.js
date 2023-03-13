@@ -12,22 +12,8 @@ module.exports = {
 			if (list.some(item => url.startsWith(item))) {
 				next()
 			} else {
-				/*
-					请求路径不是 /account/login', '/account/reg'
-					就要问是否带了token
-					向服务器携带数据的方式有几种 ?场景的有5种
-					1.get query
-					2.post body
-					3.cookie
-					4.headers 请求
-					5.请求头里  authorization
-				*/
 				try {
-					let token = req.body.token || req.query.token || req.cookies.token || req.headers.token;
-					if (token == null) {
-						token = req.headers["authorization"].split(/ /)[1]
-					}
-					// console.log(token);
+					token = req.headers.authorization.split(' ')[1];
 					jwt.decode(token, process.env.SECRET_KEY)
 					next()
 				} catch (error) {

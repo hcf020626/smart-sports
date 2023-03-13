@@ -8,22 +8,32 @@ export default {
 		},
 		userLogout(context, value){
 			context.commit('USER_LOGOUT', value)
+		},
+		updateUser(context, value){
+			context.commit('UPDATE_USER', value)
 		}
 	},
 	mutations: {
 		//mutations中的方法一般大写，用于区分actions中的方法。
 		USER_LOGIN(state, value){
-			// console.log('here in mutations');
 			state.token = value.token;
 			state.userInfo = value.userInfo;
 			uni.setStorageSync('token', state.token);
 			uni.setStorageSync('userInfo', JSON.stringify(state.userInfo))
 		},
 		USER_LOGOUT(state, value){
-			// console.log('bye');
 			state.token = '';
 			state.userInfo = {};
 			uni.clearStorageSync();
+		},
+		UPDATE_USER(state, {email, realname, gender, idCard, phone, avatar_url}){
+			state.userInfo.email = email;
+			state.userInfo.realname = realname;
+			state.userInfo.gender = gender;
+			state.userInfo.idCard = idCard;
+			state.userInfo.phone = phone;
+			state.userInfo.avatar_url = avatar_url;
+			uni.setStorageSync('userInfo', JSON.stringify(state.userInfo))
 		}
 	},
 	getters: {},

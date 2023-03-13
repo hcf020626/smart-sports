@@ -116,11 +116,21 @@
 						},
 					],
 					code: [{
-						required: true,
-						message: '请输入验证码',
-						// 可以单个或者同时写两个触发验证方式 
-						trigger: ['change', 'blur'],
-					}],
+							required: true,
+							message: '请输入验证码',
+							// 可以单个或者同时写两个触发验证方式 
+							trigger: ['change', 'blur'],
+						},
+						{
+							// 自定义验证函数
+							validator: (rule, value, callback) => {
+								// 返回true表示校验通过，返回false表示不通过
+								return uni.$u.test.code(value, 6)
+							},
+							trigger: ['change', 'blur'],
+							message: '验证码为6位数字'
+						},
+					],
 				}
 			}
 		},
@@ -129,47 +139,52 @@
 				this.agree = !this.agree
 			},
 			async regHandler() {
-			    try {
-			        const isValid = await this.$refs.uForm.validate();
-			
-			        if (!isValid) {
-			            return this.$refs.uToast.show({
-			                type: 'error',
-			                message: '表单校验失败，请正确填写表单的每一项',
-			                icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-			                position: 'top'
-			            })
-			        }
-			
-			        const { data: { msg, status } } = await api.account.reg({
-			            email: this.form.email,
-			            password: this.form.password2,
-			            code: this.form.code,
-			            token: this.form.token
-			        });
-			
-			        if (!status) {
-			            this.$refs.uToast.show({
-			                type: 'success',
-			                message: msg,
-			                icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
-			                position: 'top'
-			            })
-			
-			            // 清空表单元素的值和错误提示
-			            this.$refs.uForm.resetFields();
-			        } else {
-			            this.$refs.uToast.show({
-			                type: 'error',
-			                message: msg,
-			                icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-			                position: 'top'
-			            })
-			        }
-			    } catch (err) {
-			        console.error(err); // 输出错误信息
-			        // 进行错误处理逻辑，比如显示错误提示信息等
-			    }
+				try {
+					const isValid = await this.$refs.uForm.validate();
+
+					if (!isValid) {
+						return this.$refs.uToast.show({
+							type: 'error',
+							message: '表单校验失败，请正确填写表单的每一项',
+							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+							position: 'top'
+						})
+					}
+
+					const {
+						data: {
+							msg,
+							status
+						}
+					} = await api.account.reg({
+						email: this.form.email,
+						password: this.form.password2,
+						code: this.form.code,
+						token: this.form.token
+					});
+
+					if (!status) {
+						this.$refs.uToast.show({
+							type: 'success',
+							message: msg,
+							icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
+							position: 'top'
+						})
+
+						// 清空表单元素的值和错误提示
+						this.$refs.uForm.resetFields();
+					} else {
+						this.$refs.uToast.show({
+							type: 'error',
+							message: msg,
+							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+							position: 'top'
+						})
+					}
+				} catch (err) {
+					console.error(err); // 输出错误信息
+					// 进行错误处理逻辑，比如显示错误提示信息等
+				}
 			},
 			codeChange(text) {
 				this.form.tips = text;

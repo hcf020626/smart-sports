@@ -2,7 +2,7 @@
 	<view class="container">
 		<view class="cell-group">
 			<u-cell-group :border="false">
-				<u-cell icon="account" title="个人资料" :border="false" isLink></u-cell>
+				<u-cell icon="account" title="个人资料" :border="false" isLink url="../edit-profile/edit-profile"></u-cell>
 				<u-cell icon="lock" title="修改密码" :border="false" isLink></u-cell>
 			</u-cell-group>
 		</view>

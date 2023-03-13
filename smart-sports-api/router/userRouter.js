@@ -13,6 +13,9 @@ userRouter.post('/login', require('../router_handler/userRouterHandlers').userLo
 // 发送邮箱验证码
 userRouter.post('/send-verification-code', require('../router_handler/userRouterHandlers').sendVerificationCode)
 
+// 保存用户信息
+userRouter.post('/saveUserInfo', require('../utils/MulterHelper').single('avatar'), require('../router_handler/userRouterHandlers').saveUserInfo)
+
 // 向外导出路由对象
 module.exports = userRouter
 

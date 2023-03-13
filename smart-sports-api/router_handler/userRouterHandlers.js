@@ -6,6 +6,7 @@ const md5 = require('md5')
 const jwt = require('jwt-simple')
 //导入时间处理模块
 const moment = require('moment')
+const { fields } = require('../utils/MulterHelper')
 // 将 .env 文件中配置的环境变量加载到 process.env 中
 require('dotenv').config()
 
@@ -209,6 +210,49 @@ exports.userLogin = (req, resp, next) => {
 
 	})
 
+}
+
+exports.saveUserInfo = (req, resp, next) => {
+	  
+	  const {email, realname, gender, phone, idCard} = req.body;
+	  const {filename} = req.file;
+	  
+	  const avatar_url = '/account/avatars/'+filename;
+	  
+	  const sql = "update t_parents set realname=?, gender=?, phone=?, idCard=? , avatar_url=? where email=?"
+	  
+	  console.log("req.body: ",req.body);
+	  console.log("req.file: ",req.file);
+	  
+	  pool.query(sql, [realname, gender, phone, idCard, avatar_url, email], (err, results, fields)=>{
+		  if(err){
+			  return resp.json({
+				  status: 1,
+				  msg: err.message
+			  })
+		  }
+		  
+		  if(results.affectedRows !== 1){
+			  console.log("results: ",results);
+			  return resp.json({
+			  	status: 1,
+			  	msg: '保存失败，请稍后再试'
+			  })
+		  }
+		  
+		  resp.json({
+		  	status: 0,
+		  	msg: '保存成功！',
+			data: {
+				email,
+				realname,
+				gender,
+				phone,
+				idCard,
+				avatar_url
+			}
+		  })
+	  })
 }
 
 /*

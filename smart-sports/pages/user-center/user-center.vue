@@ -2,7 +2,7 @@
 	<view class="container">
 		<view class="wrap" hover-class="cell-hover-class" @tap="goToProfile">
 			<view class="wrap-item avatar">
-				<u-avatar :src="src" size="70"></u-avatar>
+				<u-avatar :src="avatar_url" size="70"></u-avatar>
 			</view>
 			<view class="wrap-item realname">
 				<text>{{userInfo.realname?userInfo.realname:'亲，您还未设置真实姓名'}}</text>
@@ -23,10 +23,11 @@
 
 <script>
 	import {mapState} from 'vuex'
+	import { baseURL } from '@/config.js';
 	export default {
 		data() {
 			return {
-				src: 'D:\\Learning\\Graduation Design\\基于 Android 的智慧体育平台家长模块设计与实现\\smart-sports-app\\static\\avatar.png',
+				avatar_url: ''
 			}
 		},
 		methods: {
@@ -39,8 +40,10 @@
 		computed: {
 			...mapState('accountModule', ['userInfo'])
 		},
-		onLoad() {
-			console.log("this.userInfo.realname: ",this.userInfo.realname);
+		mounted() {
+			this.$nextTick(()=>{
+				this.avatar_url = baseURL + this.userInfo.avatar_url
+			})
 		}
 	}
 </script>

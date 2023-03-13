@@ -5,6 +5,6 @@ export default {
 		login,
 		reg,
 		sendCode,
-		verifyCode
+		verifyCode,
 	}
 }
