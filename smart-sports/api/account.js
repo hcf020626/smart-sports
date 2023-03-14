@@ -1,6 +1,7 @@
 import http from '@/utils/request.js'
 
 export function login ({email, password}){
+	console.log('here in login');
 	return http.request({
 		method: 'POST',
 		url: '/account/login',
@@ -40,14 +41,16 @@ export function sendCode(email){
 	})
 }
 
-export function updatePassword({email, oldPassword, newPassword}){
+export function updatePassword({email, oldPassword, newPassword, captcha, token}){
 	return http.request({
 		method: 'POST',
 		url: '/account/updatePassword',
 		data: {
 			email,
 			oldPassword,
-			newPassword
+			newPassword,
+			captcha,
+			token
 		},
 		custom: {auth: true}
 	})

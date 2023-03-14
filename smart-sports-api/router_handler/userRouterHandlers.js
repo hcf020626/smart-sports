@@ -267,80 +267,118 @@ exports.saveUserInfo = (req, resp, next) => {
 	})
 }
 
-exports.updatePassword = (req, resp, next)=>{
-	const {email, oldPassword, newPassword} = req.body;
+exports.updatePassword = (req, resp, next) => {
+	const {
+		email,
+		oldPassword,
+		newPassword,
+		token
+	} = req.body;
+	console.log("token: ",token);
 	
-	const sql = 'select * from t_parents where email=?';
-	
-	pool.query(sql, [email], (err, results, fields) => {
-		if (err) {
+	try{
+		const {captcha} = jwt.decode(token, process.env.SECRET_KEY)
+		
+		console.log("captcha: ",captcha);
+		console.log("req.body.captcha: ",req.body.captcha);
+		
+		if(req.body.captcha.toLocaleUpperCase() !== captcha.toLocaleUpperCase()){
 			return resp.json({
 				status: 1,
-				msg: err.message
+				msg: '验证码错误'
 			})
 		}
 		
-		if(results.length !== 1){
-			return resp.json({
-				status: 1,
-				msg: '查询密码失败，请稍后再试'
-			})
-		}
+		const sql = 'select * from t_parents where email=?';
 		
-		if(results[0].password !== md5(md5(oldPassword) + process.env.SECRET_KEY)){
-			return resp.json({
-				status: 1,
-				msg: '旧密码填写错误，请重新输入'
-			})
-		}
-		
-		const sql = 'update t_parents set password=? where email=?';
-		const encryptedPassword = md5(md5(newPassword) + process.env.SECRET_KEY);
-		
-		pool.query(sql, [encryptedPassword, email], (err, results, fields) => {
+		pool.query(sql, [email], (err, results, fields) => {
 			if (err) {
 				return resp.json({
 					status: 1,
 					msg: err.message
 				})
 			}
-			
-			if(results.affectedRows !== 1){
+		
+			if (results.length !== 1) {
 				return resp.json({
 					status: 1,
-					msg: '修改失败，请稍后再试'
+					msg: '查询密码失败，请稍后再试'
 				})
 			}
-			
-			resp.json({
-				status: 0,
-				msg: '修改成功！请重新登录',
-				password: encryptedPassword
+		
+			if (results[0].password !== md5(md5(oldPassword) + process.env.SECRET_KEY)) {
+				return resp.json({
+					status: 1,
+					msg: '旧密码填写错误，请重新输入'
+				})
+			}
+		
+			const sql = 'update t_parents set password=? where email=?';
+			const encryptedPassword = md5(md5(newPassword) + process.env.SECRET_KEY);
+		
+			pool.query(sql, [encryptedPassword, email], (err, results, fields) => {
+				if (err) {
+					return resp.json({
+						status: 1,
+						msg: err.message
+					})
+				}
+		
+				if (results.affectedRows !== 1) {
+					return resp.json({
+						status: 1,
+						msg: '修改失败，请稍后再试'
+					})
+				}
+		
+				resp.json({
+					status: 0,
+					msg: '修改成功！请重新登录',
+					password: encryptedPassword
+				})
 			})
 		})
-	})
+	}catch(e){
+		//TODO handle the exception
+		console.log("e: ",e);
+		resp.status(500).json({
+			status: 1,
+			msg: '服务器发生错误，请稍后再试'
+		})
+	}
 }
 
-exports.sendCaptcha = (req, resp, next)=>{
+exports.sendCaptcha = (req, resp, next) => {
 	const captcha = svgCaptcha.create({
 		noise: 3,
 		background: '#2b85e4'
 	})
-	
-	req.session.captcha = captcha.text.toLocaleUpperCase();
-	
+
+	// 将图形验证码的文本值保存在token中
+	const token = jwt.encode({
+		captcha: captcha.text,
+		exp: Date.now() + 120000
+	}, process.env.SECRET_KEY);
+
 	resp.type('svg');
-	resp.status(200).send(captcha.data);
+	resp.status(200).send({
+		status: 0,
+		msg: '图形验证码发送成功',
+		token,
+		data: captcha.data
+	});
 }
 
-exports.veryfiCaptcha = (req, resp, next)=>{
-	const {captcha} = req.body;
-	if(captcha.toLocaleUpperCase() !== req.session.captcha){
+exports.veryfiCaptcha = (req, resp, next) => {
+	const {
+		captcha
+	} = req.body;
+	if (captcha.toLocaleUpperCase() !== req.session.captcha) {
 		resp.json({
 			status: 1,
 			msg: '验证码错误'
 		})
-	}else{
+	} else {
 		resp.json({
 			status: 0,
 			msg: '验证码正确'

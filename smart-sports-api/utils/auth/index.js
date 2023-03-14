@@ -14,7 +14,6 @@ module.exports = {
 			} else {
 				try {
 					token = req.headers.authorization.split(' ')[1];
-					console.log("token: ",token);
 					jwt.decode(token, process.env.SECRET_KEY)
 					next()
 				} catch (error) {

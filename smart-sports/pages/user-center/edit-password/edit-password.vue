@@ -1,5 +1,6 @@
 <template>
 	<view class="container">
+		
 		<!-- 消息提示组件，用于提示用户在登录时碰到的问题 -->
 		<u-toast ref="uToast"></u-toast>
 
@@ -25,7 +26,9 @@
 			</u-form-item>
 
 			<u-form-item prop="captcha">
-				<u-input type="text" v-model="formData.captcha" placeholder="请输入验证码" :clearable="true"></u-input>
+				<u-input type="text" v-model="formData.captcha" placeholder="请输入验证码" :clearable="true">
+					<image slot="suffix" :src="svgUrl" mode="aspectFill" @click="refreshCaptcha" style="width: 300rpx; height: 100rpx;"/>
+				</u-input>
 			</u-form-item>
 
 			<u-form-item>
@@ -40,14 +43,17 @@
 	import {
 		mapActions
 	} from 'vuex'
+	import {baseURL} from '@/config.js'
 	export default {
 		data() {
 			return {
+				svgUrl: '',
 				formData: {
 					oldPassword: '',
 					newPassword: '',
 					newPassword2: '',
-					captcha: ''
+					captcha: '',
+					token: ''
 				},
 				rules: {
 					oldPassword: [{
@@ -96,6 +102,20 @@
 		},
 		methods: {
 			...mapActions('accountModule', ['updatePassword']),
+			refreshCaptcha(){
+				uni.request({
+					url: baseURL + '/account/send-captcha',
+					method: 'GET',
+					success: (res) => {
+						console.log("res: ",res);
+						this.svgUrl = 'data:image/svg+xml;base64,' + btoa(res.data.data);
+						this.formData.token = res.data.token;
+					},
+					header: {
+						Authorization: uni.getStorageSync('token')
+					}
+				})
+			},
 			async submitChanges() {
 				try {
 					const isValid = await this.$refs.uFrom.validate();
@@ -118,7 +138,9 @@
 					} = await api.account.updatePassword({
 						email: this.$store.state.accountModule.userInfo.email,
 						oldPassword: this.formData.oldPassword,
-						newPassword: this.formData.newPassword2
+						newPassword: this.formData.newPassword2,
+						captcha: this.formData.captcha,
+						token: this.formData.token
 					});
 					if (!status) {
 						this.updatePassword(password);
@@ -143,10 +165,11 @@
 					}
 				} catch (e) {
 					console.log("e: ",e);
+					const {data: {msg}} = e
 					//TODO handle the exception
 					this.$refs.uToast.show({
 						type: 'error',
-						message: '请检查表单是否填写完整',
+						message: msg,
 						icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
 						position: 'top'
 					})
@@ -156,6 +179,20 @@
 		onReady() {
 			//如果需要兼容微信小程序，并且校验规则中含有方法等，只能通过setRules方法设置规则。
 			this.$refs.uFrom.setRules(this.rules)
+		},
+		mounted() {
+			uni.request({
+				url: baseURL + '/account/send-captcha',
+				method: 'GET',
+				success: (res) => {
+					console.log("res: ",res);
+					this.svgUrl = 'data:image/svg+xml;base64,' + btoa(res.data.data);
+					this.formData.token = res.data.token
+				},
+				header: {
+					Authorization: uni.getStorageSync('token')
+				}
+			})
 		}
 	}
 </script>

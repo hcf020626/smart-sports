@@ -9,8 +9,8 @@
 
 		<view class="cell-group">
 			<u-cell-group :border="false">
-				<u-cell icon="file-text" title="用户协议" :border="false" isLink></u-cell>
-				<u-cell icon="question" title="隐私政策" :border="false" isLink></u-cell>
+				<u-cell icon="file-text" title="用户协议" :border="false" isLink url="../user-agreement/user-agreement"></u-cell>
+				<u-cell icon="question" title="隐私政策" :border="false" isLink url="../privacy-policy/privacy-policy"></u-cell>
 			</u-cell-group>
 		</view>
 

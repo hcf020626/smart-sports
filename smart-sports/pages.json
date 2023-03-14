@@ -12,36 +12,57 @@
 				"navigationBarTitleText": "我的",
 				"enablePullDownRefresh": false
 			}
+		}, {
+			"path": "pages/auth/login/login",
+			"style": {
+				"navigationBarTitleText": "登录",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/auth/reg/reg",
+			"style": {
+				"navigationBarTitleText": "注册",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/auth/forget/forget",
+			"style": {
+				"navigationBarTitleText": "忘记密码",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/user-center/profile/profile",
+			"style": {
+				"navigationBarTitleText": "个人主页",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/user-center/settings/settings",
+			"style": {
+				"navigationBarTitleText": "设置",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/user-center/edit-profile/edit-profile",
+			"style": {
+				"navigationBarTitleText": "编辑个人资料 ",
+				"enablePullDownRefresh": false
+			}
+		}, {
+			"path": "pages/user-center/edit-password/edit-password",
+			"style": {
+				"navigationBarTitleText": "修改密码",
+				"enablePullDownRefresh": false
+			}
+
 		}
-	    ,{
-            "path" : "pages/auth/login/login",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "登录",
-                "enablePullDownRefresh": false
-            }
-            
-        }
         ,{
-            "path" : "pages/auth/reg/reg",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "注册",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/auth/forget/forget",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "忘记密码",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/auth/agreement/agreement",
+            "path" : "pages/user-center/user-agreement/user-agreement",
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "用户协议",
@@ -50,36 +71,10 @@
             
         }
         ,{
-            "path" : "pages/user-center/profile/profile",
+            "path" : "pages/user-center/privacy-policy/privacy-policy",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "个人主页",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/user-center/settings/settings",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "设置",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/user-center/edit-profile/edit-profile",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "编辑个人资料 ",
-                "enablePullDownRefresh": false
-            }
-		}
-        ,{
-            "path" : "pages/user-center/edit-password/edit-password",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "修改密码",
+                "navigationBarTitleText": "隐私政策",
                 "enablePullDownRefresh": false
             }
             
@@ -90,7 +85,7 @@
 		"selectedColor": "#3cc51f",
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
-		
+
 		"list": [{
 			"pagePath": "pages/index/index",
 			"iconPath": "static/tabBar/1-index.png",

@@ -48,7 +48,7 @@
 				<u-checkbox shape="circle" :checked="agree" @change="agreeHandler"></u-checkbox>
 			</u-checkbox-group>
 			<text>勾选代表同意</text>
-			<navigator url="./agreement/agreement" open-type="navigate">《软件用户协议》</navigator>
+			<navigator url="../../user-center/user-agreement/user-agreement" open-type="navigate">《软件用户协议》</navigator>
 		</view>
 
 	</view>
@@ -201,6 +201,7 @@
 						title: '正在获取验证码'
 					})
 
+				try{
 					const {
 						data: {
 							msg,
@@ -208,9 +209,9 @@
 							token
 						}
 					} = await api.account.sendCode(this.form.email);
-
+					
 					uni.hideLoading()
-
+					
 					if (!status) {
 						this.form.token = token;
 						this.$refs.uToast.show({
@@ -229,6 +230,15 @@
 							position: 'top'
 						})
 					}
+				}catch(e){
+					//TODO handle the exception
+					this.$refs.uToast.show({
+						type: 'error',
+						message: e.errMsg,
+						icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+						position: 'top'
+					})
+				}
 				} else {
 					uni.$u.toast('倒计时结束后再发送');
 				}

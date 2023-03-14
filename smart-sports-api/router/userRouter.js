@@ -14,8 +14,8 @@ userRouter.post('/login', require('../router_handler/userRouterHandlers').userLo
 userRouter.post('/send-verification-code', require('../router_handler/userRouterHandlers').sendVerificationCode)
 
 // 发送图形验证码
-userRouter.post('/send-captcha', require('../router_handler/userRouterHandlers').sendCaptcha)
-userRouter.post('/verify-captcha', require('../router_handler/userRouterHandlers').veryfiCaptcha)
+userRouter.get('/send-captcha', require('../router_handler/userRouterHandlers').sendCaptcha)
+userRouter.get('/verify-captcha', require('../router_handler/userRouterHandlers').veryfiCaptcha)
 
 // 保存用户信息
 userRouter.post('/saveUserInfo', require('../utils/MulterHelper').single('avatar'), require('../router_handler/userRouterHandlers').saveUserInfo)
