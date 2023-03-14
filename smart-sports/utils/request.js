@@ -18,7 +18,7 @@ http.interceptors.request.use((config) => { // 可使用async await 做异步操
   }
   
   if (config.custom.auth) {
-    config.header.token = uni.getStorageSync('token')
+	config.header.Authorization = uni.getStorageSync('token')
   }
   // if (config.custom.loading) {
   //  uni.showLoading()

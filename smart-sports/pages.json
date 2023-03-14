@@ -75,6 +75,15 @@
                 "enablePullDownRefresh": false
             }
 		}
+        ,{
+            "path" : "pages/user-center/edit-password/edit-password",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "修改密码",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"tabBar": {
 		"color": "#303133 ",

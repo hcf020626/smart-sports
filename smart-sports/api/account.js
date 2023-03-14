@@ -39,3 +39,16 @@ export function sendCode(email){
 		custom: {auth: false}
 	})
 }
+
+export function updatePassword({email, oldPassword, newPassword}){
+	return http.request({
+		method: 'POST',
+		url: '/account/updatePassword',
+		data: {
+			email,
+			oldPassword,
+			newPassword
+		},
+		custom: {auth: true}
+	})
+}

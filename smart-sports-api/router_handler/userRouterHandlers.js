@@ -6,9 +6,13 @@ const md5 = require('md5')
 const jwt = require('jwt-simple')
 //导入时间处理模块
 const moment = require('moment')
-const { fields } = require('../utils/MulterHelper')
+const {
+	fields
+} = require('../utils/MulterHelper')
 // 将 .env 文件中配置的环境变量加载到 process.env 中
 require('dotenv').config()
+// 导入生成图形验证码的模块
+const svgCaptcha = require('svg-captcha')
 
 // 发送邮箱验证码的处理函数
 exports.sendVerificationCode = (req, resp) => {
@@ -213,36 +217,44 @@ exports.userLogin = (req, resp, next) => {
 }
 
 exports.saveUserInfo = (req, resp, next) => {
-	  
-	  const {email, realname, gender, phone, idCard} = req.body;
-	  const {filename} = req.file;
-	  
-	  const avatar_url = '/account/avatars/'+filename;
-	  
-	  const sql = "update t_parents set realname=?, gender=?, phone=?, idCard=? , avatar_url=? where email=?"
-	  
-	  console.log("req.body: ",req.body);
-	  console.log("req.file: ",req.file);
-	  
-	  pool.query(sql, [realname, gender, phone, idCard, avatar_url, email], (err, results, fields)=>{
-		  if(err){
-			  return resp.json({
-				  status: 1,
-				  msg: err.message
-			  })
-		  }
-		  
-		  if(results.affectedRows !== 1){
-			  console.log("results: ",results);
-			  return resp.json({
-			  	status: 1,
-			  	msg: '保存失败，请稍后再试'
-			  })
-		  }
-		  
-		  resp.json({
-		  	status: 0,
-		  	msg: '保存成功！',
+
+	const {
+		email,
+		realname,
+		gender,
+		phone,
+		idCard
+	} = req.body;
+	const {
+		filename
+	} = req.file;
+
+	const avatar_url = '/account/avatars/' + filename;
+
+	const sql = "update t_parents set realname=?, gender=?, phone=?, idCard=? , avatar_url=? where email=?"
+
+	console.log("req.body: ", req.body);
+	console.log("req.file: ", req.file);
+
+	pool.query(sql, [realname, gender, phone, idCard, avatar_url, email], (err, results, fields) => {
+		if (err) {
+			return resp.json({
+				status: 1,
+				msg: err.message
+			})
+		}
+
+		if (results.affectedRows !== 1) {
+			console.log("results: ", results);
+			return resp.json({
+				status: 1,
+				msg: '保存失败，请稍后再试'
+			})
+		}
+
+		resp.json({
+			status: 0,
+			msg: '保存成功！',
 			data: {
 				email,
 				realname,
@@ -251,8 +263,89 @@ exports.saveUserInfo = (req, resp, next) => {
 				idCard,
 				avatar_url
 			}
-		  })
-	  })
+		})
+	})
+}
+
+exports.updatePassword = (req, resp, next)=>{
+	const {email, oldPassword, newPassword} = req.body;
+	
+	const sql = 'select * from t_parents where email=?';
+	
+	pool.query(sql, [email], (err, results, fields) => {
+		if (err) {
+			return resp.json({
+				status: 1,
+				msg: err.message
+			})
+		}
+		
+		if(results.length !== 1){
+			return resp.json({
+				status: 1,
+				msg: '查询密码失败，请稍后再试'
+			})
+		}
+		
+		if(results[0].password !== md5(md5(oldPassword) + process.env.SECRET_KEY)){
+			return resp.json({
+				status: 1,
+				msg: '旧密码填写错误，请重新输入'
+			})
+		}
+		
+		const sql = 'update t_parents set password=? where email=?';
+		const encryptedPassword = md5(md5(newPassword) + process.env.SECRET_KEY);
+		
+		pool.query(sql, [encryptedPassword, email], (err, results, fields) => {
+			if (err) {
+				return resp.json({
+					status: 1,
+					msg: err.message
+				})
+			}
+			
+			if(results.affectedRows !== 1){
+				return resp.json({
+					status: 1,
+					msg: '修改失败，请稍后再试'
+				})
+			}
+			
+			resp.json({
+				status: 0,
+				msg: '修改成功！请重新登录',
+				password: encryptedPassword
+			})
+		})
+	})
+}
+
+exports.sendCaptcha = (req, resp, next)=>{
+	const captcha = svgCaptcha.create({
+		noise: 3,
+		background: '#2b85e4'
+	})
+	
+	req.session.captcha = captcha.text.toLocaleUpperCase();
+	
+	resp.type('svg');
+	resp.status(200).send(captcha.data);
+}
+
+exports.veryfiCaptcha = (req, resp, next)=>{
+	const {captcha} = req.body;
+	if(captcha.toLocaleUpperCase() !== req.session.captcha){
+		resp.json({
+			status: 1,
+			msg: '验证码错误'
+		})
+	}else{
+		resp.json({
+			status: 0,
+			msg: '验证码正确'
+		})
+	}
 }
 
 /*

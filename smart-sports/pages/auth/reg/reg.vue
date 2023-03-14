@@ -184,6 +184,12 @@
 				} catch (err) {
 					console.error(err); // 输出错误信息
 					// 进行错误处理逻辑，比如显示错误提示信息等
+					this.$refs.uToast.show({
+						type: 'error',
+						message: '请检查表单是否填写完整',
+						icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+						position: 'top'
+					})
 				}
 			},
 			codeChange(text) {

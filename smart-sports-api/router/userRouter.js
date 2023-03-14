@@ -13,8 +13,15 @@ userRouter.post('/login', require('../router_handler/userRouterHandlers').userLo
 // 发送邮箱验证码
 userRouter.post('/send-verification-code', require('../router_handler/userRouterHandlers').sendVerificationCode)
 
+// 发送图形验证码
+userRouter.post('/send-captcha', require('../router_handler/userRouterHandlers').sendCaptcha)
+userRouter.post('/verify-captcha', require('../router_handler/userRouterHandlers').veryfiCaptcha)
+
 // 保存用户信息
 userRouter.post('/saveUserInfo', require('../utils/MulterHelper').single('avatar'), require('../router_handler/userRouterHandlers').saveUserInfo)
+
+//修改用户密码
+userRouter.post('/updatePassword', require('../router_handler/userRouterHandlers').updatePassword)
 
 // 向外导出路由对象
 module.exports = userRouter

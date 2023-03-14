@@ -2,7 +2,7 @@
 	<view class="container">
 		<!-- 消息提示组件，用于提示用户在登录时碰到的问题 -->
 		<u-toast ref="uToast"></u-toast>
-		
+
 		<!--
 			通过model参数绑定一个对象，这个对象的属性为各个u-form-item内组件的对应变量；
 			由于表单验证和绑定表单规则时，需要通过ref操作，故这里需要给form组件声明ref="uForm"属性。
@@ -42,7 +42,10 @@
 </template>
 
 <script>
-	import {mapState, mapActions} from 'vuex'
+	import {
+		mapState,
+		mapActions
+	} from 'vuex'
 	import {
 		baseURL
 	} from '@/config.js'
@@ -133,65 +136,69 @@
 			async saveUserInfo() {
 				try {
 					const isValid = await this.$refs.uForm.validate();
-					if (isValid) {
-						
-						try {
-							const res = await new Promise((resolve, reject) => {
-								uni.uploadFile({
-									url: baseURL + '/account/saveUserInfo',
-									header: {
-										'Authorization': this.token
-									},
-									filePath: this.form.avatarUrl,
-									name: 'avatar',
-									method: 'POST',
-									formData: {
-										email: this.userInfo.email,
-										realname: this.form.realname,
-										gender: this.form.gender,
-										phone: this.form.phone,
-										idCard: this.form.idCard
-									},
-									success: resolve,
-									fail: reject,
-								});
+
+					if (!isValid) {
+						return this.$refs.uToast.show({
+							type: 'error',
+							message: '请检查表单是否填写完整',
+							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+							position: 'top'
+						})
+					}
+
+					try {
+						const res = await new Promise((resolve, reject) => {
+							uni.uploadFile({
+								url: baseURL + '/account/saveUserInfo',
+								header: {
+									'Authorization': this.token
+								},
+								filePath: this.form.avatarUrl,
+								name: 'avatar',
+								method: 'POST',
+								formData: {
+									email: this.userInfo.email,
+									realname: this.form.realname,
+									gender: this.form.gender,
+									phone: this.form.phone,
+									idCard: this.form.idCard
+								},
+								success: resolve,
+								fail: reject,
 							});
-							
-							
-							const {msg, status, data} = JSON.parse(res.data)
-							
-							if (!status) {
-								// 请求成功，更新本地用户信息
-								this.updateUser(data)
-								// 弹出保存成功的提示框
-								this.$refs.uToast.show({
-									type: 'success',
-									message: msg,
-									icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
-									position: 'top'
-								})
-							} else {
-								console.log('here in error');
-								this.$refs.uToast.show({
-									type: 'error',
-									message: msg,
-									icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-									position: 'top'
-								})
-							}
-						} catch (err) {
-							console.log("err: ", err);
+						});
+
+
+						const {
+							msg,
+							status,
+							data
+						} = JSON.parse(res.data)
+
+						if (!status) {
+							// 请求成功，更新本地用户信息
+							this.updateUser(data)
+							// 弹出保存成功的提示框
+							this.$refs.uToast.show({
+								type: 'success',
+								message: msg,
+								icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
+								position: 'top'
+							})
+						} else {
+							console.log('here in error');
 							this.$refs.uToast.show({
 								type: 'error',
-								message: '请求失败，请重试',
+								message: msg,
 								icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
 								position: 'top'
 							})
 						}
-					} else {
+					} catch (err) {
+						console.log("err: ", err);
 						this.$refs.uToast.show({
 							type: 'error',
-							message: '请检查表单是否填写完整',
+							message: '请求失败，请重试',
 							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
 							position: 'top'
 						})
@@ -207,11 +214,11 @@
 			}
 		},
 		created() {
-			this.$nextTick(()=>{
+			this.$nextTick(() => {
 				this.form.realname = this.userInfo.realname;
 				this.form.gender = this.userInfo.gender;
 				this.form.phone = this.userInfo.phone;
-				this.form.idCard = this.userInfo.idCard;
+				this.form.idCard = this.userInfo.idcard;
 				this.form.avatarUrl = baseURL + this.userInfo.avatar_url;
 			})
 		},
@@ -222,7 +229,7 @@
 	}
 </script>
 
-<style>
+<style scoped>
 	.container {
 		width: 100vw;
 		height: 100vh;

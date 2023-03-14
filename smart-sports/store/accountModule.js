@@ -11,7 +11,10 @@ export default {
 		},
 		updateUser(context, value){
 			context.commit('UPDATE_USER', value)
-		}
+		},
+		updatePassword(context, value){
+			context.commit('UPDATE_PASSWORD', value)
+		},
 	},
 	mutations: {
 		//mutations中的方法一般大写，用于区分actions中的方法。
@@ -34,6 +37,10 @@ export default {
 			state.userInfo.phone = phone;
 			state.userInfo.avatar_url = avatar_url;
 			uni.setStorageSync('userInfo', JSON.stringify(state.userInfo))
+		},
+		UPDATE_PASSWORD(state, value){
+			state.userInfo.password = value;
+			uni.setStorageSync('userInfo', JSON.stringify(state.userInfo));
 		}
 	},
 	getters: {},
