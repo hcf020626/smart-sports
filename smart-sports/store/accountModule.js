@@ -1,3 +1,5 @@
+import {baseURL} from '../config.js'
+
 export default {
 	namespaced:true,//开启命名空间
 	actions: {
@@ -43,7 +45,11 @@ export default {
 			uni.setStorageSync('userInfo', JSON.stringify(state.userInfo));
 		}
 	},
-	getters: {},
+	getters: {
+		fullAvatarURL(state){
+			return baseURL + state.userInfo.avatar_url
+		}
+	},
 	state: {
 		token: uni.getStorageSync('token'),
 		userInfo: JSON.parse(uni.getStorageSync('userInfo') || '{}')

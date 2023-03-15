@@ -34,20 +34,6 @@
 			}
 
 		}, {
-			"path": "pages/user-center/profile/profile",
-			"style": {
-				"navigationBarTitleText": "个人主页",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
-			"path": "pages/user-center/settings/settings",
-			"style": {
-				"navigationBarTitleText": "设置",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
 			"path": "pages/user-center/edit-profile/edit-profile",
 			"style": {
 				"navigationBarTitleText": "编辑个人资料 ",
@@ -75,6 +61,15 @@
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "隐私政策",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/user-center/about/about",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "关于",
                 "enablePullDownRefresh": false
             }
             
