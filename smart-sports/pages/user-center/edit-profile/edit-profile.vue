@@ -28,13 +28,14 @@
 				</u-input>
 			</u-form-item>
 			<u-form-item label="身份证号" prop="idCard" borderBottom>
-				<u-input type="idcard" v-model="form.idCard" border="none" placeholder="请输入身份证号码" inputAlign="right">
+				<u-input type="idcard" v-model="form.idCard" border="none" placeholder="请输入身份证号码" disabled disabledColor="whitesmoke" color="#909399" inputAlign="right">
 				</u-input>
 			</u-form-item>
 			<u-form-item>
 				<u-button type="primary" @click="saveUserInfo">保存</u-button>
 			</u-form-item>
 		</u-form>
+		
 		<u-action-sheet :actions="actionList" :closeOnClickOverlay="false" :closeOnClickAction="true"
 			@select="selectGender" @close="isShowActionSheet=false" :show="isShowActionSheet" cancelText="取消">
 		</u-action-sheet>
@@ -44,7 +45,8 @@
 <script>
 	import {
 		mapState,
-		mapActions
+		mapActions,
+		mapGetters
 	} from 'vuex'
 	import {
 		baseURL
@@ -100,25 +102,12 @@
 							trigger: ['change', 'blur'],
 						}
 					],
-					idCard: [{
-							required: true,
-							trigger: ['change', 'blur'],
-						},
-						{
-							// 自定义验证函数
-							validator: (rule, value, callback) => {
-								// 返回true表示校验通过，返回false表示不通过
-								return uni.$u.test.idCard(value);
-							},
-							// 触发器可以同时用blur和change
-							trigger: ['change', 'blur'],
-						}
-					]
 				}
 			}
 		},
 		computed: {
-			...mapState('accountModule', ['userInfo', 'token'])
+			...mapState('accountModule', ['userInfo', 'token']),
+			...mapGetters('accountModule', ['fullAvatarURL'])
 		},
 		methods: {
 			...mapActions('accountModule', ['updateUser']),
@@ -186,7 +175,6 @@
 								position: 'top'
 							})
 						} else {
-							console.log('here in error');
 							this.$refs.uToast.show({
 								type: 'error',
 								message: msg,
@@ -214,13 +202,11 @@
 			}
 		},
 		created() {
-			this.$nextTick(() => {
-				this.form.realname = this.userInfo.realname;
-				this.form.gender = this.userInfo.gender;
-				this.form.phone = this.userInfo.phone;
-				this.form.idCard = this.userInfo.idcard;
-				this.form.avatarUrl = baseURL + this.userInfo.avatar_url;
-			})
+			this.form.realname = this.userInfo.realname;
+			this.form.gender = this.userInfo.gender;
+			this.form.phone = this.userInfo.phone;
+			this.form.idCard = this.userInfo.idcard;
+			this.form.avatarUrl = this.fullAvatarURL;
 		},
 		onReady() {
 			//如果需要兼容微信小程序，并且校验规则中含有方法等，只能通过setRules方法设置规则。

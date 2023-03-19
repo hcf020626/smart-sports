@@ -51,7 +51,7 @@ export default {
 		}
 	},
 	state: {
-		token: uni.getStorageSync('token'),
+		token: uni.getStorageSync('token') || '',
 		userInfo: JSON.parse(uni.getStorageSync('userInfo') || '{}')
 	}
 }

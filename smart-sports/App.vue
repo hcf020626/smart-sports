@@ -26,4 +26,10 @@
 	.cell-hover-class {
 		opacity: 0.7;
 	}
+	
+	// 引入首页的字体图标
+	@import url('@/static/indexIcons/physicalTestIcons/iconfont.css');
+	@import url('@/static/indexIcons/commonIcons/iconfont.css');
+	// 引入我的页面的字体图标
+	@import url('@/static/userCenterIcons/iconfont.css');
 </style>
