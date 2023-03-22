@@ -68,13 +68,6 @@
 			}
 
 		}, {
-			"path": "pages/circle/circle",
-			"style": {
-				"navigationBarTitleText": "圈子",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
 			"path": "pages/user-center/authentification/authentification",
 			"style": {
 				"navigationBarTitleText": "身份认证",
@@ -178,12 +171,6 @@
 				"iconPath": "static/tabBar/1-index.png",
 				"selectedIconPath": "static/tabBar/1-index-selected.png",
 				"text": "首页"
-			},
-			{
-				"pagePath": "pages/circle/circle",
-				"iconPath": "static/tabBar/3-circle.png",
-				"selectedIconPath": "static/tabBar/3-circle-selected.png",
-				"text": "圈子"
 			}, {
 				"pagePath": "pages/user-center/user-center",
 				"iconPath": "static/tabBar/2-user-center.png",
