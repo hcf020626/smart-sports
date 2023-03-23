@@ -1,7 +1,6 @@
 import http from '@/utils/request.js'
 
 export function login ({email, password}){
-	console.log('here in login');
 	return http.request({
 		method: 'POST',
 		url: '/account/login',

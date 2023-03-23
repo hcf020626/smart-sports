@@ -369,7 +369,7 @@ exports.sendCaptcha = (req, resp, next) => {
 	});
 }
 
-exports.veryfiCaptcha = (req, resp, next) => {
+exports.verifyCaptcha = (req, resp, next) => {
 	const {
 		captcha
 	} = req.body;
@@ -384,6 +384,10 @@ exports.veryfiCaptcha = (req, resp, next) => {
 			msg: '验证码正确'
 		})
 	}
+}
+
+exports.verifyAndSaveIdCard = (req, resp, next) => {
+	
 }
 
 /*

@@ -7,7 +7,7 @@
 			通过model参数绑定一个对象，这个对象的属性为各个u-form-item内组件的对应变量；
 			由于表单验证和绑定表单规则时，需要通过ref操作，故这里需要给form组件声明ref="uForm"属性。
 		 -->
-		<u-form :model="form" ref="uForm" labelPosition="left" labelWidth="70" :labelStyle="{fontSize:'40rpx'}"
+		<u-form :model="form" ref="uForm" labelPosition="left" labelWidth="70" :labelStyle="{fontSize:'30rpx'}"
 			errorType="border-bottom">
 			<!-- 
 				prop为传入Form组件的rules中的属性字段

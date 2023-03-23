@@ -6,7 +6,7 @@
 			<u-subsection :list="subsection.list" mode="button" :current="subsection.current" @change="sectionChange"
 				activeColor="mediumslateblue"></u-subsection>
 		</view>
-		<!-- 在 content 部分 -->
+		<!-- content 部分 -->
 		<view class="content">
 			<!-- 如果 subsection.current 为 0，渲染最新页面，该页面包含了一个数据区域和一个图表区域 -->
 			<view class="latest" v-if="!subsection.current">
@@ -28,7 +28,7 @@
 			<!-- 如果 subsection.current 为 1，渲染历史页面。 -->
 			<view class="history" v-else>
 				<view class="charts-area">
-					<view style="width: 100%;">
+					<view style="width: 100%; margin-top: 30rpx;">
 						<l-echart ref="chart2" @finished="init2"></l-echart>
 					</view>
 				</view>
@@ -50,15 +50,17 @@
 					list: ['最新', '历史'],
 					current: 0
 				},
-				height: 168.0,
+				height: ((Math.random() * 20) + 155).toFixed(2),
 				age: 15,
 				gender: "男",
 				date: '2023年3月20日',
-				option: {}
+				option1: {},
+				option2: {}
 			}
 		},
 		created() {
-			this.initOption()
+			this.initOption1();
+			this.initOption2();
 		},
 		methods: {
 			sectionChange(index) {
@@ -67,9 +69,9 @@
 			async init1() {
 				// init 是 echarts 初始化调用函数,第一个参数是传入echarts,第二个参数是回调函数，回调函数的参数是 chart 实例
 				const chart1 = await this.$refs.chart1.init(echarts);
-				chart1.setOption(this.option)
+				chart1.setOption(this.option1)
 			},
-			initOption() {
+			initOption1() {
 				let height = this.height;
 				const heightData = heightRefTable[this.gender][this.age - 1]
 				let rate;
@@ -86,7 +88,7 @@
 					rate = 1
 				}
 
-				this.option = {
+				this.option1 = {
 					series: [{
 						type: 'gauge',
 						startAngle: 180,
@@ -167,6 +169,84 @@
 						}]
 					}]
 				}
+			},
+			async init2() {
+				// init 是 echarts 初始化调用函数,第一个参数是传入echarts,第二个参数是回调函数，回调函数的参数是 chart 实例
+				const chart2 = await this.$refs.chart2.init(echarts);
+				chart2.setOption(this.option2)
+			},
+			initOption2() {
+				let fakeData1 = [];
+				for (let i = 0; i < 7; i++) {
+				  fakeData1.push(((Math.random() * 20) + 155).toFixed(1));
+				}
+				
+				let fakeData2 = [];
+				for (let i = 0; i < 7; i++) {
+				  fakeData2.push(((Math.random() * 10) + 160).toFixed(1));
+				}
+				
+				this.option2 = {
+					tooltip: {
+						trigger: 'axis',
+						axisPointer: {
+							// 显示提示框上的日期
+							label: {
+								show: true
+							}
+						},
+						formatter: function(params) {
+							var result = params[0].name + '\n';
+							for (var i = 0, l = params.length; i < l; i++) {
+								var series = params[i];
+								result += series.marker + series.seriesName + ' : ' + series.value + 'cm';
+								// 添加了一个条件语句来检查是否为最后一个系列，如果不是，则添加一个换行符。这样就可以确保最后没有多余的换行符了。
+								if (i !== l - 1) {
+									result += '\n';
+								}
+							}
+							return result;
+						}
+					},
+					legend: {
+						data: ['班级平均身高', '您孩子的身高']
+					},
+					grid: {
+						left: '3%',
+						right: '4%',
+						bottom: '3%',
+						containLabel: true
+					},
+					xAxis: {
+						type: 'category',
+						data: ['2022年03月01日', '2023年6月20日', '2023年9月10日', '202年12月20日', '2023年01月12日', '2023年02月06日',
+							'2023年3月20日'
+						],
+						axisLabel: {
+							// 隐藏 x 轴上的日期
+							show: false
+						}
+					},
+					yAxis: {
+						type: 'value',
+						min: 60,
+						max: 190,
+						axisLabel: {
+							formatter: '{value} cm',
+						},
+					},
+					series: [{
+							name: '班级平均身高',
+							type: 'line',
+							data: fakeData2,
+						},
+						{
+							name: '您孩子的身高',
+							type: 'line',
+							data: fakeData1
+						},
+					]
+				};
 			}
 		}
 	}
@@ -219,5 +299,10 @@
 		color: $u-tips-color;
 	}
 
-	.latest>.charts-area {}
+	.latest>.charts-area {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
 </style>

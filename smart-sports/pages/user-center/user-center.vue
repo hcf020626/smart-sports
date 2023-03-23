@@ -30,8 +30,6 @@
 					<uni-icons slot="icon" customPrefix="iconfont" type="icon-guanyuwomen" color="mediumslateblue" size="20">
 					</uni-icons>
 				</u-cell>
-			</u-cell-group>
-			<u-cell-group :border="false">
 				<u-cell title="退出登录" :border="false" isLink @click="showModal">
 					<uni-icons slot="icon" customPrefix="iconfont" type="icon-tuichudenglu" color="mediumslateblue" size="20">
 					</uni-icons>
@@ -153,7 +151,7 @@
 	}
 	
 	.grid-item:active {
-		opacity: 0.7;
+		opacity: 0.5;
 	}
 
 	.cell-group {
