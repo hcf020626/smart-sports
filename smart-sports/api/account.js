@@ -1,5 +1,6 @@
 import http from '@/utils/request.js'
 
+// 用户登录
 export function login ({email, password}){
 	return http.request({
 		method: 'POST',
@@ -13,6 +14,7 @@ export function login ({email, password}){
 	})
 }
 
+// 用户注册
 export function reg ({email, password, code, token}){
 	return http.request({
 		method: 'POST',
@@ -28,6 +30,7 @@ export function reg ({email, password, code, token}){
 	})
 }
 
+// 发送邮箱验证码
 export function sendCode(email){
 	return http.request({
 		method: 'POST',
@@ -40,16 +43,30 @@ export function sendCode(email){
 	})
 }
 
+// 修改密码
 export function updatePassword({email, oldPassword, newPassword, captcha, token}){
 	return http.request({
 		method: 'POST',
-		url: '/account/updatePassword',
+		url: '/account/update-password',
 		data: {
 			email,
 			oldPassword,
 			newPassword,
 			captcha,
 			token
+		},
+		custom: {auth: true}
+	})
+}
+
+// 换绑
+export function changeBonding({email, id}){
+	return http.request({
+		method: 'POST',
+		url: '/account/change-bonding',
+		data: {
+			email,
+			id
 		},
 		custom: {auth: true}
 	})

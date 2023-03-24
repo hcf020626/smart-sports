@@ -1,11 +1,11 @@
 import http from '@/utils/request.js'
 
-export function getStudentsBasicInfo({email}){
+export function getStudentsByIdcard(idcard){
 	return http.request({
 		method: 'POST',
-		url: '/student/getStudentsBasicInfo',
+		url: '/student/get-students-by-idcard',
 		data: {
-			email
+			idcard
 		},
 		custom: {auth: true}
 	})

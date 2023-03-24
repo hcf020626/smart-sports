@@ -3,7 +3,7 @@ const express = require('express')
 // 创建 express 的服务器实例
 const app = express()
 
-// 导解决跨域资源共享（Cross Origin Resource Sharing，简称 cors）的中间件
+// 导入解决跨域资源共享（Cross Origin Resource Sharing，简称 cors）的中间件
 const cors = require('cors')
 // 将 cors 注册为全局中间件
 app.use(cors())
@@ -13,6 +13,7 @@ app.use('/account/avatars',express.static('uploads/avatars'))
 app.use('/student/avatars',express.static('static/student/avatars'))
 app.use('/account',express.static('pages'))
 
+// 使用中间件记录请求的方法和路径
 app.use((req, resp, next)=>{
 	console.log(req.method, req.path);
 	next()

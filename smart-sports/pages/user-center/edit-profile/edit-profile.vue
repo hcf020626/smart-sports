@@ -138,7 +138,7 @@
 					try {
 						const res = await new Promise((resolve, reject) => {
 							uni.uploadFile({
-								url: baseURL + '/account/saveUserInfo',
+								url: baseURL + '/account/save-user-info',
 								header: {
 									'Authorization': this.token
 								},

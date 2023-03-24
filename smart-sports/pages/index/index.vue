@@ -2,15 +2,15 @@
 	<view class="container">
 		<view class="card">
 			<view class="avatar">
-				<u-avatar :src="cardInfo.imgSrc" size="60"></u-avatar>
+				<u-avatar :src="studentInfo.imgSrc" size="60"></u-avatar>
 			</view>
 			<view class="studentInfo">
-				<view>姓名：{{cardInfo.studentName}}</view>
-				<view>性别：{{cardInfo.studentGender}}</view>
-				<view>年龄：{{cardInfo.studentAge}}</view>
-				<view>学校：{{cardInfo.studentSchool}}</view>
-				<view>班级：{{cardInfo.studentClass}}</view>
-				<view>学号：{{cardInfo.studentID}}</view>
+				<view>姓名：{{studentInfo.name}}</view>
+				<view>性别：{{studentInfo.gender}}</view>
+				<view>年龄：{{studentInfo.age}}</view>
+				<view>学校：{{studentInfo.school}}</view>
+				<view>班级：{{studentInfo.className}}</view>
+				<view>学号：{{studentInfo.id}}</view>
 			</view>
 		</view>
 		
@@ -28,19 +28,10 @@
 </template>
 
 <script>
-	import {baseURL} from '@/config.js'
+	import {mapState, mapActions} from 'vuex'
 	export default {
 		data() {
 			return {
-				cardInfo: {
-					imgSrc: '',
-					studentName: '',
-					studentGender: '',
-					studentAge: '',
-					studentSchool: '',
-					studentClass: '',
-					studentID: ''
-				},
 				gridItems: [{
 					iconName: 'icon-ceshengao',
 					iconColor: '#2b85e4 ',
@@ -71,15 +62,10 @@
 				})
 			}
 		},
-		mounted(){
-			this.cardInfo.imgSrc = baseURL + '/student/avatars/' + (Math.floor(Math.random() * 18) + 1) + '.png'
-			this.cardInfo.studentName = '张小蛋'
-			this.cardInfo.studentGender = '男'
-			this.cardInfo.studentAge = 15
-			this.cardInfo.studentSchool = '衡阳市第一中学'
-			this.cardInfo.studentClass = '高一二班'
-			this.cardInfo.studentID = '20190440614'
-		}
+		computed: {
+			// 获取用户信息
+			...mapState('studentModule', ['studentInfo']),
+		},
 	}
 </script>
 

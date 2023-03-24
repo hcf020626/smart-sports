@@ -151,42 +151,54 @@
 						})
 					}
 
-					const {
-						data: {
-							msg,
-							status
+					try{
+						const {
+							data: {
+								msg,
+								status
+							}
+						} = await api.account.reg({
+							email: this.form.email,
+							password: this.form.password2,
+							code: this.form.code,
+							token: this.form.token
+						});
+						
+						if (!status) {
+							this.$refs.uToast.show({
+								type: 'success',
+								message: msg,
+								icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
+								position: 'top'
+							})
+						
+							// 清空表单元素的值和错误提示
+							this.$refs.uForm.resetFields();
+						} else {
+							this.$refs.uToast.show({
+								type: 'error',
+								message: msg,
+								icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+								position: 'top'
+							})
 						}
-					} = await api.account.reg({
-						email: this.form.email,
-						password: this.form.password2,
-						code: this.form.code,
-						token: this.form.token
-					});
-
-					if (!status) {
-						this.$refs.uToast.show({
-							type: 'success',
-							message: msg,
-							icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
-							position: 'top'
-						})
-
-						// 清空表单元素的值和错误提示
-						this.$refs.uForm.resetFields();
-					} else {
+					}catch(e){
+						console.log("e: ",e);
+						//TODO handle the exception
 						this.$refs.uToast.show({
 							type: 'error',
-							message: msg,
+							message: '注册发生异常，请稍后再试',
 							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
 							position: 'top'
 						})
 					}
+					
 				} catch (err) {
 					console.error(err); // 输出错误信息
 					// 进行错误处理逻辑，比如显示错误提示信息等
 					this.$refs.uToast.show({
 						type: 'error',
-						message: '请检查表单是否填写完整',
+						message: '请检查表单是否填写完整且正确',
 						icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
 						position: 'top'
 					})

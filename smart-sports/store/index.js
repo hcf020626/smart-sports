@@ -6,11 +6,13 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 import accountModule from './accountModule.js'
+import studentModule from './studentModule.js'
 
 //创建 store 对象
 const store =  new Vuex.Store({
 	modules: {
-		accountModule
+		accountModule,
+		studentModule
 	}
 })
 

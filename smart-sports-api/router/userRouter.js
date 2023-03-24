@@ -4,26 +4,28 @@ const express = require('express')
 // 创建路由对象
 const userRouter = express.Router()
 
-// 用户注册
-userRouter.post('/reg', require('../router_handler/userRouterHandlers').userReg)
-
 // 用户登录
 userRouter.post('/login', require('../router_handler/userRouterHandlers').userLogin)
+
+// 用户注册
+userRouter.post('/reg', require('../router_handler/userRouterHandlers').userReg)
 
 // 发送邮箱验证码
 userRouter.post('/send-verification-code', require('../router_handler/userRouterHandlers').sendVerificationCode)
 
 // 发送图形验证码
 userRouter.get('/send-captcha', require('../router_handler/userRouterHandlers').sendCaptcha)
-userRouter.get('/verify-captcha', require('../router_handler/userRouterHandlers').verifyCaptcha)
 
 // 保存用户信息
-userRouter.post('/saveUserInfo', require('../utils/MulterHelper').single('avatar'), require('../router_handler/userRouterHandlers').saveUserInfo)
+userRouter.post('/save-user-info', require('../utils/MulterHelper').single('avatar'), require('../router_handler/userRouterHandlers').saveUserInfo)
 
 userRouter.post('/verify-and-save-idcard', require('../router_handler/userRouterHandlers').verifyAndSaveIdCard)
 
 //修改用户密码
-userRouter.post('/updatePassword', require('../router_handler/userRouterHandlers').updatePassword)
+userRouter.post('/update-password', require('../router_handler/userRouterHandlers').updatePassword)
+
+// 换绑
+userRouter.post('/change-bonding', require('../router_handler/userRouterHandlers').changeBonding)
 
 
 

@@ -17,6 +17,9 @@ export default {
 		updatePassword(context, value){
 			context.commit('UPDATE_PASSWORD', value)
 		},
+		updateBonding(context, value){
+			context.commit('UPDATE_BONDING', value)
+		},
 	},
 	mutations: {
 		//mutations中的方法一般大写，用于区分actions中的方法。
@@ -42,6 +45,10 @@ export default {
 		},
 		UPDATE_PASSWORD(state, value){
 			state.userInfo.password = value;
+			uni.setStorageSync('userInfo', JSON.stringify(state.userInfo));
+		},
+		UPDATE_BONDING(state, value){
+			state.userInfo.cur_bonding_id = value;
 			uni.setStorageSync('userInfo', JSON.stringify(state.userInfo));
 		}
 	},

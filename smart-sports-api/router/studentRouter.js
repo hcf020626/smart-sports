@@ -4,9 +4,8 @@ const express = require('express')
 // 创建路由对象
 const studentRouter = express.Router()
 
-studentRouter.post('/test', (req, resp, next) => {
-	resp.send('studentRouter ok!')
-})
+// 根据家长的身份证号拿到学生的信息
+studentRouter.post('/get-students-by-idcard', require('../router_handler/studentRouterHandlers').getStudentsByIdcard)
 
 // 向外导入路由对象
 module.exports = studentRouter

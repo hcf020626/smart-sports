@@ -14,68 +14,55 @@ require('dotenv').config()
 // 导入生成图形验证码的模块
 const svgCaptcha = require('svg-captcha')
 
-// 发送邮箱验证码的处理函数
-exports.sendVerificationCode = (req, resp) => {
+// 用户登录的处理函数
+exports.userLogin = (req, resp, next) => {
+	// 接收表单数据：
+	const user = req.body;
 
-	try {
-		// 接收表单数据
-		const email = req.body.email;
-
-		const {
-			transporter,
-			generateVerificationCode
-		} = require('../utils/MailTransporter')
-
-		// 生成验证码
-		const code = generateVerificationCode()
-
-		// 将 email 和 code 进行加密保存到 token 中
-		const token = jwt.encode({
-			email,
-			code,
-			exp: Date.now() + 120000
-		}, process.env.SECRET_KEY);
-		console.log("code: ", code);
-
-		resp.status(200).json({
-			status: 0,
-			msg: '验证码已发送',
-			token
-		})
-	} catch (e) {
-		console.log("e: ", e);
-		resp.status(500).json({
+	//判断邮箱和密码是否为空
+	if (user.email === '' || user.password === '') {
+		return resp.json({
 			status: 1,
-			msg: '服务器发生错误，验证码发送失败'
+			msg: '邮箱或密码不能为空'
 		})
 	}
 
-	// // 填写一封邮件
-	// const mailOptions = {
-	// 	from: process.env.QQ_EMAIL,
-	// 	to: email,
-	// 	subject: '智慧体育平台注册验证码',
-	// 	text: `你的验证码是 ${code}`
-	// }
+	const sql = 'select * from t_parents where email=?'
+	pool.query(sql, [user.email], (err, results, fields) => {
+		// sql 语句执行出错
+		if (err) {
+			return resp.json({
+				status: 1,
+				msg: err.message
+			})
+		}
 
-	// // 发送邮件
-	// transporter.sendMail(mailOptions, (error, info) => {
-	// 	if (error) {
-	// 		console.log(error);
-	// 		resp.json({
-	// 			status: 1,
-	// 			msg: '服务器故障，邮件发送失败：' + error 
-	// 		})
-	// 	} else {
-	// 		console.log('Email sent: ' + info.response);
-	// 		// 发送成功，则将验证码保存到 Session 中
-	// 		req.session.code = code
-	// 		resp.json({
-	// 			status: 0,
-	// 			msg: '验证码已发送'
-	// 		})
-	// 	}
-	// })
+		//执行 SQL 语句成功，但是查询到数据条数不等于 1
+		if (results.length !== 1) {
+			return resp.json({
+				status: 1,
+				msg: '用户不存在'
+			})
+		}
+
+		// 判断用户输入的登录密码是否和数据库中的密码一致
+		if (md5(md5(user.password) + process.env.SECRET_KEY) !== results[0].password) {
+			return resp.json({
+				status: 1,
+				msg: '邮箱或密码错误'
+			})
+		}
+
+		resp.json({
+			status: 0,
+			msg: '登录成功!',
+			data: results[0],
+			// 为了方便客户端使用 Token，在服务器端直接拼接上 Bearer 的前缀
+			token: 'Bearer ' + jwt.encode(results[0].email, process.env.SECRET_KEY)
+		})
+
+	})
+
 }
 
 // 用户注册的处理函数
@@ -165,55 +152,68 @@ exports.userReg = (req, resp, next) => {
 	}
 }
 
-// 用户登录的处理函数
-exports.userLogin = (req, resp, next) => {
-	// 接收表单数据：
-	const user = req.body;
+// 发送邮箱验证码的处理函数
+exports.sendVerificationCode = (req, resp) => {
 
-	//判断邮箱和密码是否为空
-	if (user.email === '' || user.password === '') {
-		return resp.json({
+	try {
+		// 接收表单数据
+		const email = req.body.email;
+
+		const {
+			transporter,
+			generateVerificationCode
+		} = require('../utils/MailTransporter')
+
+		// 生成验证码
+		const code = generateVerificationCode()
+
+		// 将 email 和 code 进行加密保存到 token 中
+		const token = jwt.encode({
+			email,
+			code,
+			exp: Date.now() + 120000
+		}, process.env.SECRET_KEY);
+		console.log("code: ", code);
+
+		resp.status(200).json({
+			status: 0,
+			msg: '验证码已发送',
+			token
+		})
+	} catch (e) {
+		console.log("e: ", e);
+		resp.status(500).json({
 			status: 1,
-			msg: '邮箱或密码不能为空'
+			msg: '服务器发生错误，验证码发送失败'
 		})
 	}
 
-	const sql = 'select * from t_parents where email=?'
-	pool.query(sql, [user.email], (err, results, fields) => {
-		// sql 语句执行出错
-		if (err) {
-			return resp.json({
-				status: 1,
-				msg: err.message
-			})
-		}
+	// // 填写一封邮件
+	// const mailOptions = {
+	// 	from: process.env.QQ_EMAIL,
+	// 	to: email,
+	// 	subject: '智慧体育平台注册验证码',
+	// 	text: `你的验证码是 ${code}`
+	// }
 
-		//执行 SQL 语句成功，但是查询到数据条数不等于 1
-		if (results.length !== 1) {
-			return resp.json({
-				status: 1,
-				msg: '用户不存在'
-			})
-		}
-
-		// 判断用户输入的登录密码是否和数据库中的密码一致
-		if (md5(md5(user.password) + process.env.SECRET_KEY) !== results[0].password) {
-			return resp.json({
-				status: 1,
-				msg: '邮箱或密码错误'
-			})
-		}
-
-		resp.json({
-			status: 0,
-			msg: '登录成功!',
-			data: results[0],
-			// 为了方便客户端使用 Token，在服务器端直接拼接上 Bearer 的前缀
-			token: 'Bearer ' + jwt.encode(results[0].email, process.env.SECRET_KEY)
-		})
-
-	})
-
+	// // 发送邮件
+	// transporter.sendMail(mailOptions, (error, info) => {
+	// 	if (error) {
+	// 		console.log(error);
+	// 		resp.json({
+	// 			status: 1,
+	// 			msg: '服务器故障，邮件发送失败：' + error 
+	// 		})
+	// 	} else {
+	// 		console.log('Email sent: ' + info.response);
+	// 		// 发送成功，则将验证码保存到 Session 中
+	// 		req.session.code = code
+	// 		resp.json({
+	// 			status: 0,
+	// 			msg: '验证码已发送'
+	// 		})
+	// 	}
+	// })
 }
 
 exports.saveUserInfo = (req, resp, next) => {
@@ -232,9 +232,6 @@ exports.saveUserInfo = (req, resp, next) => {
 	const avatar_url = '/account/avatars/' + filename;
 
 	const sql = "update t_parents set realname=?, gender=?, phone=?, idCard=? , avatar_url=? where email=?"
-
-	console.log("req.body: ", req.body);
-	console.log("req.file: ", req.file);
 
 	pool.query(sql, [realname, gender, phone, idCard, avatar_url, email], (err, results, fields) => {
 		if (err) {
@@ -369,21 +366,31 @@ exports.sendCaptcha = (req, resp, next) => {
 	});
 }
 
-exports.verifyCaptcha = (req, resp, next) => {
-	const {
-		captcha
-	} = req.body;
-	if (captcha.toLocaleUpperCase() !== req.session.captcha) {
-		resp.json({
-			status: 1,
-			msg: '验证码错误'
-		})
-	} else {
+exports.changeBonding = (req, resp, next) => {
+	const {email, id} = req.body;
+	const sql = 'update t_parents set cur_bonding_id=? where email=?';
+	
+	pool.query(sql, [id, email], (err, results, fields)=>{
+		//执行 sql 语句失败
+		if (err) {
+			return resp.json({
+				status: 1,
+				msg: err.message
+			})
+		}
+		
+		if(results.affectedRows !== 1){
+			return resp.json({
+				status: 1,
+				msg: '绑定失败，请稍后再试'
+			})
+		}
+		
 		resp.json({
 			status: 0,
-			msg: '验证码正确'
+			msg: '绑定成功！',
 		})
-	}
+	})
 }
 
 exports.verifyAndSaveIdCard = (req, resp, next) => {

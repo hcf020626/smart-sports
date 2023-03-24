@@ -83,13 +83,19 @@
 		},
 		methods: {
 			...mapActions('accountModule', ['userLogin']),
-			loginHandler() {
-				this.$refs.uForm.validate().then(res => {
-					console.log('登录验证通过');
-					api.account.login({
-						email: this.form.email,
-						password: this.form.password
-					}).then(res => {
+			async loginHandler() {
+				try{
+					const isValid = await this.$refs.uForm.validate();
+					if(!isValid){
+						return this.$refs.uToast.show({
+							type: 'error',
+							message: '表单校验失败，请正确填写表单的每一项',
+							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+							position: 'top'
+						})
+					}
+					
+					try{
 						const {
 							data: {
 								status,
@@ -97,7 +103,11 @@
 								data,
 								token
 							}
-						} = res;
+						} = await api.account.login({
+							email: this.form.email,
+							password: this.form.password
+						});
+						
 						if (!status) {
 							// 将用户信息和 token 保存到Vuex和本地存储中
 							this.userLogin({
@@ -125,18 +135,28 @@
 								position: 'top'
 							})
 						}
-					}).catch((err) => {
-						// 弹出登录失败的提示框
+					}catch(e){
+						//TODO handle the exception
+						console.log("e: ",e);
 						this.$refs.uToast.show({
 							type: 'error',
-							message: err.errMsg,
+							message: '登录发生异常，请稍后再试',
 							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
 							position: 'top'
 						})
+					}
+
+				}catch(e){
+					//TODO handle the exception
+					console.error(e); // 输出错误信息
+					// 进行错误处理逻辑，比如显示错误提示信息等
+					this.$refs.uToast.show({
+						type: 'error',
+						message: '请检查表单是否填写完整且正确',
+						icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+						position: 'top'
 					})
-				}).catch(errors => {
-					uni.$u.toast('校验失败')
-				})
+				}
 			},
 		},
 		onLoad({
