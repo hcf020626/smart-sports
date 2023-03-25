@@ -156,8 +156,6 @@
 								fail: reject,
 							});
 						});
-
-
 						const {
 							msg,
 							status,

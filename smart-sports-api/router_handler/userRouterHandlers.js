@@ -367,7 +367,9 @@ exports.sendCaptcha = (req, resp, next) => {
 }
 
 exports.changeBonding = (req, resp, next) => {
-	const {email, id} = req.body;
+	const {email} = req.body;
+	const id = req.body.id === 'null' ? null : req.body.id;
+	
 	const sql = 'update t_parents set cur_bonding_id=? where email=?';
 	
 	pool.query(sql, [id, email], (err, results, fields)=>{
@@ -386,10 +388,17 @@ exports.changeBonding = (req, resp, next) => {
 			})
 		}
 		
-		resp.json({
-			status: 0,
-			msg: '绑定成功！',
-		})
+		if(id){
+			resp.json({
+				status: 0,
+				msg: '绑定成功！',
+			})
+		}else{
+			resp.json({
+				status: 0,
+				msg: '已解除绑定！！',
+			})
+		}
 	})
 }
 

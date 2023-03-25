@@ -36,37 +36,37 @@
 					pagePath: '/pages/index/physicalTest/vision/vision'
 				}, {
 					iconName: 'icon-ziyuan1',
-					iconColor: 'red',
+					iconColor: '#ff5733',
 					title: '血压',
 					pagePath: '/pages/index/physicalTest/blood-pressure/blood-pressure'
 				}, {
 					iconName: 'icon-iconfhl',
-					iconColor: 'lightgreen',
+					iconColor: '#ffbd33',
 					title: '肺活量',
 					pagePath: '/pages/index/physicalTest/lung-capacity/lung-capacity'
 				}, {
 					iconName: 'icon-yangwoqizuopingtai',
-					iconColor: 'lightgreen',
+					iconColor: '#dbff33',
 					title: '仰卧起坐',
 					pagePath: '/pages/index/physicalTest/sit-ups/sit-ups'
 				}, {
 					iconName: 'icon-fuwocheng',
-					iconColor: 'lightgreen',
+					iconColor: '#75ff33',
 					title: '俯卧撑',
 					pagePath: '/pages/index/physicalTest/push-ups/push-ups'
 				}, {
 					iconName: 'icon-celiang',
-					iconColor: 'lightgreen',
+					iconColor: '#33ffbd',
 					title: '坐位体前屈',
 					pagePath: '/pages/index/physicalTest/sit-and-reachs/sit-and-reachs'
 				}, {
 					iconName: 'icon-dangang',
-					iconColor: 'lightgreen',
+					iconColor: '#33ff57',
 					title: '引体向上',
 					pagePath: '/pages/index/physicalTest/pull-ups/pull-ups'
 				}, {
 					iconName: 'icon-paobu',
-					iconColor: 'lightgreen',
+					iconColor: '#bd33ff',
 					title: '跑步',
 					pagePath: '/pages/index/physicalTest/running/running'
 				}],

@@ -7,7 +7,7 @@
 		<u-modal :show="modalInfo.show" :content="modalInfo.content" @confirm="changeBonding" :showCancelButton="true"
 			@cancel="modalInfo.show=false" :asyncClose="true"></u-modal>
 			
-		<view class="cell-group">
+		<view class="cell-group" v-if="userInfo.idcard">
 			 <!-- 单元格分组 -->
 			<u-cell-group :border="false">
 				<!-- 单元格，使用 v-for 循环渲染 cellItems 数组中的元素 -->
@@ -20,6 +20,10 @@
 					<u-switch slot="right-icon" v-model="item.checked" asyncChange  @change="showModal(item.studentInfo.id)"></u-switch>
 				</u-cell>
 			</u-cell-group>
+		</view>
+		
+		<view class="unauth-tip" v-else>
+			<view>您当前未进行身份认证或者身份认证失败，请身份认证成功后再操作！<navigator url="../authentification/authentification" open-type="navigate" class="link">身份认证</navigator></view>
 		</view>
 	</view>
 </template>
@@ -35,13 +39,13 @@
 			return {
 				 // 弹窗组件的相关数据
 				modalInfo: {
-					content: '确定要换绑吗？',
+					content: '确定要修改吗？',
 					show: false,
 					data: {}
 				},
 				// 学生信息列表
 				cellItems: [],
-				skeletonLoading: true
+				skeletonLoading: true,
 			}
 		},
 		computed: {
@@ -50,7 +54,7 @@
 		},
 		methods: {
 			...mapActions('accountModule', ['updateBonding']),
-			...mapActions('studentModule', ['updateStudent']),
+			...mapActions('studentModule', ['updateStudent', 'clearStudent']),
 			// 在showModal方法中，我们将modalInfo.show属性设置为true，表示弹出模态框，同时将被点击的学生信息对象的id属性赋值给modalInfo.data.id属性。
 			showModal(id) {
 				this.modalInfo.show = true;
@@ -61,37 +65,33 @@
 				// 首先从modalInfo.data.id属性中获取到被点击的学生的id
 				const id = this.modalInfo.data.id;
 	
-				// 最后，我们将modalInfo.show属性设置为false，表示隐藏模态框。
 				setTimeout( async ()=>{
-					let isItself = false;
+					let isRemoveAction = false;
 					this.cellItems.forEach((item)=>{
-						// 如果当前元素是被点击的元素，且已经被选中了，则不要发送网络请求
+						// 如果当前元素是被点击的元素，且已经被选中了，则将isRemoveAction标记为true，表明要移除绑定
 						if(item.studentInfo.id === id && item.checked){
-							isItself = true;
+							isRemoveAction = true;
 						}
 					})
 					
-					if(isItself){
-						// 关闭模态框
-						this.modalInfo.show = false;
-						// 弹出提示框
-						return this.$refs.uToast.show({
-							type: 'success',
-							message: '绑定成功',
-							icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
-							position: 'top',
-						})
-					}
+					// 如果isRemoveAction为true，则发送的id为null，否则，为被点击的学生的id
+					const {data: {status, msg}} = await api.account.changeBonding({email: this.userInfo.email, id: isRemoveAction?null:id});
 					
-					const {data: {status, msg}} = await api.account.changeBonding({email: this.userInfo.email, id});
+					// 提示框的类型
 					let toastType = '';
+					
 					if(!status){
-						// 更新vuex和本地中的数据
-						this.updateBonding(id);
+						// 更新vuex和本地中用户模块的数据
+						this.updateBonding(isRemoveAction?null:id);
 						// 更新单元格右边开关的状态
 						this.cellItems.forEach((item) => {
-							// 如果当前元素是被点击的元素，且还没有被被选中了，则将其checked修改为true;
-							if(item.studentInfo.id === id && !item.checked){
+							// 如果isRemoveAction为true，表明当前元素是被点击的元素，且已经被被选中了，要关闭开关
+							if(isRemoveAction){
+								item.checked = !isRemoveAction;
+								// 更新vuex和本地中的数据
+								this.clearStudent();
+							}else if(item.studentInfo.id === id && !item.checked){
+								// 如果当前元素是被点击的元素，且还没有被被选中了，则将其checked修改为true;
 								item.checked = true
 								// 更新vuex和本地中的数据
 								this.updateStudent({
@@ -163,5 +163,19 @@
 		margin: 30rpx auto;
 		border-radius: 20rpx;
 		background-color: white;
+	}
+	.unauth-tip {
+		width: 90%;
+		margin: 0 auto;
+		padding-top: 200rpx;
+		text-align: center;
+		line-height: 50rpx;
+		color: #82848a;
+	}
+	
+	.unauth-tip .link {
+		color: #2979ff;
+		text-decoration: underline;
+		display: inline;
 	}
 </style>
