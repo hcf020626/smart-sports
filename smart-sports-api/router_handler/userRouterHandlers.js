@@ -31,13 +31,14 @@ exports.userLogin = (req, resp, next) => {
 	pool.query(sql, [user.email], (err, results, fields) => {
 		// sql 语句执行出错
 		if (err) {
+			console.log("here err: ",err);
 			return resp.json({
 				status: 1,
 				msg: err.message
 			})
 		}
 
-		//执行 SQL 语句成功，但是查询到数据条数不等于 1
+		// 判断查询结果，如果查询到的数据不唯一，则表示用户不存在；如果查询到的数据唯一，则继续执行下一步。
 		if (results.length !== 1) {
 			return resp.json({
 				status: 1,
@@ -52,15 +53,39 @@ exports.userLogin = (req, resp, next) => {
 				msg: '邮箱或密码错误'
 			})
 		}
-
-		resp.json({
-			status: 0,
-			msg: '登录成功!',
-			data: results[0],
-			// 为了方便客户端使用 Token，在服务器端直接拼接上 Bearer 的前缀
-			token: 'Bearer ' + jwt.encode(results[0].email, process.env.SECRET_KEY)
+		
+		let userInfo = results[0];
+		let studentInfo;
+		
+		const sql = 'select * from t_students where id=?'
+		pool.query(sql, [userInfo.cur_bonding_id], (err, results, fields) => {
+			// sql 语句执行出错
+			if (err) {
+				return resp.json({
+					status: 1,
+					msg: err.message
+				})
+			}
+			
+			
+			if(results.length !== 1){
+				studentInfo = {}
+			}else {
+				studentInfo = results[0]
+			}
+			
+			
+			resp.json({
+				status: 0,
+				msg: '登录成功!',
+				data: {
+					userInfo,
+					studentInfo
+				},
+				// 为了方便客户端使用 Token，在服务器端直接拼接上 Bearer 的前缀
+				token: 'Bearer ' + jwt.encode(userInfo.email, process.env.SECRET_KEY)
+			})
 		})
-
 	})
 
 }
@@ -216,6 +241,7 @@ exports.sendVerificationCode = (req, resp) => {
 	// })
 }
 
+
 exports.saveUserInfo = (req, resp, next) => {
 
 	const {
@@ -264,87 +290,7 @@ exports.saveUserInfo = (req, resp, next) => {
 	})
 }
 
-exports.updatePassword = (req, resp, next) => {
-	const {
-		email,
-		oldPassword,
-		newPassword,
-		token
-	} = req.body;
-	console.log("token: ",token);
-	
-	try{
-		const {captcha} = jwt.decode(token, process.env.SECRET_KEY)
-		
-		console.log("captcha: ",captcha);
-		console.log("req.body.captcha: ",req.body.captcha);
-		
-		if(req.body.captcha.toLocaleUpperCase() !== captcha.toLocaleUpperCase()){
-			return resp.json({
-				status: 1,
-				msg: '验证码错误'
-			})
-		}
-		
-		const sql = 'select * from t_parents where email=?';
-		
-		pool.query(sql, [email], (err, results, fields) => {
-			if (err) {
-				return resp.json({
-					status: 1,
-					msg: err.message
-				})
-			}
-		
-			if (results.length !== 1) {
-				return resp.json({
-					status: 1,
-					msg: '查询密码失败，请稍后再试'
-				})
-			}
-		
-			if (results[0].password !== md5(md5(oldPassword) + process.env.SECRET_KEY)) {
-				return resp.json({
-					status: 1,
-					msg: '旧密码填写错误，请重新输入'
-				})
-			}
-		
-			const sql = 'update t_parents set password=? where email=?';
-			const encryptedPassword = md5(md5(newPassword) + process.env.SECRET_KEY);
-		
-			pool.query(sql, [encryptedPassword, email], (err, results, fields) => {
-				if (err) {
-					return resp.json({
-						status: 1,
-						msg: err.message
-					})
-				}
-		
-				if (results.affectedRows !== 1) {
-					return resp.json({
-						status: 1,
-						msg: '修改失败，请稍后再试'
-					})
-				}
-		
-				resp.json({
-					status: 0,
-					msg: '修改成功！请重新登录',
-					password: encryptedPassword
-				})
-			})
-		})
-	}catch(e){
-		//TODO handle the exception
-		console.log("e: ",e);
-		resp.status(500).json({
-			status: 1,
-			msg: '服务器发生错误，请稍后再试'
-		})
-	}
-}
-
+// 发送图形验证码的处理函数
 exports.sendCaptcha = (req, resp, next) => {
 	const captcha = svgCaptcha.create({
 		noise: 3,
@@ -366,13 +312,99 @@ exports.sendCaptcha = (req, resp, next) => {
 	});
 }
 
+// 修改密码的处理函数
+exports.updatePassword = (req, resp, next) => {
+	const {
+		email,
+		oldPassword,
+		newPassword,
+		token
+	} = req.body;
+	console.log("token: ", token);
+
+	try {
+		const {
+			captcha
+		} = jwt.decode(token, process.env.SECRET_KEY)
+
+		console.log("captcha: ", captcha);
+		console.log("req.body.captcha: ", req.body.captcha);
+
+		if (req.body.captcha.toLocaleUpperCase() !== captcha.toLocaleUpperCase()) {
+			return resp.json({
+				status: 1,
+				msg: '验证码错误'
+			})
+		}
+
+		const sql = 'select * from t_parents where email=?';
+
+		pool.query(sql, [email], (err, results, fields) => {
+			if (err) {
+				return resp.json({
+					status: 1,
+					msg: err.message
+				})
+			}
+
+			if (results.length !== 1) {
+				return resp.json({
+					status: 1,
+					msg: '查询密码失败，请稍后再试'
+				})
+			}
+
+			if (results[0].password !== md5(md5(oldPassword) + process.env.SECRET_KEY)) {
+				return resp.json({
+					status: 1,
+					msg: '旧密码填写错误，请重新输入'
+				})
+			}
+
+			const sql = 'update t_parents set password=? where email=?';
+			const encryptedPassword = md5(md5(newPassword) + process.env.SECRET_KEY);
+
+			pool.query(sql, [encryptedPassword, email], (err, results, fields) => {
+				if (err) {
+					return resp.json({
+						status: 1,
+						msg: err.message
+					})
+				}
+
+				if (results.affectedRows !== 1) {
+					return resp.json({
+						status: 1,
+						msg: '修改失败，请稍后再试'
+					})
+				}
+
+				resp.json({
+					status: 0,
+					msg: '修改成功！请重新登录',
+					password: encryptedPassword
+				})
+			})
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.status(500).json({
+			status: 1,
+			msg: '服务器发生错误，请稍后再试'
+		})
+	}
+}
+
 exports.changeBonding = (req, resp, next) => {
-	const {email} = req.body;
+	const {
+		email
+	} = req.body;
 	const id = req.body.id === 'null' ? null : req.body.id;
-	
+
 	const sql = 'update t_parents set cur_bonding_id=? where email=?';
-	
-	pool.query(sql, [id, email], (err, results, fields)=>{
+
+	pool.query(sql, [id, email], (err, results, fields) => {
 		//执行 sql 语句失败
 		if (err) {
 			return resp.json({
@@ -380,20 +412,20 @@ exports.changeBonding = (req, resp, next) => {
 				msg: err.message
 			})
 		}
-		
-		if(results.affectedRows !== 1){
+
+		if (results.affectedRows !== 1) {
 			return resp.json({
 				status: 1,
 				msg: '绑定失败，请稍后再试'
 			})
 		}
-		
-		if(id){
+
+		if (id) {
 			resp.json({
 				status: 0,
 				msg: '绑定成功！',
 			})
-		}else{
+		} else {
 			resp.json({
 				status: 0,
 				msg: '已解除绑定！！',
@@ -403,7 +435,7 @@ exports.changeBonding = (req, resp, next) => {
 }
 
 exports.verifyAndSaveIdCard = (req, resp, next) => {
-	
+
 }
 
 /*

@@ -2,25 +2,19 @@ import Vue from 'vue'
 export default {
 	namespaced:true,//开启命名空间
 	actions: {
-		updateStudent(context, value){
-			context.commit('UPDATE_STUDENT', value)
+		setStudentInfo(context, value){
+			context.commit('SET_STUDENT_INFO', value)
 		},
-		clearStudent(context, value){
-			context.commit('CLEAR_STUDENT', value)
+		clearStudentInfo(context, value){
+			context.commit('CLEAR_STUDENT_INFO', value)
 		},
 	},
 	mutations: {
-		UPDATE_STUDENT(state, {imgSrc, name, gender, age, school, className, id}){
-			Vue.set(state.studentInfo, 'imgSrc', imgSrc);
-			Vue.set(state.studentInfo, 'name', name);
-			Vue.set(state.studentInfo, 'gender', gender);
-			Vue.set(state.studentInfo, 'age', age);
-			Vue.set(state.studentInfo, 'school', school);
-			Vue.set(state.studentInfo, 'className', className);
-			Vue.set(state.studentInfo, 'id', id);
+		SET_STUDENT_INFO(state, studentInfo){
+			state.studentInfo = studentInfo
 			uni.setStorageSync('studentInfo', JSON.stringify(state.studentInfo));
 		},
-		CLEAR_STUDENT(state){
+		CLEAR_STUDENT_INFO(state){
 			state.studentInfo = {};
 			uni.removeStorageSync('studentInfo')
 		}

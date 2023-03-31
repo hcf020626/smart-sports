@@ -22,7 +22,10 @@
 		</view>
 
 		<view>
-			<u-button type="primary" @click="showInfo">点我在控制台输出 Vuex 中的用户数据</u-button>
+			<u-button type="primary" @click="showUserInfo">点我在控制台输出 Vuex 中的用户数据</u-button>
+		</view>
+		<view>
+			<u-button type="primary" @click="showStudentInfo">点我在控制台输出 Vuex 中的学生数据</u-button>
 		</view>
 		<view style="flex-grow: 1;"></view>
 		<view style="margin-bottom: 45rpx; color: #909399;">
@@ -47,12 +50,16 @@
 
 		},
 		computed: {
-			...mapState('accountModule', ['userInfo', 'token'])
+			...mapState('accountModule', ['userInfo', 'token']),
+			...mapState('studentModule', ['studentInfo']),
 		},
 		methods: {
-			showInfo() {
+			showUserInfo() {
 				console.log("this.userInfo: ", this.userInfo);
 				console.log("this.token: ", this.token);
+			},
+			showStudentInfo(){
+				console.log("this.studentInfo: ",this.studentInfo);
 			}
 		}
 	}

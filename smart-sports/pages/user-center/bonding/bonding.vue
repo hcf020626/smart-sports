@@ -54,7 +54,7 @@
 		},
 		methods: {
 			...mapActions('accountModule', ['updateBonding']),
-			...mapActions('studentModule', ['updateStudent', 'clearStudent']),
+			...mapActions('studentModule', ['updateStudentInfo', 'clearStudentInfo']),
 			// 在showModal方法中，我们将modalInfo.show属性设置为true，表示弹出模态框，同时将被点击的学生信息对象的id属性赋值给modalInfo.data.id属性。
 			showModal(id) {
 				this.modalInfo.show = true;
@@ -89,12 +89,12 @@
 							if(isRemoveAction){
 								item.checked = !isRemoveAction;
 								// 更新vuex和本地中的数据
-								this.clearStudent();
+								this.clearStudentInfo();
 							}else if(item.studentInfo.id === id && !item.checked){
 								// 如果当前元素是被点击的元素，且还没有被被选中了，则将其checked修改为true;
 								item.checked = true
 								// 更新vuex和本地中的数据
-								this.updateStudent({
+								this.updateStudentInfo({
 									imgSrc: item.studentInfo.imgSrc,
 									name: item.studentInfo.name,
 									gender: item.studentInfo.gender, 

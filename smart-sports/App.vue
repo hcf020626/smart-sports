@@ -2,9 +2,16 @@
 	export default {
 		onLaunch: function() {
 			console.log('App Launch')
+			// 判断用户是否登录
 			if(!uni.getStorageSync('token')){
-				uni.reLaunch({
-					url: '/pages/auth/login/login'
+				uni.showModal({
+					content: '您当前未登录，请先登录后再进行操作',
+					showCancel: false,
+					success() {
+						uni.reLaunch({
+							url: '/pages/auth/login/login'
+						})
+					}
 				})
 			}
 		},
@@ -17,20 +24,16 @@
 	}
 </script>
 
+<!-- 每个页面公共css -->
 <style lang="scss">
-	/*每个页面公共css */
-
 	/* 在App.vue中首行的位置引入uView基础样式 */
 	@import "@/uni_modules/uview-ui/index.scss";
-	
-	.cell-hover-class {
-		opacity: 0.7;
-	}
-	
-	
+		
 	// 引入首页的字体图标
-	@import url('@/static/indexIcons/physicalTestIcons/iconfont.css');
-	@import url('@/static/indexIcons/commonIcons/iconfont.css');
+	@import url('@/static/iconfont/index/physical-test/iconfont.css');
+	@import url('@/static/iconfont/index/common/iconfont.css');
 	// 引入我的页面的字体图标
-	@import url('@/static/userCenterIcons/iconfont.css');
+	@import url('@/static/iconfont/user-center/iconfont.css');
+	// 引入登录和注册的字体图标
+	@import url('@/static/iconfont/login-reg/iconfont.css');
 </style>

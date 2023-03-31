@@ -8,28 +8,37 @@
 			<image src="@/static/logo.png"></image>
 		</view>
 
-		<!-- 主体 表单 -->
+		<!-- 主体部分 表单 -->
 		<view class="body">
-			<u-form :model="form" ref="uForm">
+			<!-- 表单组件，用于接收用户输入的邮箱和密码 -->
+			<u-form :model="loginFormData" ref="uForm">
 				<u-form-item prop="email">
-					<u-input prefixIcon="account" type="text" v-model="form.email" placeholder="请输入邮箱" clearable
-						border="bottom" />
+					<!-- 邮箱输入框 -->
+					<u-input type="text" v-model="loginFormData.email" placeholder="请输入邮箱" clearable border="bottom">
+						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-jurassic_user" size="20"></uni-icons>
+					</u-input>
 				</u-form-item>
 				<u-form-item prop="password">
-					<u-input prefixIcon="lock" type="password" v-model="form.password" placeholder="请输入密码" clearable
-						border="bottom" />
+					<!-- 密码输入框 -->
+					<u-input prefixIcon="lock" type="password" v-model="loginFormData.password" placeholder="请输入密码"
+						clearable border="bottom">
+						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-mima" size="20"></uni-icons>
+					</u-input>
 				</u-form-item>
 			</u-form>
 
+			<!-- 登录按钮 -->
 			<view class="login-btn">
-				<u-button type="primary" @tap="loginHandler">登录</u-button>
+				<u-button type="primary" text="登录" :loading="isLoading" @tap="loginHandler"></u-button>
 			</view>
 		</view>
 
 		<!-- 尾部 忘记密码和注册账户 -->
 		<view class="footer">
+			<!-- 忘记密码链接 -->
 			<navigator class="link" url="../forget/forget" open-type="navigate">忘记密码</navigator>
 			<text>|</text>
+			<!-- 注册账户链接 -->
 			<navigator class="link" url="../reg/reg" open-type="navigate">注册账户</navigator>
 		</view>
 
@@ -37,22 +46,26 @@
 </template>
 
 <script>
-	import api from '@/api/index.js'
+	import api from '@/api/index.js' // 导入封装好的发送请求的api模块
+	import {
+		baseURL
+	} from '@/config.js' // 导入baseURL常量
 	import {
 		mapActions
-	} from 'vuex'
+	} from 'vuex' // 导入vuex的辅助函数mapActions
 	export default {
 		data() {
 			return {
-				status: '',
-				form: {
+				enterStatus: '', // 进入登录页面时的状态
+				loginFormData: { // 登录表单数据
 					email: '',
-					password: '',
-					captcha: '',
-					tips: ''
+					password: ''
 				},
-				rules: {
-					email: [{
+				isLoading: false,
+				rules: { // 表单验证规则
+					email: [
+						// 对 email 字段进行格式验证
+						{
 							type: 'email',
 							message: '邮箱格式不正确',
 							trigger: ['change', 'blur']
@@ -61,20 +74,21 @@
 						{
 							required: true,
 							message: '请输入邮箱',
-							// 可以单个或者同时写两个触发验证方式 
 							trigger: ['change', 'blur'],
 						},
 					],
-					password: [{
+					password: [
+						// 对 password 字段进行长度验证
+						{
 							min: 6,
 							max: 20,
 							message: '密码长度在6-20个字符之间',
 							trigger: ['change', 'blur']
 						},
+						// 对 password 字段进行必填验证
 						{
 							required: true,
 							message: '请输入密码',
-							// 可以单个或者同时写两个触发验证方式 
 							trigger: ['change', 'blur'],
 						}
 					],
@@ -82,44 +96,69 @@
 			}
 		},
 		methods: {
-			...mapActions('accountModule', ['userLogin']),
+			...mapActions('accountModule', ['setUserInfo']),
+			...mapActions('studentModule', ['setStudentInfo']),
 			async loginHandler() {
-				try{
-					const isValid = await this.$refs.uForm.validate();
-					if(!isValid){
-						return this.$refs.uToast.show({
-							type: 'error',
-							message: '表单校验失败，请正确填写表单的每一项',
-							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-							position: 'top'
-						})
-					}
-					
-					try{
+				const isValid = await this.$refs.uForm.validate(); // 验证表单是否合法
+
+				// 如果表单不合法，则在页面上弹出错误提示框
+				if (!isValid) {
+					return this.$refs.uToast.show({
+						type: 'error',
+						message: '请正确填写表单的每一项',
+						icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+						position: 'top'
+					})
+				}
+
+				//如果表单合法，isLoading变量会被设置为true，表示正在加载中
+				this.isLoading = true;
+				try {
+					// 使用setTimeout()函数模拟网络延迟
+					setTimeout(async () => {
+						// 调用api.account.login()异步请求登录接口，获取返回的status、msg、token和data等数据
 						const {
 							data: {
 								status,
 								msg,
-								data,
-								token
+								token,
+								data
 							}
 						} = await api.account.login({
-							email: this.form.email,
-							password: this.form.password
+							email: this.loginFormData.email,
+							password: this.loginFormData.password
 						});
-						
+
+						this.isLoading = false;
+
 						if (!status) {
-							// 将用户信息和 token 保存到Vuex和本地存储中
-							this.userLogin({
+							// 将用户信息和token保存到Vuex和本地存储中
+							this.setUserInfo({
 								token,
-								userInfo: data
+								userInfo: data.userInfo
 							})
+
+							const fullSrc = baseURL + '/student/avatars/' + (data.studentInfo
+								.gender === '女' ? (Math.floor(Math.random() * 10) + 1) : (Math
+									.floor(Math.random() * 8) + 11)) + '.png';
+							// 将学生信息保存到Vuex和本地存储中
+							this.setStudentInfo({
+								imgSrc: fullSrc,
+								name: data.studentInfo.name,
+								gender: data.studentInfo.gender,
+								age: data.studentInfo.age,
+								school: data.studentInfo.school,
+								className: data.studentInfo.class,
+								id: data.studentInfo.id
+							})
+
 							// 弹出登录成功的提示框，并稍后跳转到首页
 							this.$refs.uToast.show({
 								type: 'success',
 								message: msg,
 								icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
 								position: 'top',
+								duration: 1500,
 								complete() {
 									uni.switchTab({
 										url: '/pages/index/index'
@@ -135,24 +174,12 @@
 								position: 'top'
 							})
 						}
-					}catch(e){
-						//TODO handle the exception
-						console.log("e: ",e);
-						this.$refs.uToast.show({
-							type: 'error',
-							message: '登录发生异常，请稍后再试',
-							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-							position: 'top'
-						})
-					}
-
-				}catch(e){
+					}, 500)
+				} catch (e) {
 					//TODO handle the exception
-					console.error(e); // 输出错误信息
-					// 进行错误处理逻辑，比如显示错误提示信息等
 					this.$refs.uToast.show({
 						type: 'error',
-						message: '请检查表单是否填写完整且正确',
+						message: '登录发生异常，请稍后再试',
 						icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
 						position: 'top'
 					})
@@ -162,14 +189,14 @@
 		onLoad({
 			status
 		}) {
-			// 如果 status 等于 1，说明点击退出登录来到登录页面的，则弹出消息提示框
-			this.status = status
+			// 如果 status 等于 1，则说明是点击退出登录按钮来到登录页面的，弹出对应的消息提示框
+			this.enterStatus = status
 		},
 		// 必须要在onReady生命周期，因为onLoad生命周期组件可能尚未创建完毕
 		onReady() {
 			this.$refs.uForm.setRules(this.rules);
 
-			if (this.status === '1') {
+			if (this.enterStatus === '1') {
 				this.$refs.uToast.show({
 					type: 'success',
 					message: '您已经成功退出登录',

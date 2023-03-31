@@ -8,73 +8,86 @@
 			<image src="@/static/logo.png"></image>
 		</view>
 
-		<!-- 主体 表单 -->
+		<!-- 主体部分 表单 -->
 		<view class="body">
-			<u-form :model="form" ref="uForm">
+			<!-- 表单组件 -->
+			<u-form :model="regFormData" ref="uForm">
+				<!-- 邮箱输入框 -->
 				<u-form-item prop="email">
-					<u-input prefixIcon="account" type="text" v-model="form.email" placeholder="请输入邮箱" clearable
-						border="bottom" />
-				</u-form-item>
-				<u-form-item prop="password">
-					<u-input prefixIcon="lock" type="password" v-model="form.password" placeholder="请输入密码" clearable
-						border="bottom" />
-				</u-form-item>
-				<u-form-item prop="password2">
-					<u-input prefixIcon="lock-fill" type="password" v-model="form.password2" placeholder="请再次输入密码"
-						clearable border="bottom" />
-				</u-form-item>
-				<u-form-item prop="code">
-					<u-input prefixIcon="email" type="number" v-model="form.code" placeholder="请输入验证码" clearable
+					<u-input prefixIcon="account" type="text" v-model="regFormData.email" placeholder="请输入邮箱" clearable
 						border="bottom">
+						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-jurassic_user" size="20">
+						</uni-icons>
+					</u-input>
+				</u-form-item>
+				<!-- 密码输入框 -->
+				<u-form-item prop="password">
+					<u-input prefixIcon="lock" type="password" v-model="regFormData.password" placeholder="请输入密码"
+						clearable border="bottom">
+						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-mima" size="20"></uni-icons>
+					</u-input>
+				</u-form-item>
+				<!-- 再次输入密码输入框 -->
+				<u-form-item prop="password2">
+					<u-input prefixIcon="lock-fill" type="password" v-model="regFormData.password2"
+						placeholder="请再次输入密码" clearable border="bottom">
+						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-zaicishurumima" size="20">
+						</uni-icons>
+					</u-input>
+				</u-form-item>
+				<!-- 验证码输入框 -->
+				<u-form-item prop="code">
+					<u-input prefixIcon="email" type="number" v-model="regFormData.code" placeholder="请输入验证码" clearable
+						border="bottom">
+						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-yanzhengma2" size="20"></uni-icons>
 						<template slot="suffix">
 							<u-code ref="uCode" @change="codeChange" seconds="120" startText="获取验证码" changeText="X秒重新获取"
 								endText="重新获取">
 							</u-code>
-							<u-button @tap="getCode" :text="form.tips" type="primary" size="mini" plain>
+							<u-button @tap="getCode" :text="regFormData.tips" type="primary" size="mini" plain>
 							</u-button>
 						</template>
 					</u-input>
 				</u-form-item>
 			</u-form>
 
+			<!-- 注册按钮 -->
 			<view class="reg-btn">
-				<u-button type="primary" @tap="regHandler" :disabled="!agree">注册</u-button>
+				<u-button type="primary" text="注册" :loading="isLoading" @tap="regHandler" :disabled="!isAgree">
+				</u-button>
 			</view>
 		</view>
 
-		<!-- 尾部 忘记密码和注册账户 -->
+		<!-- 尾部 软件用户协议 -->
 		<view class="footer">
 			<u-checkbox-group>
-				<u-checkbox shape="circle" :checked="agree" @change="agreeHandler"></u-checkbox>
+				<u-checkbox shape="circle" :checked="isAgree" @change="agreeHandler"></u-checkbox>
 			</u-checkbox-group>
 			<text>勾选代表同意</text>
 			<navigator url="../../user-center/user-agreement/user-agreement" open-type="navigate">《软件用户协议》</navigator>
 		</view>
-
 	</view>
 </template>
 
 <script>
-	import api from '@/api/index.js'
-	import {
-		verifyCode
-	} from '../../../api/account'
+	import api from '@/api/index.js' // 导入封装好的发送请求的api模块
 	export default {
 		data() {
 			return {
-				leftIconStyle: {
-					'fontSize': '35rpx'
-				},
-				form: {
+				regFormData: { // 注册表单数据
 					email: '',
 					password: '',
 					password2: '',
 					tips: '',
+					code: '',
 					token: ''
 				},
-				agree: false,
-				rules: {
-					email: [{
+				isLoading: false,
+				isAgree: false,
+				rules: { // 表单验证规则
+					email: [
+						// 对 email 字段进行格式验证
+						{
 							type: 'email',
 							message: '邮箱格式不正确',
 							trigger: ['change', 'blur']
@@ -83,27 +96,29 @@
 						{
 							required: true,
 							message: '请输入邮箱',
-							// 可以单个或者同时写两个触发验证方式 
 							trigger: ['change', 'blur'],
 						},
 					],
-					password: [{
+					password: [
+						// 对 password 字段进行长度验证
+						{
 							min: 6,
 							max: 20,
 							message: '密码长度在6-20个字符之间',
 							trigger: ['change', 'blur']
 						},
+						// 对 password 字段进行必填验证
 						{
 							required: true,
 							message: '请输入密码',
-							// 可以单个或者同时写两个触发验证方式 
 							trigger: ['change', 'blur'],
 						},
 					],
-					password2: [{
+					password2: [
+						// 对 password2 字段进行必填验证
+						{
 							required: true,
 							message: '请再次输入密码',
-							// 可以单个或者同时写两个触发验证方式 
 							trigger: ['change', 'blur'],
 						},
 						// 自定义规则判断密码是否一致
@@ -115,14 +130,15 @@
 							message: '两次密码不一致'
 						},
 					],
-					code: [{
+					code: [
+						// 对 code 字段进行必填验证
+						{
 							required: true,
 							message: '请输入验证码',
-							// 可以单个或者同时写两个触发验证方式 
 							trigger: ['change', 'blur'],
 						},
+						// 自定义规则对 code 字段进行格式验证
 						{
-							// 自定义验证函数
 							validator: (rule, value, callback) => {
 								// 返回true表示校验通过，返回false表示不通过
 								return uni.$u.test.code(value, 6)
@@ -135,46 +151,57 @@
 			}
 		},
 		methods: {
+			// agreeHandler方法用于处理用户是否同意注册协议的逻辑，通过改变isAgree变量的值来更新页面上的选择框状态。
 			agreeHandler() {
-				this.agree = !this.agree
+				this.isAgree = !this.isAgree
 			},
 			async regHandler() {
+				const isValid = await this.$refs.uForm.validate();
+
+				// 如果表单不合法，则在页面上弹出错误提示框
+				if (!isValid) {
+					return this.$refs.uToast.show({
+						type: 'error',
+						message: '请正确填写表单的每一项',
+						icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+						position: 'top'
+					})
+				}
+
+				//如果表单合法，isLoading变量会被设置为true，表示正在加载中
+				this.isLoading = true;
 				try {
-					const isValid = await this.$refs.uForm.validate();
+					// 使用setTimeout()函数模拟网络延迟
+					setTimeout(async () => {
 
-					if (!isValid) {
-						return this.$refs.uToast.show({
-							type: 'error',
-							message: '表单校验失败，请正确填写表单的每一项',
-							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-							position: 'top'
-						})
-					}
-
-					try{
+						// 调用api.account.reg()异步请求注册接口，获取返回的status、msg
 						const {
 							data: {
 								msg,
 								status
 							}
 						} = await api.account.reg({
-							email: this.form.email,
-							password: this.form.password2,
-							code: this.form.code,
-							token: this.form.token
+							email: this.regFormData.email,
+							password: this.regFormData.password2,
+							code: this.regFormData.code,
+							token: this.regFormData.token
 						});
-						
+
+						this.isLoading = false;
+
 						if (!status) {
+							// 弹出注册成功的提示框
 							this.$refs.uToast.show({
 								type: 'success',
 								message: msg,
 								icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
 								position: 'top'
 							})
-						
+
 							// 清空表单元素的值和错误提示
 							this.$refs.uForm.resetFields();
 						} else {
+							// 弹出注册失败的提示框
 							this.$refs.uToast.show({
 								type: 'error',
 								message: msg,
@@ -182,75 +209,68 @@
 								position: 'top'
 							})
 						}
-					}catch(e){
-						console.log("e: ",e);
-						//TODO handle the exception
-						this.$refs.uToast.show({
-							type: 'error',
-							message: '注册发生异常，请稍后再试',
-							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-							position: 'top'
-						})
-					}
-					
-				} catch (err) {
-					console.error(err); // 输出错误信息
-					// 进行错误处理逻辑，比如显示错误提示信息等
+					},500)
+				} catch (e) {
+					//TODO handle the exception
 					this.$refs.uToast.show({
 						type: 'error',
-						message: '请检查表单是否填写完整且正确',
+						message: '注册发生异常，请稍后再试',
 						icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
 						position: 'top'
 					})
 				}
 			},
 			codeChange(text) {
-				this.form.tips = text;
+				this.regFormData.tips = text;
 			},
-			async getCode() {
+			getCode() {
 				if (this.$refs.uCode.canGetCode) {
 					uni.showLoading({
 						title: '正在获取验证码'
 					})
 
-				try{
-					const {
-						data: {
-							msg,
-							status,
-							token
-						}
-					} = await api.account.sendCode(this.form.email);
-					
-					uni.hideLoading()
-					
-					if (!status) {
-						this.form.token = token;
-						this.$refs.uToast.show({
-							type: 'success',
-							message: msg,
-							icon: 'https://cdn.uviewui.com/uview/demo/toast/sucess.png',
-							position: 'top'
-						})
-						// 通知验证码组件内部开始倒计时
-						this.$refs.uCode.start();
-					} else {
+					try {
+						setTimeout(async ()=>{
+							// 调用api.account.sendCode()异步请求注册接口，获取返回的status、msg和token
+							const {
+								data: {
+									msg,
+									status,
+									token
+								}
+							} = await api.account.sendCode(this.regFormData.email);
+							
+							uni.hideLoading()
+							
+							if (!status) {
+								this.regFormData.token = token;
+								this.$refs.uToast.show({
+									type: 'success',
+									message: msg,
+									icon: 'https://cdn.uviewui.com/uview/demo/toast/sucess.png',
+									position: 'top'
+								})
+								// 通知验证码组件内部开始倒计时
+								this.$refs.uCode.start();
+							} else {
+								this.$refs.uToast.show({
+									type: 'error',
+									message: msg,
+									icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+									position: 'top'
+								})
+							}
+						}, 500)
+						
+					} catch (e) {
+						//TODO handle the exception
 						this.$refs.uToast.show({
 							type: 'error',
-							message: msg,
+							message: e.errMsg,
 							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
 							position: 'top'
 						})
 					}
-				}catch(e){
-					//TODO handle the exception
-					this.$refs.uToast.show({
-						type: 'error',
-						message: e.errMsg,
-						icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-						position: 'top'
-					})
-				}
 				} else {
 					uni.$u.toast('倒计时结束后再发送');
 				}

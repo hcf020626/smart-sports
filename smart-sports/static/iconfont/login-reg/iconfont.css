@@ -1,0 +1,29 @@
+@font-face {
+  font-family: "iconfont"; /* Project id  */
+  src: url('/static/iconfont/login-reg/iconfont.ttf?t=1680265522584') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-yanzhengma2:before {
+  content: "\e656";
+}
+
+.icon-zaicishurumima:before {
+  content: "\e69e";
+}
+
+.icon-mima:before {
+  content: "\e60d";
+}
+
+.icon-jurassic_user:before {
+  content: "\e6a4";
+}
+
