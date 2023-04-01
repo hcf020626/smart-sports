@@ -1,5 +1,5 @@
-// 导入数据库连接池
-const pool = require('../utils/DBHelper')
+// 导入自己封装好的数据库工具
+const db = require('../utils/DBHelper')
 //导入对用户密码进行 md5 加密的模块
 const md5 = require('md5')
 // 导入 JWT 模块
@@ -15,7 +15,7 @@ require('dotenv').config()
 const svgCaptcha = require('svg-captcha')
 
 // 用户登录的处理函数
-exports.userLogin = (req, resp, next) => {
+exports.userLogin = async (req, resp, next) => {
 	// 接收表单数据：
 	const user = req.body;
 
@@ -27,16 +27,10 @@ exports.userLogin = (req, resp, next) => {
 		})
 	}
 
-	const sql = 'select * from t_parents where email=?'
-	pool.query(sql, [user.email], (err, results, fields) => {
-		// sql 语句执行出错
-		if (err) {
-			console.log("here err: ",err);
-			return resp.json({
-				status: 1,
-				msg: err.message
-			})
-		}
+	try {
+		let userInfo, studentInfo;
+		let sql = 'select * from t_parents where email=?'
+		let results = await db.exec(sql, [user.email]);
 
 		// 判断查询结果，如果查询到的数据不唯一，则表示用户不存在；如果查询到的数据唯一，则继续执行下一步。
 		if (results.length !== 1) {
@@ -53,45 +47,42 @@ exports.userLogin = (req, resp, next) => {
 				msg: '邮箱或密码错误'
 			})
 		}
-		
-		let userInfo = results[0];
-		let studentInfo;
-		
-		const sql = 'select * from t_students where id=?'
-		pool.query(sql, [userInfo.cur_bonding_id], (err, results, fields) => {
-			// sql 语句执行出错
-			if (err) {
-				return resp.json({
-					status: 1,
-					msg: err.message
-				})
-			}
-			
-			
-			if(results.length !== 1){
-				studentInfo = {}
-			}else {
-				studentInfo = results[0]
-			}
-			
-			
-			resp.json({
-				status: 0,
-				msg: '登录成功!',
-				data: {
-					userInfo,
-					studentInfo
-				},
-				// 为了方便客户端使用 Token，在服务器端直接拼接上 Bearer 的前缀
-				token: 'Bearer ' + jwt.encode(userInfo.email, process.env.SECRET_KEY)
-			})
-		})
-	})
 
+		userInfo = results[0];
+
+		sql = 'select * from t_students where id=?'
+		results = await db.exec(sql, [userInfo.cur_bonding_id]);
+
+		if (results.length !== 1) {
+			studentInfo = {}
+		}else{
+			studentInfo = results[0];
+		}
+
+		console.log("userInfo, studentInfo: ", userInfo, studentInfo);
+
+		resp.json({
+			status: 0,
+			msg: '登录成功!',
+			data: {
+				userInfo,
+				studentInfo
+			},
+			// 为了方便客户端使用 Token，在服务器端直接拼接上 Bearer 的前缀
+			token: 'Bearer ' + jwt.encode(userInfo.email, process.env.SECRET_KEY)
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，登录失败'
+		})
+	}
 }
 
 // 用户注册的处理函数
-exports.userReg = (req, resp, next) => {
+exports.userReg = async (req, resp, next) => {
 	//接收表单数据
 	const user = req.body;
 
@@ -111,16 +102,10 @@ exports.userReg = (req, resp, next) => {
 		} = jwt.decode(req.body.token, process.env.SECRET_KEY);
 
 		if (user.code === code.toString() && user.email === email) {
-			//检测邮箱是否被占用
-			const sql = 'select * from t_parents where email=?';
-			pool.query(sql, [user.email], (err, results, fields) => {
-				//执行 sql 语句失败
-				if (err) {
-					return resp.json({
-						status: 1,
-						msg: err.message
-					})
-				}
+			try {
+				//检测邮箱是否被占用
+				let sql = 'select * from t_parents where email=?';
+				let results = await db.exec(sql, [user.email], );
 
 				//如果查询记录不止一条，说明邮箱被占用
 				if (results.length > 0) {
@@ -130,38 +115,31 @@ exports.userReg = (req, resp, next) => {
 					})
 				}
 
-				// ? 表示占位符
-				const sql = 'insert into t_parents(`email`, `password`, `reg_time`)values(?, ?, ?)';
-				pool.query(
-					sql,
-					// 使用数组的形式为占位符指定具体的值
-					[
-						user.email,
-						md5(md5(user.password) + process.env.SECRET_KEY),
-						moment().format('YYYY-MM-DD HH:mm:ss')
-					],
-					function(error, results, fields) {
-						//执行 sql 语句失败
-						if (error) {
-							return resp.json({
-								status: 1,
-								msg: error.message
-							})
-						}
+				sql = 'insert into t_parents(`email`, `password`, `reg_time`)values(?, ?, ?)';
+				results = await db.exec(sql, [
+					user.email,
+					md5(md5(user.password) + process.env.SECRET_KEY),
+					moment().format('YYYY-MM-DD HH:mm:ss')
+				])
 
-						if (results.affectedRows !== 1) {
-							return resp.json({
-								status: 1,
-								msg: '用户注册失败，请稍后再试'
-							})
-						}
+				if (results.affectedRows !== 1) {
+					return resp.json({
+						status: 1,
+						msg: '服务器出现异常，注册失败'
+					})
+				}
 
-						resp.json({
-							status: 0,
-							msg: '注册成功！'
-						})
-					});
-			})
+				resp.json({
+					status: 0,
+					msg: '注册成功！'
+				})
+			} catch (e) {
+				//TODO handle the exception
+				resp.json({
+					status: 1,
+					msg: '服务器出现错误，注册失败'
+				})
+			}
 		} else {
 			resp.status(400).json({
 				status: 1,
@@ -178,7 +156,7 @@ exports.userReg = (req, resp, next) => {
 }
 
 // 发送邮箱验证码的处理函数
-exports.sendVerificationCode = (req, resp) => {
+exports.sendCode = (req, resp) => {
 
 	try {
 		// 接收表单数据
@@ -209,7 +187,7 @@ exports.sendVerificationCode = (req, resp) => {
 		console.log("e: ", e);
 		resp.status(500).json({
 			status: 1,
-			msg: '服务器发生错误，验证码发送失败'
+			msg: '服务器出现错误，验证码发送失败'
 		})
 	}
 
@@ -242,14 +220,14 @@ exports.sendVerificationCode = (req, resp) => {
 }
 
 
-exports.saveUserInfo = (req, resp, next) => {
+exports.saveUserInfo = async (req, resp, next) => {
 
 	const {
 		email,
 		realname,
 		gender,
 		phone,
-		idCard
+		idcard
 	} = req.body;
 	const {
 		filename
@@ -257,37 +235,38 @@ exports.saveUserInfo = (req, resp, next) => {
 
 	const avatar_url = '/account/avatars/' + filename;
 
-	const sql = "update t_parents set realname=?, gender=?, phone=?, idCard=? , avatar_url=? where email=?"
+	try {
+		const sql = "update t_parents set realname=?, gender=?, phone=?, idCard=? , avatar_url=? where email=?"
 
-	pool.query(sql, [realname, gender, phone, idCard, avatar_url, email], (err, results, fields) => {
-		if (err) {
-			return resp.json({
-				status: 1,
-				msg: err.message
-			})
-		}
+		const results = await db.exec(sql, [realname, gender, phone, idcard, avatar_url, email]);
 
 		if (results.affectedRows !== 1) {
-			console.log("results: ", results);
 			return resp.json({
 				status: 1,
-				msg: '保存失败，请稍后再试'
+				msg: '服务器出现异常，保存失败'
 			})
 		}
 
 		resp.json({
 			status: 0,
 			msg: '保存成功！',
-			data: {
+			updatedUserInfo: {
 				email,
 				realname,
 				gender,
 				phone,
-				idCard,
+				idcard,
 				avatar_url
 			}
 		})
-	})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，保存失败'
+		})
+	}
 }
 
 // 发送图形验证码的处理函数
@@ -313,22 +292,18 @@ exports.sendCaptcha = (req, resp, next) => {
 }
 
 // 修改密码的处理函数
-exports.updatePassword = (req, resp, next) => {
+exports.updatePassword = async (req, resp, next) => {
 	const {
 		email,
 		oldPassword,
 		newPassword,
 		token
 	} = req.body;
-	console.log("token: ", token);
 
 	try {
 		const {
 			captcha
 		} = jwt.decode(token, process.env.SECRET_KEY)
-
-		console.log("captcha: ", captcha);
-		console.log("req.body.captcha: ", req.body.captcha);
 
 		if (req.body.captcha.toLocaleUpperCase() !== captcha.toLocaleUpperCase()) {
 			return resp.json({
@@ -337,54 +312,38 @@ exports.updatePassword = (req, resp, next) => {
 			})
 		}
 
-		const sql = 'select * from t_parents where email=?';
-
-		pool.query(sql, [email], (err, results, fields) => {
-			if (err) {
-				return resp.json({
-					status: 1,
-					msg: err.message
-				})
-			}
-
-			if (results.length !== 1) {
-				return resp.json({
-					status: 1,
-					msg: '查询密码失败，请稍后再试'
-				})
-			}
-
-			if (results[0].password !== md5(md5(oldPassword) + process.env.SECRET_KEY)) {
-				return resp.json({
-					status: 1,
-					msg: '旧密码填写错误，请重新输入'
-				})
-			}
-
-			const sql = 'update t_parents set password=? where email=?';
-			const encryptedPassword = md5(md5(newPassword) + process.env.SECRET_KEY);
-
-			pool.query(sql, [encryptedPassword, email], (err, results, fields) => {
-				if (err) {
-					return resp.json({
-						status: 1,
-						msg: err.message
-					})
-				}
-
-				if (results.affectedRows !== 1) {
-					return resp.json({
-						status: 1,
-						msg: '修改失败，请稍后再试'
-					})
-				}
-
-				resp.json({
-					status: 0,
-					msg: '修改成功！请重新登录',
-					password: encryptedPassword
-				})
+		let sql = 'select * from t_parents where email=?';
+		let results = await db.exec(sql, [email]);
+		
+		if (results.length !== 1) {
+			return resp.json({
+				status: 1,
+				msg: '服务器出现异常，修改密码失败'
 			})
+		}
+		
+		if (results[0].password !== md5(md5(oldPassword) + process.env.SECRET_KEY)) {
+			return resp.json({
+				status: 1,
+				msg: '旧密码填写错误，请重新输入'
+			})
+		}
+		
+		const encryptedPassword = md5(md5(newPassword) + process.env.SECRET_KEY);
+		sql = 'update t_parents set password=? where email=?';
+		results = await db.exec(sql, [encryptedPassword, email]);
+		
+		if (results.affectedRows !== 1) {
+			return resp.json({
+				status: 1,
+				msg: '修改失败，请稍后再试'
+			})
+		}
+		
+		resp.json({
+			status: 0,
+			msg: '修改成功！请重新登录',
+			password: encryptedPassword
 		})
 	} catch (e) {
 		//TODO handle the exception
@@ -396,27 +355,20 @@ exports.updatePassword = (req, resp, next) => {
 	}
 }
 
-exports.changeBonding = (req, resp, next) => {
+exports.changeBonding = async (req, resp, next) => {
 	const {
 		email
 	} = req.body;
 	const id = req.body.id === 'null' ? null : req.body.id;
 
-	const sql = 'update t_parents set cur_bonding_id=? where email=?';
-
-	pool.query(sql, [id, email], (err, results, fields) => {
-		//执行 sql 语句失败
-		if (err) {
-			return resp.json({
-				status: 1,
-				msg: err.message
-			})
-		}
+	try {
+		const sql = 'update t_parents set cur_bonding_id=? where email=?';
+		const results = await db.exec(sql, [id, email]);
 
 		if (results.affectedRows !== 1) {
 			return resp.json({
 				status: 1,
-				msg: '绑定失败，请稍后再试'
+				msg: '服务器出现异常，绑定失败'
 			})
 		}
 
@@ -431,7 +383,14 @@ exports.changeBonding = (req, resp, next) => {
 				msg: '已解除绑定！！',
 			})
 		}
-	})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.status(500).json({
+			status: 1,
+			msg: '服务器发生错误，请稍后再试'
+		})
+	}
 }
 
 exports.verifyAndSaveIdCard = (req, resp, next) => {

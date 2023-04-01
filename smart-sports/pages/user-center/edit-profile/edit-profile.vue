@@ -1,41 +1,46 @@
 <template>
+	<!--页面容器-->
 	<view class="container">
-		<!-- 消息提示组件，用于提示用户在登录时碰到的问题 -->
+		<!-- 消息提示组件，用于提示用户在保存个人资料时碰到的问题 -->
 		<u-toast ref="uToast"></u-toast>
 
-		<!--
-			通过model参数绑定一个对象，这个对象的属性为各个u-form-item内组件的对应变量；
-			由于表单验证和绑定表单规则时，需要通过ref操作，故这里需要给form组件声明ref="uForm"属性。
-		 -->
-		<u-form :model="form" ref="uForm" labelPosition="left" labelWidth="70" :labelStyle="{fontSize:'30rpx'}"
+		<u-form :model="formData" ref="uForm" labelPosition="left" labelWidth="70" :labelStyle="{fontSize:'30rpx'}"
 			errorType="border-bottom">
-			<!-- 
-				prop为传入Form组件的rules中的属性字段
-			 -->
+			<!--头像表单项，使用 u-avatar 显示头像，点击头像触发上传事件-->
 			<u-form-item label="头像" borderBottom>
-				<u-avatar :src="form.avatarUrl" shape="circle" size="60" slot="right" @click="uploadAvatar"></u-avatar>
+				<u-avatar slot="right" :src="formData.avatar_url" shape="circle" size="60" @click="uploadAvatar">
+				</u-avatar>
 			</u-form-item>
+			<!--姓名表单项，使用 u-input 输入姓名，必须为中文-->
 			<u-form-item label="姓名" prop="realname" borderBottom>
-				<u-input type="text" v-model="form.realname" border="none" placeholder="姓名,只能为中文" inputAlign="right">
+				<u-input type="text" v-model="formData.realname" border="none" placeholder="姓名,只能为中文"
+					inputAlign="right">
 				</u-input>
 			</u-form-item>
+			<!--性别表单项，使用 u-input 输入框，点击输入框弹出 u-action-sheet 选择性别-->
 			<u-form-item label="性别" prop="gender" borderBottom @click="isShowActionSheet = true">
-				<u-input type="text" v-model="form.gender" border="none" placeholder="请选择性别" disabled
+				<u-input type="text" v-model="formData.gender" border="none" placeholder="请选择性别" disabled
 					disabledColor="#F5F5F5" inputAlign="right" suffixIcon="arrow-right"></u-input>
 			</u-form-item>
+			<!--手机号表单项，使用 u-input 输入手机号-->
 			<u-form-item label="手机号" prop="phone" borderBottom>
-				<u-input type="number" v-model="form.phone" border="none" placeholder="请输入手机号码" inputAlign="right">
+				<u-input type="number" v-model="formData.phone" border="none" placeholder="请输入手机号码" inputAlign="right">
 				</u-input>
 			</u-form-item>
-			<u-form-item label="身份证号" prop="idCard" borderBottom>
-				<u-input type="idcard" v-model="form.idCard" border="none" placeholder="请输入身份证号码" disabled disabledColor="whitesmoke" color="#909399" inputAlign="right">
+			<!--身份证号表单项，使用 u-input 输入身份证号，需要校验-->
+			<u-form-item label="身份证号" prop="idcard" borderBottom>
+				<u-input type="idcard" v-model="formData.idcard" border="none" placeholder="请输入身份证号码"
+					inputAlign="right">
 				</u-input>
 			</u-form-item>
+
+			<!--保存按钮，点击触发 saveUserInfo 事件-->
 			<u-form-item>
-				<u-button type="primary" @click="saveUserInfo">保存</u-button>
+				<u-button type="primary" :loading="isLoading" loading-text="保存" @click="saveUserInfo">保存</u-button>
 			</u-form-item>
 		</u-form>
-		
+
+		<!--性别选择弹窗，使用 u-action-sheet 显示-->
 		<u-action-sheet :actions="actionList" :closeOnClickOverlay="false" :closeOnClickAction="true"
 			@select="selectGender" @close="isShowActionSheet=false" :show="isShowActionSheet" cancelText="取消">
 		</u-action-sheet>
@@ -51,16 +56,18 @@
 	import {
 		baseURL
 	} from '@/config.js'
+	import api from '@/api/index.js'
 	export default {
 		data() {
 			return {
-				form: {
+				formData: {
 					realname: '',
 					gender: '',
 					phone: '',
-					idCard: '',
-					avatarUrl: '',
+					idcard: '',
+					avatar_url: '',
 				},
+				isLoading: false,
 				isShowActionSheet: false,
 				actionList: [{
 						name: '男'
@@ -102,84 +109,83 @@
 							trigger: ['change', 'blur'],
 						}
 					],
+					idcard: [{
+						required: true,
+						trigger: ['change', 'blur'],
+					}, {
+						pattern: /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dxX]$/g,
+						// 正则检验前先将值转为字符串
+						transform(value) {
+							return String(value);
+						},
+						trigger: ['blur', 'change']
+					}]
 				}
 			}
 		},
 		computed: {
 			...mapState('accountModule', ['userInfo', 'token']),
-			...mapGetters('accountModule', ['fullAvatarURL'])
+			...mapGetters('accountModule', ['full_avatar_url'])
 		},
 		methods: {
-			...mapActions('accountModule', ['updateUser']),
+			...mapActions('accountModule', ['updateUserInfo']),
 			selectGender(index) {
-				this.form.gender = index.name
+				this.formData.gender = index.name
 			},
 			uploadAvatar() {
 				uni.chooseImage({
 					count: 1,
 					success: (res) => {
-						this.form.avatarUrl = res.tempFilePaths[0]
+						this.formData.avatar_url = res.tempFilePaths[0]
 					}
 				})
 			},
-			async saveUserInfo() {
-				try {
-					const isValid = await this.$refs.uForm.validate();
-
-					if (!isValid) {
-						return this.$refs.uToast.show({
-							type: 'error',
-							message: '请检查表单是否填写完整',
-							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-							position: 'top'
-						})
-					}
-
+			saveUserInfo() {
+				this.$refs.uForm.validate().then(res => {
+					//如果表单合法，isLoading变量会被设置为true，表示正在加载中
+					this.isLoading = true;
+					// 使用setTimeout()函数模拟网络延迟
 					try {
-						const res = await new Promise((resolve, reject) => {
-							uni.uploadFile({
-								url: baseURL + '/account/save-user-info',
-								header: {
-									'Authorization': this.token
-								},
-								filePath: this.form.avatarUrl,
-								name: 'avatar',
-								method: 'POST',
-								formData: {
-									email: this.userInfo.email,
-									realname: this.form.realname,
-									gender: this.form.gender,
-									phone: this.form.phone,
-									idCard: this.form.idCard
-								},
-								success: resolve,
-								fail: reject,
+						// 使用setTimeout()函数模拟网络延迟
+						setTimeout(async () => {
+							// 调用api.account.saveUserInfo()异步请求保存用户接口，获取返回的status、msg、token和data等数据
+							const {
+								data: {
+									msg,
+									status,
+									updatedUserInfo
+								}
+							} = await api.account.saveUserInfo({
+								avatar_url: this.formData.avatar_url,
+								email: this.userInfo.email,
+								realname: this.formData.realname,
+								gender: this.formData.gender,
+								phone: this.formData.phone,
+								idcard: this.formData.idcard
 							});
-						});
-						const {
-							msg,
-							status,
-							data
-						} = JSON.parse(res.data)
+							
+							this.isLoading = false;
+							
+							if (!status) {
+								// 请求成功，更新本地用户信息
+								this.updateUserInfo(updatedUserInfo)
+								// 弹出保存成功的提示框
+								this.$refs.uToast.show({
+									type: 'success',
+									message: msg,
+									icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
+									position: 'top'
+								})
+							} else {
+								this.$refs.uToast.show({
+									type: 'error',
+									message: msg,
+									icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+									position: 'top'
+								})
+							}
 
-						if (!status) {
-							// 请求成功，更新本地用户信息
-							this.updateUser(data)
-							// 弹出保存成功的提示框
-							this.$refs.uToast.show({
-								type: 'success',
-								message: msg,
-								icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
-								position: 'top'
-							})
-						} else {
-							this.$refs.uToast.show({
-								type: 'error',
-								message: msg,
-								icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-								position: 'top'
-							})
-						}
+						}, 500)
 					} catch (err) {
 						console.log("err: ", err);
 						this.$refs.uToast.show({
@@ -189,22 +195,24 @@
 							position: 'top'
 						})
 					}
-				} catch (e) {
-					this.$refs.uToast.show({
+				}).catch(errors => {
+					console.log("errors: ", errors);
+					// 如果表单不合法，则在页面上弹出错误提示框
+					return this.$refs.uToast.show({
 						type: 'error',
-						message: '请检查表单是否填写完整',
+						message: '请正确填写表单的每一项',
 						icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
 						position: 'top'
 					})
-				}
+				})
 			}
 		},
 		created() {
-			this.form.realname = this.userInfo.realname;
-			this.form.gender = this.userInfo.gender;
-			this.form.phone = this.userInfo.phone;
-			this.form.idCard = this.userInfo.idcard;
-			this.form.avatarUrl = this.fullAvatarURL;
+			this.formData.realname = this.userInfo.realname;
+			this.formData.gender = this.userInfo.gender;
+			this.formData.phone = this.userInfo.phone;
+			this.formData.idcard = this.userInfo.idcard;
+			this.formData.avatar_url = this.full_avatar_url;
 		},
 		onReady() {
 			//如果需要兼容微信小程序，并且校验规则中含有方法等，只能通过setRules方法设置规则。

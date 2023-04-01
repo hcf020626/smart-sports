@@ -1,4 +1,4 @@
-import {login, reg, sendCode, updatePassword, changeBonding} from './account.js'
+import {login, reg, sendCode, saveUserInfo, updatePassword, changeBonding} from './account.js'
 import {getStudentsByIdcard} from './student.js'
 
 export default {
@@ -6,10 +6,12 @@ export default {
 		login,
 		reg,
 		sendCode,
+		saveUserInfo,
 		updatePassword,
 		changeBonding
 	},
 	student: {
 		getStudentsByIdcard
-	}
+	},
+	
 }

@@ -15,7 +15,8 @@
 				<u-form-item prop="email">
 					<!-- 邮箱输入框 -->
 					<u-input type="text" v-model="loginFormData.email" placeholder="请输入邮箱" clearable border="bottom">
-						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-jurassic_user" size="20"></uni-icons>
+						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-jurassic_user" size="20">
+						</uni-icons>
 					</u-input>
 				</u-form-item>
 				<u-form-item prop="password">
@@ -96,94 +97,95 @@
 			}
 		},
 		methods: {
-			...mapActions('accountModule', ['setUserInfo']),
+			...mapActions('accountModule', ['userLogin']),
 			...mapActions('studentModule', ['setStudentInfo']),
-			async loginHandler() {
-				const isValid = await this.$refs.uForm.validate(); // 验证表单是否合法
+			loginHandler() {
+				this.$refs.uForm.validate().then(res => {
+					//如果表单合法，isLoading变量会被设置为true，表示正在加载中
+					this.isLoading = true;
+					// 使用setTimeout()函数模拟网络延迟
+					setTimeout(async () => {
+						try {
+							// 调用api.account.login()异步请求登录接口，获取返回的status、msg、token和data等数据
+							const {
+								data: {
+									status,
+									msg,
+									token,
+									data
+								}
+							} = await api.account.login({
+								email: this.loginFormData.email,
+								password: this.loginFormData.password
+							});
 
-				// 如果表单不合法，则在页面上弹出错误提示框
-				if (!isValid) {
+							if (!status) {
+								// 将用户信息和token保存到Vuex和本地存储中
+								this.userLogin({
+									token,
+									userInfo: data.userInfo
+								})
+
+								const fullSrc = baseURL + '/student/avatars/' + (data.studentInfo
+									.gender === '女' ? (Math.floor(Math.random() * 10) + 1) : (
+										Math
+										.floor(Math.random() * 8) + 11)) + '.png';
+								// 将学生信息保存到Vuex和本地存储中
+								this.setStudentInfo({
+									imgSrc: fullSrc,
+									name: data.studentInfo.name,
+									gender: data.studentInfo.gender,
+									age: data.studentInfo.age,
+									school: data.studentInfo.school,
+									className: data.studentInfo.class,
+									id: data.studentInfo.id
+								})
+
+								// 弹出登录成功的提示框，并稍后跳转到首页
+								this.$refs.uToast.show({
+									type: 'success',
+									message: msg,
+									icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
+									position: 'top',
+									duration: 1500,
+									complete() {
+										uni.switchTab({
+											url: '/pages/index/index'
+										})
+									}
+								})
+							} else {
+								// 弹出登录失败的提示框
+								this.$refs.uToast.show({
+									type: 'error',
+									message: msg,
+									icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+									position: 'top'
+								})
+							}
+						} catch (e) {
+							//TODO handle the exception
+							console.log("e: ",e);
+							this.$refs.uToast.show({
+								type: 'error',
+								message: '请求发生问题，请稍后再试',
+								icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+								position: 'top'
+							})
+						}finally{
+							this.isLoading = false;
+						}
+					}, 500)
+				}).catch(errors => {
+					console.log("errors: ", errors);
+					// 如果表单不合法，则在页面上弹出错误提示框
 					return this.$refs.uToast.show({
 						type: 'error',
 						message: '请正确填写表单的每一项',
 						icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
 						position: 'top'
 					})
-				}
-
-				//如果表单合法，isLoading变量会被设置为true，表示正在加载中
-				this.isLoading = true;
-				try {
-					// 使用setTimeout()函数模拟网络延迟
-					setTimeout(async () => {
-						// 调用api.account.login()异步请求登录接口，获取返回的status、msg、token和data等数据
-						const {
-							data: {
-								status,
-								msg,
-								token,
-								data
-							}
-						} = await api.account.login({
-							email: this.loginFormData.email,
-							password: this.loginFormData.password
-						});
-
-						this.isLoading = false;
-
-						if (!status) {
-							// 将用户信息和token保存到Vuex和本地存储中
-							this.setUserInfo({
-								token,
-								userInfo: data.userInfo
-							})
-
-							const fullSrc = baseURL + '/student/avatars/' + (data.studentInfo
-								.gender === '女' ? (Math.floor(Math.random() * 10) + 1) : (Math
-									.floor(Math.random() * 8) + 11)) + '.png';
-							// 将学生信息保存到Vuex和本地存储中
-							this.setStudentInfo({
-								imgSrc: fullSrc,
-								name: data.studentInfo.name,
-								gender: data.studentInfo.gender,
-								age: data.studentInfo.age,
-								school: data.studentInfo.school,
-								className: data.studentInfo.class,
-								id: data.studentInfo.id
-							})
-
-							// 弹出登录成功的提示框，并稍后跳转到首页
-							this.$refs.uToast.show({
-								type: 'success',
-								message: msg,
-								icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
-								position: 'top',
-								duration: 1500,
-								complete() {
-									uni.switchTab({
-										url: '/pages/index/index'
-									})
-								}
-							})
-						} else {
-							// 弹出登录失败的提示框
-							this.$refs.uToast.show({
-								type: 'error',
-								message: msg,
-								icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-								position: 'top'
-							})
-						}
-					}, 500)
-				} catch (e) {
-					//TODO handle the exception
-					this.$refs.uToast.show({
-						type: 'error',
-						message: '登录发生异常，请稍后再试',
-						icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-						position: 'top'
-					})
-				}
+				})
 			},
 		},
 		onLoad({

@@ -1,18 +1,11 @@
 <template>
+	<!-- 页面容器 -->
 	<view class="container">
-		
 		<!-- 消息提示组件，用于提示用户在登录时碰到的问题 -->
 		<u-toast ref="uToast"></u-toast>
 
-		<!-- 
-			通过model参数绑定一个对象，这个对象的属性为各个u-form-item内组件的对应变量。
-			通过setRules方法给表单设置规则。
-			由于表单验证和绑定表单规则时，需要通过ref操作，故这里需要给form组件声明ref="uForm"属性。
-		 -->
 		<u-form :model="formData" ref="uFrom">
-			<!-- 
-				prop为传入Form组件的 rules 中的属性字段
-			 -->
+
 			<u-form-item prop="oldPassword">
 				<u-input type="password" v-model="formData.oldPassword" placeholder="请输入旧密码" :clearable="true"></u-input>
 			</u-form-item>

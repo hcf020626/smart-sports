@@ -1,19 +1,32 @@
 <script>
+	import {mapActions} from 'vuex'
+	
 	export default {
+		methods: {
+			...mapActions(['setTheLatestData']),
+			checkIsLogin(){
+				// 判断用户是否登录
+				if(!uni.getStorageSync('token')){
+					uni.showModal({
+						content: '您当前未登录，请先登录后再进行操作',
+						showCancel: false,
+						success() {
+							uni.reLaunch({
+								url: '/pages/auth/login/login'
+							})
+						}
+					})
+				}else {
+					this.getAndSetTheLatestData()
+				}
+			},
+			getAndSetTheLatestData(){
+				this.setTheLatestData()
+			}
+		},
 		onLaunch: function() {
 			console.log('App Launch')
-			// 判断用户是否登录
-			if(!uni.getStorageSync('token')){
-				uni.showModal({
-					content: '您当前未登录，请先登录后再进行操作',
-					showCancel: false,
-					success() {
-						uni.reLaunch({
-							url: '/pages/auth/login/login'
-						})
-					}
-				})
-			}
+			this.checkIsLogin()
 		},
 		onShow: function() {
 			console.log('App Show')

@@ -11,7 +11,7 @@ userRouter.post('/login', require('../router_handler/userRouterHandlers').userLo
 userRouter.post('/reg', require('../router_handler/userRouterHandlers').userReg)
 
 // 发送邮箱验证码
-userRouter.post('/send-verification-code', require('../router_handler/userRouterHandlers').sendVerificationCode)
+userRouter.post('/send-code', require('../router_handler/userRouterHandlers').sendCode)
 
 
 // 保存用户信息

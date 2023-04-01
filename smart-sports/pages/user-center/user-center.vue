@@ -1,22 +1,18 @@
 <template>
-	<!-- 整个页面的最外层容器，使用flex布局，纵向居中 -->
+	<!-- 整个页面的最外层容器 -->
 	<view class="container">
-		<!-- 该部分展示了用户头像、真实姓名和跳转链接，通过点击该区域可以进入到用户信息编辑页面。 -->
-		<view class="custom-cell-group" hover-class="custom-cell-hover-class" @tap="goToEditProfile">
-			<!-- 用户头像 -->
-			<view class="custom-cell avatar">
-				<u-avatar :src="fullAvatarURL" size="70"></u-avatar>
-			</view>
-			<!-- 真实姓名 -->
-			<view class="custom-cell realname">
-				<text>{{userInfo.realname?userInfo.realname:'亲，您还未设置真实姓名'}}</text>
-			</view>
-			<!-- 右侧箭头图标 -->
-			<view class="custom-cell right-icon">
-				<u-icon name="arrow-right" label="主页" labelPos="left" labelSize="12" size="13"></u-icon>
-			</view>
-		</view>
-
+		<!-- 该部分展示了用户头像、真实姓名 -->
+		<u-cell-group :border="false">
+			<u-cell :border="false">
+				<!-- 单元格左侧图标，使用 u-avatar 组件显示用户头像 -->
+				<u-avatar slot="icon" :src="full_avatar_url" size="70"></u-avatar>
+				<template slot="title">
+					<u-text :text="userInfo.realname?userInfo.realname:'亲，您还未设置真实姓名'"></u-text>
+				</template>
+				<!-- 标题下方的描述信息 -->
+				<u-text slot="label" :text="userInfo.phone | phoneMask" color="#909399" size="13.5" :show-sex="true"></u-text>
+			</u-cell>
+		</u-cell-group>
 		<!-- 功能入口展示区域 -->
 		<view class="grid">
 			<!-- 循环遍历渲染每一个功能入口 -->
@@ -69,10 +65,10 @@
 			return { // 返回数据对象
 				gridItems: [ // 定义一个数组gridItems
 					{ // 对象1
-						iconName: 'icon-shenfenrenzheng', // 图标名称
+						iconName: 'icon-bianjigerenziliao', // 图标名称
 						iconColor: '#2b85e4 ', // 图标颜色
-						title: '身份认证', // 标题
-						pagePath: '/pages/user-center/authentification/authentification' // 跳转路径
+						title: '个人资料', // 标题
+						pagePath: '/pages/user-center/edit-profile/edit-profile' // 跳转路径
 					},
 					{
 						iconName: 'icon-changyonglvyouyewutubiao_fuzhi_qinzi', // 图标名称
@@ -104,11 +100,6 @@
 					url: '/pages/auth/login/login?status=1' // 跳转到登录页
 				})
 			},
-			goToEditProfile() { // 定义goToEditProfile方法
-				uni.navigateTo({ // 跳转到编辑用户资料页
-					url: '/pages/user-center/edit-profile/edit-profile'
-				})
-			},
 			goToPage(path) { // 定义goToPage方法
 				uni.navigateTo({ // 跳转到指定页面
 					url: path
@@ -118,7 +109,20 @@
 		computed: {
 			// 使用mapState和mapGetters函数从Vuex store中获取accountModule模块的userInfo状态和fullAvatarURL计算属性。
 			...mapState('accountModule', ['userInfo']),
-			...mapGetters('accountModule', ['fullAvatarURL'])
+			...mapGetters('accountModule', ['full_avatar_url'])
+		},
+		filters: {
+			// 电话号码脱敏
+			phoneMask(value) {
+				if (!value) return ''
+				const visibleDigitsStart = 3 // 号码中开头的可见数字数量
+				const visibleDigitsEnd = 2 // 号码结尾的可见数字数量
+				const maskedDigits = value.length - visibleDigitsStart - visibleDigitsEnd // 中间需要屏蔽的数字数量
+				const masked = '*'.repeat(maskedDigits)
+				const visibleStart = value.substr(0, visibleDigitsStart)
+				const visibleEnd = value.substr(value.length - visibleDigitsEnd, visibleDigitsEnd)
+				return `${visibleStart}${masked}${visibleEnd}`
+			}
 		}
 	}
 </script>
@@ -130,30 +134,6 @@
 		background-color: WhiteSmoke;
 	}
 
-	.custom-cell-group {
-		width: 100vw;
-		height: 200rpx;
-		display: flex;
-		align-items: center;
-	}
-
-	.custom-cell {
-		margin: auto 20rpx;
-	}
-
-	.custom-cell-group .avatar {}
-
-	.custom-cell-group .realname {
-		flex-grow: 1;
-		color: #969799;
-	}
-
-	.custom-cell-group .right-icon {}
-	
-	.custom-cell-hover-class {
-		opacity: 0.7;
-	}
-
 	.grid {
 		display: flex;
 		flex-direction: row;
@@ -163,6 +143,7 @@
 		width: 95vw;
 		margin: 30rpx auto;
 		background-color: white;
+		border-radius: 20rpx;
 	}
 
 	.grid-item {

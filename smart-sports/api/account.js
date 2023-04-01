@@ -43,6 +43,23 @@ export function sendCode(email){
 	})
 }
 
+// 保存用户信息
+export function saveUserInfo({avatar_url, email, realname, gender, phone, idcard}){
+	return http.upload('/account/save-user-info', {
+		filePath: avatar_url,	// 要上传文件资源的路径。
+		name: 'avatar',	// 文件对应的 key , 开发者在服务器端通过这个 key 可以获取到文件二进制内容
+		formData: {
+			email,
+			realname,
+			gender,
+			phone,
+			idcard
+		},
+		custom: {auth: true}
+	})
+}
+
+
 // 修改密码
 export function updatePassword({email, oldPassword, newPassword, captcha, token}){
 	return http.request({

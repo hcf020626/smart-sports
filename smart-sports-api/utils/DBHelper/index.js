@@ -11,5 +11,25 @@ const pool  = mysql.createPool({
   database        : process.env.DB_DATABASE
 });
 
-// 导出数据库连接池
-module.exports = pool
+module.exports = {
+    exec(sql, params = []) {
+        return new Promise((resolve, reject) => {
+            pool.getConnection(function (err, conn) {
+                if (err) {
+                    console.log("连接数据库失败:" + err.message);
+                    reject(err.message)
+                }
+                conn.query(sql, params, (err, results) => {
+                    if (err) {
+                        console.log("执行sql语句失败:" + err.message);
+                        reject(err.message)
+                    }
+                    resolve(results);
+                    //释放连接
+                    conn.release();
+                })
+
+            })
+        })
+    }
+}

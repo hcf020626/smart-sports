@@ -142,8 +142,8 @@
 				 	this.$set(item, 'imgSrc', fullSrc);
 				 	//将处理后的学生信息对象以及一个表示该学生是否被选中的布尔值（这里我们用checked表示）封装成一个对象，并将该对象推入到cellItems数组中。
 				 	this.cellItems.push({studentInfo: item, checked: this.userInfo.cur_bonding_id === item.id});
-					uni.hideLoading();
 				 })
+				 uni.hideLoading();
 			 }, 500)
 			
 			

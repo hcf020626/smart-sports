@@ -68,13 +68,6 @@
 			}
 
 		}, {
-			"path": "pages/user-center/authentification/authentification",
-			"style": {
-				"navigationBarTitleText": "身份认证",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
 			"path": "pages/user-center/bonding/bonding",
 			"style": {
 				"navigationBarTitleText": "亲子绑定",
