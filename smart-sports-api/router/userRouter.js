@@ -20,15 +20,14 @@ userRouter.post('/save-user-info', require('../utils/MulterHelper').single('avat
 // 发送图形验证码
 userRouter.get('/send-captcha', require('../router_handler/userRouterHandlers').sendCaptcha)
 
-userRouter.post('/verify-and-save-idcard', require('../router_handler/userRouterHandlers').verifyAndSaveIdCard)
-
 //修改用户密码
 userRouter.post('/update-password', require('../router_handler/userRouterHandlers').updatePassword)
 
 // 换绑
 userRouter.post('/change-bonding', require('../router_handler/userRouterHandlers').changeBonding)
 
-
+// 获取最新的用户和对应的学生信息
+userRouter.post('/get-the-latest-info', require('../router_handler/userRouterHandlers').getTheLatestInfo)
 
 // 向外导出路由对象
 module.exports = userRouter

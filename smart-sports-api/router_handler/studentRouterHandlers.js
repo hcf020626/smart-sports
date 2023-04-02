@@ -17,7 +17,7 @@ exports.getStudentsByIdcard = async (req, resp, next) => {
 		}
 		
 		resp.json({
-			status: 1,
+			status: 0,
 			msg: '查询成功',
 			data: results
 		})
@@ -26,7 +26,7 @@ exports.getStudentsByIdcard = async (req, resp, next) => {
 		console.log("e: ", e);
 		resp.json({
 			status: 1,
-			msg: '服务器出现错误，登录失败'
+			msg: '服务器出现错误，查找学生信息失败'
 		})
 	}
 }

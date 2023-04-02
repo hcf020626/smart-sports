@@ -44,7 +44,7 @@ export function sendCode(email){
 }
 
 // 保存用户信息
-export function saveUserInfo({avatar_url, email, realname, gender, phone, idcard}){
+export function saveUserInfo({email, realname, gender, idcard, phone, avatar_url, cur_bonding_id}){
 	return http.upload('/account/save-user-info', {
 		filePath: avatar_url,	// 要上传文件资源的路径。
 		name: 'avatar',	// 文件对应的 key , 开发者在服务器端通过这个 key 可以获取到文件二进制内容
@@ -53,7 +53,8 @@ export function saveUserInfo({avatar_url, email, realname, gender, phone, idcard
 			realname,
 			gender,
 			phone,
-			idcard
+			idcard,
+			cur_bonding_id
 		},
 		custom: {auth: true}
 	})
@@ -84,6 +85,18 @@ export function changeBonding({email, id}){
 		data: {
 			email,
 			id
+		},
+		custom: {auth: true}
+	})
+}
+
+// 获取最新的用户和对应的学生信息
+export function getTheLatestInfo(email){
+	return http.request({
+		method: 'POST',
+		url: '/account/get-the-latest-info',
+		data: {
+			email
 		},
 		custom: {auth: true}
 	})

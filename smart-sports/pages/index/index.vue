@@ -1,9 +1,15 @@
 <template>
 	<view class="container">
-		<template v-if="userInfo.cur_bonding_id">
+		<view class="errMsg" v-if="userInfo.cur_bonding_id === '-1'">
+			<view>您当前的身份证号码已发送变更，请重新进行亲子绑定再操作！<navigator url="../user-center/bonding/bonding" open-type="navigate" class="link">亲子绑定</navigator></view>
+		</view>
+		<view class="errMsg" v-else-if="userInfo.cur_bonding_id === ''">
+			<view>您当前未进行亲子绑定或者亲子绑定失败，请亲子绑定成功后再操作！<navigator url="../user-center/bonding/bonding" open-type="navigate" class="link">亲子绑定</navigator></view>
+		</view>
+		<template v-else>
 			<view class="card">
 				<view class="avatar">
-					<u-avatar :src="studentInfo.imgSrc" size="60"></u-avatar>
+					<u-avatar :src="studentInfo.avatar_url" size="60"></u-avatar>
 				</view>
 				<view class="studentInfo">
 					<view>姓名：{{studentInfo.name}}</view>
@@ -26,14 +32,11 @@
 				</view>
 			</view>
 		</template>
-		<view class="unbonding-tip" v-else>
-			<view>您当前未进行亲子绑定或者亲子绑定失败，请亲子绑定成功后再操作！<navigator url="../user-center/bonding/bonding" open-type="navigate" class="link">亲子绑定</navigator></view>
-		</view>
 	</view>
 </template>
 
 <script>
-	import {mapState, mapActions} from 'vuex'
+	import {mapState} from 'vuex'
 	export default {
 		data() {
 			return {
@@ -82,7 +85,7 @@
 		width: 100vw;
 		height: 100vh;
 		background-color: whitesmoke;
-		background-image: url('@/static/bg.png');
+		background-image: url('@/static/images/bg.png');
 		background-repeat: no-repeat;
 		background-size: 100%;
 		background-position: center;
@@ -131,7 +134,7 @@
 		opacity: 0.7;
 	}
 	
-	.unbonding-tip {
+	.errMsg {
 		width: 90%;
 		margin: 0 auto;
 		padding-top: 200rpx;
@@ -140,7 +143,7 @@
 		color: #82848a;
 	}
 	
-	.unbonding-tip .link {
+	.errMsg .link {
 		color: #2979ff;
 		text-decoration: underline;
 		display: inline;

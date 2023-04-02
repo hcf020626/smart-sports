@@ -160,14 +160,14 @@
 
 		"list": [{
 				"pagePath": "pages/index/index",
-				"iconPath": "static/tabBar/1-index.png",
-				"selectedIconPath": "static/tabBar/1-index-selected.png",
+				"iconPath": "static/images/tabBar/1-index.png",
+				"selectedIconPath": "static/images/tabBar/1-index-selected.png",
 				"text": "首页"
 			},
 			{
 				"pagePath": "pages/user-center/user-center",
-				"iconPath": "static/tabBar/2-user-center.png",
-				"selectedIconPath": "static/tabBar/2-user-center-selected.png",
+				"iconPath": "static/images/tabBar/2-user-center.png",
+				"selectedIconPath": "static/images/tabBar/2-user-center-selected.png",
 				"text": "我的"
 			}
 		]

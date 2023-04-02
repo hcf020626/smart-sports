@@ -5,7 +5,7 @@
 
 		<!-- 头部 logo -->
 		<view class="header">
-			<image src="@/static/logo.png"></image>
+			<image src="@/static/images/logo.png"></image>
 		</view>
 
 		<!-- 主体部分 表单 -->
@@ -230,34 +230,44 @@
 
 					try {
 						setTimeout(async ()=>{
-							// 调用api.account.sendCode()异步请求注册接口，获取返回的status、msg和token
-							const {
-								data: {
-									msg,
-									status,
-									token
+							try{
+								// 调用api.account.sendCode()异步请求注册接口，获取返回的status、msg和token
+								const {
+									data: {
+										msg,
+										status,
+										token
+									}
+								} = await api.account.sendCode(this.regFormData.email);
+								if (!status) {
+									this.regFormData.token = token;
+									this.$refs.uToast.show({
+										type: 'success',
+										message: msg,
+										icon: 'https://cdn.uviewui.com/uview/demo/toast/sucess.png',
+										position: 'top'
+									})
+									// 通知验证码组件内部开始倒计时
+									this.$refs.uCode.start();
+								} else {
+									this.$refs.uToast.show({
+										type: 'error',
+										message: msg,
+										icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+										position: 'top'
+									})
 								}
-							} = await api.account.sendCode(this.regFormData.email);
-							
-							uni.hideLoading()
-							
-							if (!status) {
-								this.regFormData.token = token;
-								this.$refs.uToast.show({
-									type: 'success',
-									message: msg,
-									icon: 'https://cdn.uviewui.com/uview/demo/toast/sucess.png',
-									position: 'top'
-								})
-								// 通知验证码组件内部开始倒计时
-								this.$refs.uCode.start();
-							} else {
+							}catch(e){
+								//TODO handle the exception
+								console.log("e: ",e);
 								this.$refs.uToast.show({
 									type: 'error',
-									message: msg,
+									message: '请求发生问题，请稍后再试',
 									icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
 									position: 'top'
 								})
+							}finally{
+								uni.hideLoading()
 							}
 						}, 500)
 						

@@ -5,7 +5,7 @@
 
 		<!-- 头部 logo -->
 		<view class="header">
-			<image src="@/static/logo.png"></image>
+			<image src="@/static/images/logo.png"></image>
 		</view>
 
 		<!-- 主体部分 表单 -->
@@ -98,7 +98,7 @@
 		},
 		methods: {
 			...mapActions('accountModule', ['userLogin']),
-			...mapActions('studentModule', ['setStudentInfo']),
+			...mapActions('studentModule', ['updateStudentInfo']),
 			loginHandler() {
 				this.$refs.uForm.validate().then(res => {
 					//如果表单合法，isLoading变量会被设置为true，表示正在加载中
@@ -126,13 +126,13 @@
 									userInfo: data.userInfo
 								})
 
-								const fullSrc = baseURL + '/student/avatars/' + (data.studentInfo
+								const full_avatar_url = baseURL + '/student/avatars/' + (data.studentInfo
 									.gender === '女' ? (Math.floor(Math.random() * 10) + 1) : (
 										Math
 										.floor(Math.random() * 8) + 11)) + '.png';
 								// 将学生信息保存到Vuex和本地存储中
-								this.setStudentInfo({
-									imgSrc: fullSrc,
+								this.updateStudentInfo({
+									avatar_url: full_avatar_url,
 									name: data.studentInfo.name,
 									gender: data.studentInfo.gender,
 									age: data.studentInfo.age,

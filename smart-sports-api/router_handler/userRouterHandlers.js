@@ -227,18 +227,20 @@ exports.saveUserInfo = async (req, resp, next) => {
 		realname,
 		gender,
 		phone,
-		idcard
+		idcard,
 	} = req.body;
 	const {
 		filename
 	} = req.file;
+	
+	const cur_bonding_id = req.body.cur_bonding_id === 'null' ? null : req.body.cur_bonding_id;
 
 	const avatar_url = '/account/avatars/' + filename;
 
 	try {
-		const sql = "update t_parents set realname=?, gender=?, phone=?, idCard=? , avatar_url=? where email=?"
+		const sql = "update t_parents set realname=?, gender=?, phone=?, idCard=? , avatar_url=?, cur_bonding_id=? where email=?"
 
-		const results = await db.exec(sql, [realname, gender, phone, idcard, avatar_url, email]);
+		const results = await db.exec(sql, [realname, gender, phone, idcard, avatar_url, cur_bonding_id, email]);
 
 		if (results.affectedRows !== 1) {
 			return resp.json({
@@ -256,7 +258,7 @@ exports.saveUserInfo = async (req, resp, next) => {
 				gender,
 				phone,
 				idcard,
-				avatar_url
+				avatar_url,
 			}
 		})
 	} catch (e) {
@@ -393,8 +395,53 @@ exports.changeBonding = async (req, resp, next) => {
 	}
 }
 
-exports.verifyAndSaveIdCard = (req, resp, next) => {
-
+exports.getTheLatestInfo = async (req, resp, next) => {
+	const {email} = req.body;
+	
+	console.log("email: ",email);
+	
+	try {
+		let userInfo, studentInfo;
+		let sql = 'select * from t_parents where email=?'
+		let results = await db.exec(sql, [email]);
+	
+		if (results.length !== 1) {
+			console.log("results: ",results);
+			return resp.json({
+				status: 1,
+				msg: '服务器出现异常，获取失败'
+			})
+		}
+	
+		userInfo = results[0];
+	
+		sql = 'select * from t_students where id=?'
+		results = await db.exec(sql, [userInfo.cur_bonding_id]);
+	
+		if (results.length !== 1) {
+			studentInfo = {}
+		}else{
+			studentInfo = results[0];
+		}
+	
+		console.log("userInfo, studentInfo: ", userInfo, studentInfo);
+	
+		resp.json({
+			status: 0,
+			msg: '获取成功!',
+			data: {
+				userInfo,
+				studentInfo
+			},
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，获取失败'
+		})
+	}
 }
 
 /*

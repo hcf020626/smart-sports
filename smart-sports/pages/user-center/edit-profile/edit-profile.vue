@@ -124,7 +124,7 @@
 			}
 		},
 		computed: {
-			...mapState('accountModule', ['userInfo', 'token']),
+			...mapState('accountModule', ['userInfo']),
 			...mapGetters('accountModule', ['full_avatar_url'])
 		},
 		methods: {
@@ -145,9 +145,9 @@
 					//如果表单合法，isLoading变量会被设置为true，表示正在加载中
 					this.isLoading = true;
 					// 使用setTimeout()函数模拟网络延迟
-					try {
-						// 使用setTimeout()函数模拟网络延迟
-						setTimeout(async () => {
+					// 使用setTimeout()函数模拟网络延迟
+					setTimeout(async () => {
+						try {
 							// 调用api.account.saveUserInfo()异步请求保存用户接口，获取返回的status、msg、token和data等数据
 							const {
 								data: {
@@ -156,19 +156,22 @@
 									updatedUserInfo
 								}
 							} = await api.account.saveUserInfo({
-								avatar_url: this.formData.avatar_url,
 								email: this.userInfo.email,
 								realname: this.formData.realname,
 								gender: this.formData.gender,
+								idcard: this.formData.idcard,
 								phone: this.formData.phone,
-								idcard: this.formData.idcard
+								avatar_url: this.formData.avatar_url,
+								cur_bonding_id: this.userInfo.idcard === this.formData
+									.idcard ? this.userInfo.cur_bonding_id : null
 							});
-							
-							this.isLoading = false;
-							
 							if (!status) {
-								// 请求成功，更新本地用户信息
-								this.updateUserInfo(updatedUserInfo)
+								// 请求成功，更新本地用户信息，如果用户身份证信息发生变更，将本地的cur_bonding_id设置为1，提示用户需要重新进行亲子绑定。
+								this.updateUserInfo({
+									...updatedUserInfo,
+									cur_bonding_id: this.userInfo.idcard === this.formData
+										.idcard ? this.userInfo.cur_bonding_id : '-1'
+								})
 								// 弹出保存成功的提示框
 								this.$refs.uToast.show({
 									type: 'success',
@@ -184,17 +187,18 @@
 									position: 'top'
 								})
 							}
-
-						}, 500)
-					} catch (err) {
-						console.log("err: ", err);
-						this.$refs.uToast.show({
-							type: 'error',
-							message: '请求失败，请重试',
-							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-							position: 'top'
-						})
-					}
+						} catch (err) {
+							console.log("err: ", err);
+							this.$refs.uToast.show({
+								type: 'error',
+								message: '请求失败，请重试',
+								icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+								position: 'top'
+							})
+						} finally {
+							this.isLoading = false;
+						}
+					}, 500)
 				}).catch(errors => {
 					console.log("errors: ", errors);
 					// 如果表单不合法，则在页面上弹出错误提示框

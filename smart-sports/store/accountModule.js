@@ -1,5 +1,4 @@
 import {baseURL} from '../config.js'
-import Vue from  'vue'
 export default {
 	namespaced:true,//开启命名空间
 	actions: {
@@ -12,13 +11,7 @@ export default {
 		},
 		updateUserInfo(context, value){
 			context.commit('UPDATE_USER_INFO', value)
-		},
-		updatePassword(context, value){
-			context.commit('UPDATE_PASSWORD', value)
-		},
-		updateBonding(context, value){
-			context.commit('UPDATE_BONDING', value)
-		},
+		}
 	},
 	mutations: {
 		//mutations中的方法一般大写，用于区分actions中的方法。
@@ -33,23 +26,22 @@ export default {
 			state.userInfo = {};
 			uni.clearStorageSync();
 		},
-		UPDATE_USER_INFO(state, {email, realname, gender, idcard, phone, avatar_url}){
-			state.userInfo.email = email;
-			state.userInfo.realname = realname;
-			state.userInfo.gender = gender;
-			state.userInfo.idcard = idcard;
-			state.userInfo.phone = phone;
-			state.userInfo.avatar_url = avatar_url;
+		UPDATE_USER_INFO(state, {email, password, realname, gender, idcard, phone, cur_bonding_id, avatar_url}){
+			state.userInfo.email = email || state.userInfo.email;
+			state.userInfo.password = password || state.userInfo.password;
+			state.userInfo.realname = realname || state.userInfo.realname;
+			state.userInfo.gender = gender || state.userInfo.gender;
+			state.userInfo.idcard = idcard || state.userInfo.idcard;
+			state.userInfo.phone = phone || state.userInfo.phone;
+			if(cur_bonding_id === ''){
+				state.userInfo.cur_bonding_id = '';
+			}else{
+				state.userInfo.cur_bonding_id = cur_bonding_id || state.userInfo.cur_bonding_id;
+			}
+			state.userInfo.avatar_url = avatar_url || state.userInfo.avatar_url;
 			uni.setStorageSync('userInfo', JSON.stringify(state.userInfo))
+			console.log("in accountModule: state.userInfo: ",state.userInfo);
 		},
-		UPDATE_PASSWORD(state, value){
-			state.userInfo.password = value;
-			uni.setStorageSync('userInfo', JSON.stringify(state.userInfo));
-		},
-		UPDATE_BONDING(state, value){
-			state.userInfo.cur_bonding_id = value;
-			uni.setStorageSync('userInfo', JSON.stringify(state.userInfo));
-		}
 	},
 	getters: {
 		full_avatar_url(state){
@@ -58,6 +50,6 @@ export default {
 	},
 	state: {
 		token: uni.getStorageSync('token') || '',
-		userInfo: JSON.parse(uni.getStorageSync('userInfo') || '{}')
+		userInfo: JSON.parse(uni.getStorageSync('userInfo') || '{}'),
 	}
 }
