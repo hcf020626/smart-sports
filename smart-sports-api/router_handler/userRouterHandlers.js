@@ -11,8 +11,6 @@ const {
 } = require('../utils/MulterHelper')
 // 将 .env 文件中配置的环境变量加载到 process.env 中
 require('dotenv').config()
-// 导入生成图形验证码的模块
-const svgCaptcha = require('svg-captcha')
 
 // 用户登录的处理函数
 exports.userLogin = async (req, resp, next) => {
@@ -55,7 +53,7 @@ exports.userLogin = async (req, resp, next) => {
 
 		if (results.length !== 1) {
 			studentInfo = {}
-		}else{
+		} else {
 			studentInfo = results[0];
 		}
 
@@ -221,26 +219,25 @@ exports.sendCode = (req, resp) => {
 
 
 exports.saveUserInfo = async (req, resp, next) => {
-
-	const {
-		email,
-		realname,
-		gender,
-		phone,
-		idcard,
-	} = req.body;
-	const {
-		filename
-	} = req.file;
-	
-	const cur_bonding_id = req.body.cur_bonding_id === 'null' ? null : req.body.cur_bonding_id;
-
-	const avatar_url = '/account/avatars/' + filename;
-
 	try {
-		const sql = "update t_parents set realname=?, gender=?, phone=?, idCard=? , avatar_url=?, cur_bonding_id=? where email=?"
+		const {
+			email,
+			realname,
+			gender,
+			phone,
+			idcard,
+		} = req.body;
 
-		const results = await db.exec(sql, [realname, gender, phone, idcard, avatar_url, cur_bonding_id, email]);
+		const cur_bonding_id = req.body.cur_bonding_id === 'null' ? null : req.body.cur_bonding_id;
+
+		const avatar_url = '/account/avatars/' + filename;
+
+		const sql =
+			"update t_parents set realname=?, gender=?, phone=?, idCard=? , avatar_url=?, cur_bonding_id=? where email=?"
+
+		const results = await db.exec(sql, [realname, gender, phone, idcard, avatar_url, cur_bonding_id,
+			email
+		]);
 
 		if (results.affectedRows !== 1) {
 			return resp.json({
@@ -271,77 +268,44 @@ exports.saveUserInfo = async (req, resp, next) => {
 	}
 }
 
-// 发送图形验证码的处理函数
-exports.sendCaptcha = (req, resp, next) => {
-	const captcha = svgCaptcha.create({
-		noise: 3,
-		background: '#2b85e4'
-	})
-
-	// 将图形验证码的文本值保存在token中
-	const token = jwt.encode({
-		captcha: captcha.text,
-		exp: Date.now() + 120000
-	}, process.env.SECRET_KEY);
-
-	resp.type('svg');
-	resp.status(200).send({
-		status: 0,
-		msg: '图形验证码发送成功',
-		token,
-		data: captcha.data
-	});
-}
-
 // 修改密码的处理函数
 exports.updatePassword = async (req, resp, next) => {
 	const {
 		email,
 		oldPassword,
 		newPassword,
-		token
 	} = req.body;
 
+	// 验证旧密码是否与数据库保存的密码一致
+	let sql = 'select * from t_parents where email=?';
+	let results = await db.exec(sql, [email]);
+
+	if (results.length !== 1) {
+		return resp.json({
+			status: 1,
+			msg: '服务器出现异常，修改密码失败'
+		})
+	}
+
+	if (results[0].password !== md5(md5(oldPassword) + process.env.SECRET_KEY)) {
+		return resp.json({
+			status: 1,
+			msg: '旧密码填写错误，请重新输入'
+		})
+	}
 	try {
-		const {
-			captcha
-		} = jwt.decode(token, process.env.SECRET_KEY)
+		// 验证通过，将新密码保存到数据库中
+		const encryptedPassword = md5(md5(newPassword) + process.env.SECRET_KEY);
+		sql = 'update t_parents set password=? where email=?';
+		results = await db.exec(sql, [encryptedPassword, email]);
 
-		if (req.body.captcha.toLocaleUpperCase() !== captcha.toLocaleUpperCase()) {
-			return resp.json({
-				status: 1,
-				msg: '验证码错误'
-			})
-		}
-
-		let sql = 'select * from t_parents where email=?';
-		let results = await db.exec(sql, [email]);
-		
-		if (results.length !== 1) {
+		if (results.affectedRows !== 1) {
 			return resp.json({
 				status: 1,
 				msg: '服务器出现异常，修改密码失败'
 			})
 		}
-		
-		if (results[0].password !== md5(md5(oldPassword) + process.env.SECRET_KEY)) {
-			return resp.json({
-				status: 1,
-				msg: '旧密码填写错误，请重新输入'
-			})
-		}
-		
-		const encryptedPassword = md5(md5(newPassword) + process.env.SECRET_KEY);
-		sql = 'update t_parents set password=? where email=?';
-		results = await db.exec(sql, [encryptedPassword, email]);
-		
-		if (results.affectedRows !== 1) {
-			return resp.json({
-				status: 1,
-				msg: '修改失败，请稍后再试'
-			})
-		}
-		
+
 		resp.json({
 			status: 0,
 			msg: '修改成功！请重新登录',
@@ -352,7 +316,7 @@ exports.updatePassword = async (req, resp, next) => {
 		console.log("e: ", e);
 		resp.status(500).json({
 			status: 1,
-			msg: '服务器发生错误，请稍后再试'
+			msg: '服务器出现错误，修改密码失败'
 		})
 	}
 }
@@ -390,42 +354,44 @@ exports.changeBonding = async (req, resp, next) => {
 		console.log("e: ", e);
 		resp.status(500).json({
 			status: 1,
-			msg: '服务器发生错误，请稍后再试'
+			msg: '服务器出现错误，请稍后再试'
 		})
 	}
 }
 
 exports.getTheLatestInfo = async (req, resp, next) => {
-	const {email} = req.body;
-	
-	console.log("email: ",email);
-	
+	const {
+		email
+	} = req.body;
+
+	console.log("email: ", email);
+
 	try {
 		let userInfo, studentInfo;
 		let sql = 'select * from t_parents where email=?'
 		let results = await db.exec(sql, [email]);
-	
+
 		if (results.length !== 1) {
-			console.log("results: ",results);
+			console.log("results: ", results);
 			return resp.json({
 				status: 1,
 				msg: '服务器出现异常，获取失败'
 			})
 		}
-	
+
 		userInfo = results[0];
-	
+
 		sql = 'select * from t_students where id=?'
 		results = await db.exec(sql, [userInfo.cur_bonding_id]);
-	
+
 		if (results.length !== 1) {
 			studentInfo = {}
-		}else{
+		} else {
 			studentInfo = results[0];
 		}
-	
+
 		console.log("userInfo, studentInfo: ", userInfo, studentInfo);
-	
+
 		resp.json({
 			status: 0,
 			msg: '获取成功!',

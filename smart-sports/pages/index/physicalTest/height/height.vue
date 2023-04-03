@@ -21,7 +21,7 @@
 				<!-- 图表区域通过 l-echart 组件渲染了一个仪表盘图表 -->
 				<view class="charts-area">
 					<view style="width: 100%;">
-						<l-echart ref="chart1" @finished="init1"></l-echart>
+						<l-echart ref="heightGuage" @finished="initHeightGuage"></l-echart>
 					</view>
 				</view>
 			</view>
@@ -29,7 +29,7 @@
 			<view class="history" v-else>
 				<view class="charts-area">
 					<view style="width: 100%; margin-top: 30rpx;">
-						<l-echart ref="chart2" @finished="init2"></l-echart>
+						<l-echart ref="heightLineChart" @finished="initHeightLineChart"></l-echart>
 					</view>
 				</view>
 			</view>
@@ -54,50 +54,63 @@
 				age: 15,
 				gender: "男",
 				date: '2023年3月20日',
-				option1: {},
-				option2: {}
+				heightGuageOption: {},
+				heightLineChartOption: {}
 			}
 		},
 		created() {
-			this.initOption1();
-			this.initOption2();
+			this.initHeightGuageOption();
+			this.initHeightLineChartOption();
 		},
 		methods: {
 			sectionChange(index) {
 				this.subsection.current = index;
 			},
-			async init1() {
+			// 初始化身高仪表盘
+			async initHeightGuage() {
 				// init 是 echarts 初始化调用函数,第一个参数是传入echarts,第二个参数是回调函数，回调函数的参数是 chart 实例
-				const chart1 = await this.$refs.chart1.init(echarts);
-				chart1.setOption(this.option1)
+				const heightGuage = await this.$refs.heightGuage.init(echarts);
+				heightGuage.setOption(this.heightGuageOption)
 			},
-			initOption1() {
+			// 初始化身高折线图
+			async initHeightLineChart() {
+				// init 是 echarts 初始化调用函数,第一个参数是传入echarts,第二个参数是回调函数，回调函数的参数是 chart 实例
+				const heightLineChart = await this.$refs.heightLineChart.init(echarts);
+				heightLineChart.setOption(this.heightLineChartOption)
+			},
+			initHeightGuageOption() {
 				let height = this.height;
 				const heightData = heightRefTable[this.gender][this.age - 1]
 				let rate;
 
 				if (height <= heightData[0]) {
-					rate = (height / heightData[0]) * 0.25;
+					rate = (height - 0) / (heightData[0] - 0) * 0.25 + 0;
 				} else if (height <= heightData[1]) {
-					rate = ((height - heightData[0]) / (heightData[1] - heightData[0])) * 0.25 + 0.25;
+					rate = (height - heightData[0]) / (heightData[1] - heightData[0]) * 0.25 + 0.25;
 				} else if (height <= heightData[2]) {
-					rate = ((height - heightData[1]) / (heightData[2] - heightData[1])) * 0.25 + 0.5;
+					rate = (height - heightData[1]) / (heightData[2] - heightData[1]) * 0.25 + 0.5;
 				} else if (height <= heightData[3]) {
-					rate = ((height - heightData[2]) / (heightData[3] - heightData[2])) * 0.25 + 0.75;
+					rate = (height - heightData[2]) / (heightData[3] - heightData[2]) * 0.25 + 0.75;
 				} else {
 					rate = 1
 				}
 
-				this.option1 = {
+				this.heightGuageOption = {
 					series: [{
+						// type: 设置图表类型为 gauge，即仪表盘类型。
 						type: 'gauge',
+						// startAngle 和 endAngle: 指定仪表盘起始和结束的角度，这里起始角度为 180，结束角度为 0，即逆时针旋转。
 						startAngle: 180,
 						endAngle: 0,
+						// center 和 radius: 控制仪表盘的位置和大小，这里的 center 为 ['50%', '75%'] 表示相对于容器宽度和高度的位置，radius 为 '100%' 表示宽度和高度都为 100%。
 						center: ['50%', '75%'],
-						radius: '90%',
+						radius: '100%',
+						// min 和 max: 控制指针的取值范围，这里设置最小值为 0，最大值为 1。
 						min: 0,
 						max: 1,
+						// splitNumber: 控制仪表盘轴线的分割段数。
 						splitNumber: 8,
+						// axisLine: 设置仪表盘轴线的样式，包括线宽和颜色。
 						axisLine: {
 							lineStyle: {
 								width: 6,
@@ -115,21 +128,21 @@
 							width: 20,
 							offsetCenter: [0, '-60%'],
 							itemStyle: {
-								color: '#7b68ee'
+								color: '#333333'
 							}
 						},
 						axisTick: {
 							length: 12,
 							lineStyle: {
-								color: '#000',
+								color: '#333333',
 								width: 2
 							}
 						},
 						splitLine: {
 							length: 20,
 							lineStyle: {
-								color: '#000',
-								width: 5
+								color: '#333333',
+								width: 4
 							}
 						},
 						axisLabel: {
@@ -170,12 +183,7 @@
 					}]
 				}
 			},
-			async init2() {
-				// init 是 echarts 初始化调用函数,第一个参数是传入echarts,第二个参数是回调函数，回调函数的参数是 chart 实例
-				const chart2 = await this.$refs.chart2.init(echarts);
-				chart2.setOption(this.option2)
-			},
-			initOption2() {
+			initHeightLineChartOption() {
 				let fakeData1 = [];
 				for (let i = 0; i < 7; i++) {
 				  fakeData1.push(((Math.random() * 20) + 155).toFixed(1));
@@ -186,7 +194,7 @@
 				  fakeData2.push(((Math.random() * 10) + 160).toFixed(1));
 				}
 				
-				this.option2 = {
+				this.heightLineChartOption = {
 					tooltip: {
 						trigger: 'axis',
 						axisPointer: {

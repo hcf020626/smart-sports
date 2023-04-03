@@ -56,7 +56,6 @@
 				},
 				// 学生信息列表
 				cellItems: [],
-				skeletonLoading: true,
 				errMsg: {
 					msg: '',
 					show: false

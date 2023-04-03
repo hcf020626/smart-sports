@@ -30,9 +30,12 @@
 
 			<!-- 登录按钮 -->
 			<view class="login-btn">
-				<u-button type="primary" text="登录" :loading="isLoading" @tap="loginHandler"></u-button>
+				<u-button type="primary" text="登录" :loading="isLoading" @tap="clickLoginBtn"></u-button>
 			</view>
 		</view>
+
+		<!-- 滑动验证组件 -->
+		<tf-verify-img @succeed="verifySucceed" @close="showVerify = false" v-if="showVerify"></tf-verify-img>
 
 		<!-- 尾部 忘记密码和注册账户 -->
 		<view class="footer">
@@ -49,12 +52,16 @@
 <script>
 	import api from '@/api/index.js' // 导入封装好的发送请求的api模块
 	import {
-		baseURL
-	} from '@/config.js' // 导入baseURL常量
-	import {
+		mapState,
 		mapActions
 	} from 'vuex' // 导入vuex的辅助函数mapActions
+
+	import tfVerifyImg from '@/components/tf-verify-img/tf-verify-img.vue'; // 导入滑块验证组件
+
 	export default {
+		components: {
+			tfVerifyImg
+		},
 		data() {
 			return {
 				enterStatus: '', // 进入登录页面时的状态
@@ -63,6 +70,7 @@
 					password: ''
 				},
 				isLoading: false,
+				showVerify: false,
 				rules: { // 表单验证规则
 					email: [
 						// 对 email 字段进行格式验证
@@ -96,86 +104,16 @@
 				}
 			}
 		},
+		computed: {
+			...mapState('studentModule', ['studentInfo']),
+		},
 		methods: {
 			...mapActions('accountModule', ['userLogin']),
 			...mapActions('studentModule', ['updateStudentInfo']),
-			loginHandler() {
+			clickLoginBtn() {
 				this.$refs.uForm.validate().then(res => {
-					//如果表单合法，isLoading变量会被设置为true，表示正在加载中
-					this.isLoading = true;
-					// 使用setTimeout()函数模拟网络延迟
-					setTimeout(async () => {
-						try {
-							// 调用api.account.login()异步请求登录接口，获取返回的status、msg、token和data等数据
-							const {
-								data: {
-									status,
-									msg,
-									token,
-									data
-								}
-							} = await api.account.login({
-								email: this.loginFormData.email,
-								password: this.loginFormData.password
-							});
-
-							if (!status) {
-								// 将用户信息和token保存到Vuex和本地存储中
-								this.userLogin({
-									token,
-									userInfo: data.userInfo
-								})
-
-								const full_avatar_url = baseURL + '/student/avatars/' + (data.studentInfo
-									.gender === '女' ? (Math.floor(Math.random() * 10) + 1) : (
-										Math
-										.floor(Math.random() * 8) + 11)) + '.png';
-								// 将学生信息保存到Vuex和本地存储中
-								this.updateStudentInfo({
-									avatar_url: full_avatar_url,
-									name: data.studentInfo.name,
-									gender: data.studentInfo.gender,
-									age: data.studentInfo.age,
-									school: data.studentInfo.school,
-									className: data.studentInfo.class,
-									id: data.studentInfo.id
-								})
-
-								// 弹出登录成功的提示框，并稍后跳转到首页
-								this.$refs.uToast.show({
-									type: 'success',
-									message: msg,
-									icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
-									position: 'top',
-									duration: 1500,
-									complete() {
-										uni.switchTab({
-											url: '/pages/index/index'
-										})
-									}
-								})
-							} else {
-								// 弹出登录失败的提示框
-								this.$refs.uToast.show({
-									type: 'error',
-									message: msg,
-									icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-									position: 'top'
-								})
-							}
-						} catch (e) {
-							//TODO handle the exception
-							console.log("e: ",e);
-							this.$refs.uToast.show({
-								type: 'error',
-								message: '请求发生问题，请稍后再试',
-								icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-								position: 'top'
-							})
-						}finally{
-							this.isLoading = false;
-						}
-					}, 500)
+					// 显示滑块验证
+					this.showVerify = true;
 				}).catch(errors => {
 					console.log("errors: ", errors);
 					// 如果表单不合法，则在页面上弹出错误提示框
@@ -186,6 +124,89 @@
 						position: 'top'
 					})
 				})
+			},
+			verifySucceed() {
+				// 验证成功，执行登录逻辑
+				this.$refs.uToast.show({
+					type: 'default',
+					message: '验证成功',
+					icon: 'https://cdn.uviewui.com/uview/demo/toast/default.png',
+					position: 'top'
+				})
+				this.showVerify = false;
+				
+				//如果表单合法，isLoading变量会被设置为true，表示正在加载中
+				this.isLoading = true;
+				// 使用setTimeout()函数模拟网络延迟
+				setTimeout(async () => {
+					try {
+						// 调用api.account.login()异步请求登录接口，获取返回的status、msg、token和data等数据
+						const {
+							data: {
+								status,
+								msg,
+								token,
+								data
+							}
+						} = await api.account.login({
+							email: this.loginFormData.email,
+							password: this.loginFormData.password
+						});
+				
+						if (!status) {
+							// 将用户信息和token保存到Vuex和本地存储中
+							this.userLogin({
+								token,
+								userInfo: data.userInfo
+							})
+				
+							
+							// 将学生信息保存到Vuex和本地存储中
+							this.updateStudentInfo({
+								avatar_url: this.studentInfo.avatar_url,
+								name: data.studentInfo.name,
+								gender: data.studentInfo.gender,
+								age: data.studentInfo.age,
+								school: data.studentInfo.school,
+								className: data.studentInfo.class,
+								id: data.studentInfo.id
+							})
+				
+							// 弹出登录成功的提示框，并稍后跳转到首页
+							this.$refs.uToast.show({
+								type: 'success',
+								message: msg,
+								icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
+								position: 'top',
+								duration: 1500,
+								complete() {
+									uni.switchTab({
+										url: '/pages/index/index'
+									})
+								}
+							})
+						} else {
+							// 弹出登录失败的提示框
+							this.$refs.uToast.show({
+								type: 'error',
+								message: msg,
+								icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+								position: 'top'
+							})
+						}
+					} catch (e) {
+						//TODO handle the exception
+						console.log("e: ", e);
+						this.$refs.uToast.show({
+							type: 'error',
+							message: '请求发生问题，请稍后再试',
+							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+							position: 'top'
+						})
+					} finally {
+						this.isLoading = false;
+					}
+				}, 1500)
 			},
 		},
 		onLoad({

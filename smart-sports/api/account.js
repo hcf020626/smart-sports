@@ -62,7 +62,7 @@ export function saveUserInfo({email, realname, gender, idcard, phone, avatar_url
 
 
 // 修改密码
-export function updatePassword({email, oldPassword, newPassword, captcha, token}){
+export function updatePassword({email, oldPassword, newPassword}){
 	return http.request({
 		method: 'POST',
 		url: '/account/update-password',
@@ -70,8 +70,6 @@ export function updatePassword({email, oldPassword, newPassword, captcha, token}
 			email,
 			oldPassword,
 			newPassword,
-			captcha,
-			token
 		},
 		custom: {auth: true}
 	})

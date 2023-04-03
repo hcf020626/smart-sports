@@ -89,4 +89,6 @@
 	@import url('@/static/iconfont/user-center/iconfont.css');
 	// 引入登录和注册的字体图标
 	@import url('@/static/iconfont/login-reg/iconfont.css');
+	// 引入修改密码的字体图标
+	@import url('@/static/iconfont/edit-password/iconfont.css');
 </style>

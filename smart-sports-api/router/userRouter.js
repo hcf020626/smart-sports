@@ -17,9 +17,6 @@ userRouter.post('/send-code', require('../router_handler/userRouterHandlers').se
 // 保存用户信息
 userRouter.post('/save-user-info', require('../utils/MulterHelper').single('avatar'), require('../router_handler/userRouterHandlers').saveUserInfo)
 
-// 发送图形验证码
-userRouter.get('/send-captcha', require('../router_handler/userRouterHandlers').sendCaptcha)
-
 //修改用户密码
 userRouter.post('/update-password', require('../router_handler/userRouterHandlers').updatePassword)
 

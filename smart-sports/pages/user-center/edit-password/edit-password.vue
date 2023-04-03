@@ -1,31 +1,36 @@
 <template>
 	<!-- 页面容器 -->
 	<view class="container">
-		<!-- 消息提示组件，用于提示用户在登录时碰到的问题 -->
+		<!-- 消息提示组件，用于提示用户在编辑密码时碰到的问题 -->
 		<u-toast ref="uToast"></u-toast>
 
-		<u-form :model="formData" ref="uFrom">
-
+		<u-form :model="formData" ref="uForm">
 			<u-form-item prop="oldPassword">
-				<u-input type="password" v-model="formData.oldPassword" placeholder="请输入旧密码" :clearable="true"></u-input>
-			</u-form-item>
-
-			<u-form-item prop="newPassword">
-				<u-input type="password" v-model="formData.newPassword" placeholder="请输入新密码" :clearable="true"></u-input>
-			</u-form-item>
-
-			<u-form-item prop="newPassword2">
-				<u-input type="password" v-model="formData.newPassword2" placeholder="请再次输入新密码" :clearable="true"></u-input>
-			</u-form-item>
-
-			<u-form-item prop="captcha">
-				<u-input type="text" v-model="formData.captcha" placeholder="请输入验证码" :clearable="true">
-					<image slot="suffix" :src="svgUrl" mode="aspectFill" @click="refreshCaptcha" style="width: 300rpx; height: 100rpx;"/>
+				<u-input type="password" v-model="formData.oldPassword" placeholder="请输入旧密码" :clearable="true">
+					<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-mima" color="grey" size="25">
+					</uni-icons>
 				</u-input>
 			</u-form-item>
 
+			<u-form-item prop="newPassword">
+				<u-input type="password" v-model="formData.newPassword" placeholder="请输入新密码" :clearable="true">
+					<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-xinmima" color="grey" size="25">
+					</uni-icons>
+				</u-input>
+			</u-form-item>
+
+			<u-form-item prop="newPassword2">
+				<u-input type="password" v-model="formData.newPassword2" placeholder="请再次输入新密码" :clearable="true">
+					<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-zaicishurumima" color="grey" size="25">
+					</uni-icons>
+				</u-input>
+			</u-form-item>
+			
+			<!-- 滑动验证组件 -->
+			<tf-verify-img @succeed="verifySucceed" @close="showVerify = false" v-if="showVerify"></tf-verify-img>
+
 			<u-form-item>
-				<u-button type="primary" class="save-btn" @click="submitChanges">提交修改</u-button>
+				<u-button type="primary" text="提交修改" :loading="isLoading" @click="clickSaveBtn"></u-button>
 			</u-form-item>
 		</u-form>
 	</view>
@@ -36,17 +41,15 @@
 	import {
 		mapActions
 	} from 'vuex'
-	import {baseURL} from '@/config.js'
 	export default {
 		data() {
 			return {
-				svgUrl: '',
+				showVerify: false,
+				isLoading: false,
 				formData: {
 					oldPassword: '',
 					newPassword: '',
 					newPassword2: '',
-					captcha: '',
-					token: ''
 				},
 				rules: {
 					oldPassword: [{
@@ -85,108 +88,94 @@
 							message: '两次密码不一致'
 						},
 					],
-					captcha: [{
-						required: true,
-						message: '请输入验证码',
-						trigger: ['change', 'blur']
-					}]
 				}
 			}
 		},
 		methods: {
-			...mapActions('accountModule', ['updatePassword']),
-			refreshCaptcha(){
-				uni.request({
-					url: baseURL + '/account/send-captcha',
-					method: 'GET',
-					success: (res) => {
-						console.log("res: ",res);
-						this.svgUrl = 'data:image/svg+xml;base64,' + btoa(res.data.data);
-						this.formData.token = res.data.token;
-					},
-					header: {
-						Authorization: uni.getStorageSync('token')
-					}
-				})
-			},
-			async submitChanges() {
-				try {
-					const isValid = await this.$refs.uFrom.validate();
-
-					if (!isValid) {						
-						return this.$refs.uToast.show({
-							type: 'error',
-							message: '表单校验失败，请正确填写表单的每一项',
-							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-							position: 'top'
-						})
-					}
-
-					const {
-						data: {
-							msg,
-							status,
-							password
-						}
-					} = await api.account.updatePassword({
-						email: this.$store.state.accountModule.userInfo.email,
-						oldPassword: this.formData.oldPassword,
-						newPassword: this.formData.newPassword2,
-						captcha: this.formData.captcha,
-						token: this.formData.token
-					});
-					if (!status) {
-						this.updatePassword(password);
-						this.$refs.uToast.show({
-							type: 'success',
-							message: msg,
-							icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
-							position: 'top',
-							complete(){
-								uni.reLaunch({
-									url: '/pages/auth/login/login',
-								})
-							}
-						})
-					}else{
-						this.$refs.uToast.show({
-							type: 'error',
-							message: msg,
-							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-							position: 'top'
-						})
-					}
-				} catch (e) {
-					console.log("e: ",e);
-					const {data: {msg}} = e
-					//TODO handle the exception
-					this.$refs.uToast.show({
+			...mapActions('accountModule', ['updateUserInfo']),
+			clickSaveBtn(){
+				this.$refs.uForm.validate().then(res => {
+					// 显示滑块验证
+					this.showVerify = true;
+				}).catch(errors => {
+					console.log("errors: ", errors);
+					// 如果表单不合法，则在页面上弹出错误提示框
+					return this.$refs.uToast.show({
 						type: 'error',
-						message: msg,
+						message: '请正确填写表单的每一项',
 						icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
 						position: 'top'
 					})
-				}
+				})
+			},
+			verifySucceed() {
+				// 验证成功，执行修改密码的逻辑
+				this.$refs.uToast.show({
+					type: 'default',
+					message: '验证成功',
+					icon: 'https://cdn.uviewui.com/uview/demo/toast/default.png',
+					position: 'top'
+				})
+				this.showVerify = false;
+				
+				//如果表单合法，isLoading变量会被设置为true，表示正在加载中
+				this.isLoading = true;
+				// 使用setTimeout()函数模拟网络延迟
+				setTimeout(async () => {
+					try {
+					
+						const {
+							data: {
+								msg,
+								status,
+								password
+							}
+						} = await api.account.updatePassword({
+							email: this.$store.state.accountModule.userInfo.email,
+							oldPassword: this.formData.oldPassword,
+							newPassword: this.formData.newPassword2,
+						});
+						if (!status) {
+							this.updateUserInfo({password});
+							this.$refs.uToast.show({
+								type: 'success',
+								message: msg,
+								icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
+								position: 'top',
+								complete(){
+									uni.reLaunch({
+										url: '/pages/auth/login/login',
+									})
+								}
+							})
+						}else{
+							this.$refs.uToast.show({
+								type: 'error',
+								message: msg,
+								icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+								position: 'top'
+							})
+						}
+					} catch (e) {
+						console.log("e: ",e);
+						//TODO handle the exception
+						console.log("e: ", e);
+						this.$refs.uToast.show({
+							type: 'error',
+							message: '请求发生问题，请稍后再试',
+							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+							position: 'top'
+						})
+					}finally {
+						this.isLoading = false;
+					}
+				}, 1500)
 			}
 		},
 		onReady() {
 			//如果需要兼容微信小程序，并且校验规则中含有方法等，只能通过setRules方法设置规则。
-			this.$refs.uFrom.setRules(this.rules)
+			this.$refs.uForm.setRules(this.rules)
 		},
-		mounted() {
-			uni.request({
-				url: baseURL + '/account/send-captcha',
-				method: 'GET',
-				success: (res) => {
-					console.log("res: ",res);
-					this.svgUrl = 'data:image/svg+xml;base64,' + btoa(res.data.data);
-					this.formData.token = res.data.token
-				},
-				header: {
-					Authorization: uni.getStorageSync('token')
-				}
-			})
-		}
 	}
 </script>
 
@@ -200,9 +189,5 @@
 	.u-form {
 		width: 90vw;
 		margin: 0 auto;
-	}
-
-	.save-btn {
-		margin: 40rpx 20rpx;
 	}
 </style>
