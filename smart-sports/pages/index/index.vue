@@ -1,10 +1,14 @@
 <template>
 	<view class="container">
 		<view class="errMsg" v-if="userInfo.cur_bonding_id === '-1'">
-			<view>您当前的身份证号码已发送变更，请重新进行亲子绑定再操作！<navigator url="../user-center/bonding/bonding" open-type="navigate" class="link">亲子绑定</navigator></view>
+			<view>您当前的身份证号码已发送变更，请重新进行亲子绑定再操作！<navigator url="../user-center/bonding/bonding" open-type="navigate"
+					class="link">亲子绑定</navigator>
+			</view>
 		</view>
 		<view class="errMsg" v-else-if="userInfo.cur_bonding_id === ''">
-			<view>您当前未进行亲子绑定或者亲子绑定失败，请亲子绑定成功后再操作！<navigator url="../user-center/bonding/bonding" open-type="navigate" class="link">亲子绑定</navigator></view>
+			<view>您当前未进行亲子绑定或者亲子绑定失败，请亲子绑定成功后再操作！<navigator url="../user-center/bonding/bonding" open-type="navigate"
+					class="link">亲子绑定</navigator>
+			</view>
 		</view>
 		<template v-else>
 			<view class="card">
@@ -20,11 +24,13 @@
 					<view>学号：{{studentInfo.id}}</view>
 				</view>
 			</view>
-			
+
 			<view class="grid">
-				<view v-for="(gridItem,itemIndex) in gridItems" :key="itemIndex" class="grid-item" @click="goToPage(gridItem.pagePath)">
+				<view v-for="(gridItem,itemIndex) in gridItems" :key="itemIndex" class="grid-item"
+					@click="goToPage(gridItem.pagePath)">
 					<view>
-						<uni-icons customPrefix="iconfont" :type="gridItem.iconName" :color="gridItem.iconColor" size="28"></uni-icons>
+						<uni-icons customPrefix="iconfont" :type="gridItem.iconName" :color="gridItem.iconColor"
+							size="28"></uni-icons>
 					</view>
 					<view>
 						<u-text :text="gridItem.title"></u-text>
@@ -36,35 +42,37 @@
 </template>
 
 <script>
-	import {mapState} from 'vuex'
+	import {
+		mapState
+	} from 'vuex'
 	export default {
 		data() {
 			return {
 				gridItems: [{
-					iconName: 'icon-ceshengao',
+					iconName: 'icon-height',
 					iconColor: '#2b85e4 ',
 					title: '身高',
-					pagePath: '/pages/index/physicalTest/height/height'
+					pagePath: '/pages/index/body-metrics/height/height'
 				}, {
-					iconName: 'icon-ziyuan',
+					iconName: 'icon-weight',
 					iconColor: '#18b566',
 					title: '体重',
-					pagePath: '/pages/index/physicalTest/weight/weight'
+					pagePath: '/pages/index/body-metrics/weight/weight'
 				}, {
-					iconName: 'icon-shilibiao',
+					iconName: 'icon-vision',
 					iconColor: '#606266',
 					title: '视力',
-					pagePath: '/pages/index/physicalTest/vision/vision'
+					pagePath: '/pages/index/body-metrics/vision/vision'
 				}, {
-					iconName: 'icon-quanbu',
+					iconName: 'icon-all',
 					iconColor: 'lightgreen',
 					title: '全部',
-					pagePath: '/pages/index/physicalTest/all/all'
+					pagePath: '/pages/index/all/all'
 				}],
 			}
 		},
 		methods: {
-			goToPage(path){
+			goToPage(path) {
 				uni.navigateTo({
 					url: path
 				})
@@ -90,6 +98,7 @@
 		background-size: 100%;
 		background-position: center;
 	}
+
 	.card {
 		width: 94vw;
 		height: 300rpx;
@@ -103,12 +112,12 @@
 		font-size: 0.82rem;
 		color: whitesmoke;
 	}
-	
+
 	.card .avatar {
 		margin-left: 30rpx;
 		margin-right: 50rpx;
 	}
-	
+
 	.grid {
 		display: flex;
 		flex-direction: row;
@@ -116,24 +125,24 @@
 		align-items: center;
 		flex-wrap: wrap;
 		height: 200rpx;
-		width: 95vw;
+		width: 100%;
 		margin: 30rpx auto;
 	}
-	
+
 	.grid-item {
 		display: flex;
 		flex-direction: column;
 		justify-content: space-around;
 		align-items: center;
 		height: 150rpx;
-		width: 20vw;
+		width: 25%;
 		font-size: 0.9rem;
 	}
-	
+
 	.grid-item:active {
 		opacity: 0.7;
 	}
-	
+
 	.errMsg {
 		width: 90%;
 		margin: 0 auto;
@@ -142,7 +151,7 @@
 		line-height: 50rpx;
 		color: #82848a;
 	}
-	
+
 	.errMsg .link {
 		color: #2979ff;
 		text-decoration: underline;

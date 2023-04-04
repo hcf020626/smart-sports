@@ -33,12 +33,12 @@
 		<view class="cell-group">
 			<u-cell-group :border="false">
 				<u-cell title="关于" :border="false" isLink url="./about/about">
-					<uni-icons slot="icon" customPrefix="iconfont" type="icon-guanyuwomen" color="mediumslateblue"
+					<uni-icons slot="icon" customPrefix="iconfont" type="icon-about" color="mediumslateblue"
 						size="20">
 					</uni-icons>
 				</u-cell>
 				<u-cell title="退出登录" :border="false" isLink @click="showModal">
-					<uni-icons slot="icon" customPrefix="iconfont" type="icon-tuichudenglu" color="mediumslateblue"
+					<uni-icons slot="icon" customPrefix="iconfont" type="icon-exit" color="mediumslateblue"
 						size="20">
 					</uni-icons>
 				</u-cell>
@@ -65,19 +65,19 @@
 			return { // 返回数据对象
 				gridItems: [ // 定义一个数组gridItems
 					{ // 对象1
-						iconName: 'icon-bianjigerenziliao', // 图标名称
+						iconName: 'icon-auth', // 图标名称
 						iconColor: '#2b85e4 ', // 图标颜色
 						title: '个人资料', // 标题
 						pagePath: '/pages/user-center/edit-profile/edit-profile' // 跳转路径
 					},
 					{
-						iconName: 'icon-changyonglvyouyewutubiao_fuzhi_qinzi', // 图标名称
+						iconName: 'icon-parent-child', // 图标名称
 						iconColor: '#18b566', // 图标颜色
 						title: '亲子绑定', // 标题
 						pagePath: '/pages/user-center/bonding/bonding' // 跳转路径
 					},
 					{
-						iconName: 'icon-xiugaimima', // 图标名称
+						iconName: 'icon-edit-password', // 图标名称
 						iconColor: '#606266', // 图标颜色
 						title: '修改密码', // 标题
 						pagePath: '/pages/user-center/edit-password/edit-password' // 跳转路径

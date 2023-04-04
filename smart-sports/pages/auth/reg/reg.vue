@@ -16,7 +16,7 @@
 				<u-form-item prop="email">
 					<u-input prefixIcon="account" type="text" v-model="regFormData.email" placeholder="请输入邮箱" clearable
 						border="bottom">
-						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-jurassic_user" size="20">
+						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-user" size="20">
 						</uni-icons>
 					</u-input>
 				</u-form-item>
@@ -24,14 +24,14 @@
 				<u-form-item prop="password">
 					<u-input prefixIcon="lock" type="password" v-model="regFormData.password" placeholder="请输入密码"
 						clearable border="bottom">
-						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-mima" size="20"></uni-icons>
+						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-old-password" size="20"></uni-icons>
 					</u-input>
 				</u-form-item>
 				<!-- 再次输入密码输入框 -->
 				<u-form-item prop="password2">
 					<u-input prefixIcon="lock-fill" type="password" v-model="regFormData.password2"
 						placeholder="请再次输入密码" clearable border="bottom">
-						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-zaicishurumima" size="20">
+						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-once-again-password" size="20">
 						</uni-icons>
 					</u-input>
 				</u-form-item>
@@ -39,7 +39,7 @@
 				<u-form-item prop="code">
 					<u-input prefixIcon="email" type="number" v-model="regFormData.code" placeholder="请输入验证码" clearable
 						border="bottom">
-						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-yanzhengma2" size="20"></uni-icons>
+						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-code" size="20"></uni-icons>
 						<template slot="suffix">
 							<u-code ref="uCode" @change="codeChange" seconds="120" startText="获取验证码" changeText="X秒重新获取"
 								endText="重新获取">

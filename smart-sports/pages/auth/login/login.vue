@@ -15,7 +15,7 @@
 				<u-form-item prop="email">
 					<!-- 邮箱输入框 -->
 					<u-input type="text" v-model="loginFormData.email" placeholder="请输入邮箱" clearable border="bottom">
-						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-jurassic_user" size="20">
+						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-user" size="20">
 						</uni-icons>
 					</u-input>
 				</u-form-item>
@@ -23,7 +23,7 @@
 					<!-- 密码输入框 -->
 					<u-input prefixIcon="lock" type="password" v-model="loginFormData.password" placeholder="请输入密码"
 						clearable border="bottom">
-						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-mima" size="20"></uni-icons>
+						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-old-password" size="20"></uni-icons>
 					</u-input>
 				</u-form-item>
 			</u-form>

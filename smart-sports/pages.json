@@ -75,83 +75,114 @@
 			}
 
 		}, {
-			"path": "pages/index/physicalTest/height/height",
+			"path": "pages/index/body-metrics/height/height",
 			"style": {
 				"navigationBarTitleText": "身高",
 				"enablePullDownRefresh": false
 			}
 
-		}, {
-			"path": "pages/index/physicalTest/weight/weight",
+		},{
+			"path": "pages/index/body-metrics/weight/weight",
 			"style": {
 				"navigationBarTitleText": "体重",
 				"enablePullDownRefresh": false
 			}
 
-		}, {
-			"path": "pages/index/physicalTest/vision/vision",
+		},{
+			"path": "pages/index/body-metrics/vision/vision",
 			"style": {
 				"navigationBarTitleText": "视力",
 				"enablePullDownRefresh": false
 			}
 
-		}, {
-			"path": "pages/index/physicalTest/all/all",
-			"style": {
-				"navigationBarTitleText": "成长与健康",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
-			"path": "pages/index/physicalTest/blood-pressure/blood-pressure",
+		},{
+			"path": "pages/index/body-metrics/blood-pressure/blood-pressure",
 			"style": {
 				"navigationBarTitleText": "血压",
 				"enablePullDownRefresh": false
 			}
 
-		}, {
-			"path": "pages/index/physicalTest/lung-capacity/lung-capacity",
+		},{
+			"path": "pages/index/body-metrics/lung-capacity/lung-capacity",
 			"style": {
 				"navigationBarTitleText": "肺活量",
 				"enablePullDownRefresh": false
 			}
 
-		}, {
-			"path": "pages/index/physicalTest/push-ups/push-ups",
-			"style": {
-				"navigationBarTitleText": "俯卧撑",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
-			"path": "pages/index/physicalTest/sit-ups/sit-ups",
+		},{
+			"path": "pages/index/strength-and-stamina/sit-ups/sit-ups",
 			"style": {
 				"navigationBarTitleText": "仰卧起坐",
 				"enablePullDownRefresh": false
 			}
 
-		}, {
-			"path": "pages/index/physicalTest/sit-and-reachs/sit-and-reachs",
+		},{
+			"path": "pages/index/strength-and-stamina/push-ups/push-ups",
 			"style": {
-				"navigationBarTitleText": "坐立体前屈",
+				"navigationBarTitleText": "俯卧撑",
 				"enablePullDownRefresh": false
 			}
 
-		}, {
-			"path": "pages/index/physicalTest/pull-ups/pull-ups",
+		},{
+			"path": "pages/index/strength-and-stamina/pull-ups/pull-ups",
 			"style": {
 				"navigationBarTitleText": "引体向上",
 				"enablePullDownRefresh": false
 			}
 
-		}, {
-			"path": "pages/index/physicalTest/running/running",
+		},{
+			"path": "pages/index/strength-and-stamina/running/running",
 			"style": {
 				"navigationBarTitleText": "跑步",
 				"enablePullDownRefresh": false
 			}
+
+		},{
+			"path": "pages/index/strength-and-stamina/swimming/swimming",
+			"style": {
+				"navigationBarTitleText": "游泳",
+				"enablePullDownRefresh": false
+			}
+
+		},{
+			"path": "pages/index/flexibility/sit-and-reaches/sit-and-reaches",
+			"style": {
+				"navigationBarTitleText": "坐位体前屈",
+				"enablePullDownRefresh": false
+			}
+
+		},{
+			"path": "pages/index/explosiveness/long-jump/long-jump",
+			"style": {
+				"navigationBarTitleText": "立定跳远",
+				"enablePullDownRefresh": false
+			}
+
+		},{
+			"path": "pages/index/explosiveness/solid-ball/solid-ball",
+			"style": {
+				"navigationBarTitleText": "投掷实心球",
+				"enablePullDownRefresh": false
+			}
+
+		},{
+			"path": "pages/index/coordination/rope-skipping/rope-skipping",
+			"style": {
+				"navigationBarTitleText": "跳绳",
+				"enablePullDownRefresh": false
+			}
+
 		}
-	],
+        ,{
+            "path" : "pages/index/all/all",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
 	"tabBar": {
 		"color": "#303133 ",
 		"selectedColor": "#3cc51f",

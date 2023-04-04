@@ -82,13 +82,14 @@
 	/* 在App.vue中首行的位置引入uView基础样式 */
 	@import "@/uni_modules/uview-ui/index.scss";
 
-	// 引入首页的字体图标
-	@import url('@/static/iconfont/index/physical-test/iconfont.css');
-	@import url('@/static/iconfont/index/common/iconfont.css');
-	// 引入我的页面的字体图标
-	@import url('@/static/iconfont/user-center/iconfont.css');
-	// 引入登录和注册的字体图标
-	@import url('@/static/iconfont/login-reg/iconfont.css');
-	// 引入修改密码的字体图标
-	@import url('@/static/iconfont/edit-password/iconfont.css');
+	@import url('//at.alicdn.com/t/c/font_3944024_ax6a6aaubm.css');
+	
+	@font-face {
+		font-family: leo-he;
+		src: url('/static/iconfont/font/ZCOOLKuaiLe-Regular.ttf');
+	}
+	
+	view, text, ul, li {
+		font-family: leo-he;
+	}
 </style>

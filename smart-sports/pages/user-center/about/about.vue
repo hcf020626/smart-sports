@@ -6,7 +6,7 @@
 		</view>
 
 		<view class="content-area">
-			<text class="app-name">{{appName}}</text>旨在帮助家长更好地关注和管理孩子的体育锻炼。该平台提供了以下功能：
+			<text class="app-name">{{appName}}</text><text>旨在帮助家长更好地关注和管理孩子的体育锻炼。该平台提供了以下功能：</text>
 			<ul>
 				<li>课程管理：家长可以通过平台查看孩子的课程表和学习进度，了解孩子的体育锻炼情况。</li>
 				<li>成绩分析：平台会对孩子的体育成绩进行分析和评估，让家长更好地了解孩子的体育水平和发展状况。</li>
