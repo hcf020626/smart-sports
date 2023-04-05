@@ -53,7 +53,7 @@
 				height: ((Math.random() * 20) + 155).toFixed(2),
 				age: 15,
 				gender: "男",
-				date: '2023年3月20日',
+				currentDate: '2023年3月20日',
 				heightGuageOption: {},
 				heightLineChartOption: {}
 			}
@@ -78,22 +78,45 @@
 				const heightLineChart = await this.$refs.heightLineChart.init(echarts);
 				heightLineChart.setOption(this.heightLineChartOption)
 			},
-			initHeightGuageOption() {
-				let height = this.height;
-				const heightData = heightRefTable[this.gender][this.age - 1]
-				let rate;
+			getRate(height) {
 
-				if (height <= heightData[0]) {
-					rate = (height - 0) / (heightData[0] - 0) * 0.25 + 0;
-				} else if (height <= heightData[1]) {
-					rate = (height - heightData[0]) / (heightData[1] - heightData[0]) * 0.25 + 0.25;
-				} else if (height <= heightData[2]) {
-					rate = (height - heightData[1]) / (heightData[2] - heightData[1]) * 0.25 + 0.5;
-				} else if (height <= heightData[3]) {
-					rate = (height - heightData[2]) / (heightData[3] - heightData[2]) * 0.25 + 0.75;
-				} else {
-					rate = 1
+			},
+			initHeightGuageOption() {
+				const height = this.height;
+				const heightData = heightRefTable[this.gender][this.age - 1];
+				const heightRanges = [{
+						range: [0, heightData[0]],
+						rate: 0
+					},
+					{
+						range: [heightData[0], heightData[1]],
+						rate: 0.25
+					},
+					{
+						range: [heightData[1], heightData[2]],
+						rate: 0.5
+					},
+					{
+						range: [heightData[2], heightData[3]],
+						rate: 0.75
+					},
+					{
+						range: [heightData[3], Infinity],
+						rate: 1
+					},
+				];
+
+				let rate = 0;
+				for (const {
+						range,
+						rate: rangeRate
+					} of heightRanges) {
+					if (height <= range[1]) {
+						rate = (height - range[0]) / (range[1] - range[0]) * 0.25 + rangeRate;
+						break;
+					}
 				}
+
 
 				this.heightGuageOption = {
 					series: [{
@@ -186,14 +209,14 @@
 			initHeightLineChartOption() {
 				let fakeData1 = [];
 				for (let i = 0; i < 7; i++) {
-				  fakeData1.push(((Math.random() * 20) + 155).toFixed(1));
+					fakeData1.push(((Math.random() * 20) + 155).toFixed(1));
 				}
-				
+
 				let fakeData2 = [];
 				for (let i = 0; i < 7; i++) {
-				  fakeData2.push(((Math.random() * 10) + 160).toFixed(1));
+					fakeData2.push(((Math.random() * 10) + 160).toFixed(1));
 				}
-				
+
 				this.heightLineChartOption = {
 					tooltip: {
 						trigger: 'axis',

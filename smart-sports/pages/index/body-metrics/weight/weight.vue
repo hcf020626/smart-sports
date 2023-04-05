@@ -1,38 +1,64 @@
 <template>
 	<!-- container 容器包括两个部分：一个是 subsection，另一个是 content -->
 	<view class="container">
-		<!-- subsection 通过 u-subsection 组件渲染了一个 tab 栏，用于切换最新和历史两个页面。 -->
+		<!-- subsection 通过 u-subsection 组件渲染了一个 tab 栏，用于切换日和统计两个页面。 -->
 		<view class="subsection">
 			<u-subsection :list="subsection.list" mode="button" :current="subsection.current" @change="sectionChange"
 				activeColor="mediumslateblue"></u-subsection>
 		</view>
 		<!-- content 部分 -->
 		<view class="content">
-			<!-- 如果 subsection.current 为 0，渲染最新页面，该页面包含了一个数据区域和一个图表区域 -->
-			<view class="latest" v-if="!subsection.current">
+			<!-- 如果 subsection.current 为 0，渲染日页面，该页面包含了一个数据区域和一个图表区域 -->
+			<view class="day" v-if="!subsection.current">
 				<!-- 数据区域显示了当前的身高和日期 -->
 				<view class="data-area">
 					<view class="weight">
 						<text class="number">{{weight}}</text>
 						<text class="unit">kg</text>
 					</view>
-					<view class="date">{{date}}</view>
+					<view class="date" @click="openCalendar">
+						<text>{{currentSelectedDate}}</text>
+						<uni-icons customPrefix="iconfont" type="icon-arrow-down"></uni-icons>
+					</view>
 				</view>
 				<!-- 图表区域通过 l-echart 组件渲染了一个仪表盘图表 -->
 				<view class="charts-area">
 					<view style="width: 100%;">
 						<l-echart ref="weightGuage" @finished="initWeightGuage"></l-echart>
 					</view>
+					<view class="legend">
+						<view class="item">
+							<view class="box box1"></view>
+							<text>偏瘦</text>
+						</view>
+						<view class="item">
+							<view class="box box2"></view>
+							<text>正常</text>
+						</view>
+						<view class="item">
+							<view class="box box3"></view>
+							<text>超重</text>
+						</view>
+						<view class="item">
+							<view class="box box4"></view>
+							<text>肥胖</text>
+						</view>
+					</view>
+
+					<view class="tips">{{tips}}</view>
 				</view>
 			</view>
-			<!-- 如果 subsection.current 为 1，渲染历史页面。 -->
-			<view class="history" v-else>
+			<!-- 如果 subsection.current 为 1，渲染统计页面。 -->
+			<view class="stats" v-else>
 				<view class="charts-area">
 					<view style="width: 100%; margin-top: 30rpx;">
 						<l-echart ref="weightLineChart" @finished="initWeightLineChart"></l-echart>
 					</view>
 				</view>
 			</view>
+
+			<uni-calendar ref="calendar" :insert="false" :start-date="'1970-1-1'" :end-date="new Date().toLocaleString()"
+				@confirm="calendarConfirm" />
 		</view>
 	</view>
 </template>
@@ -45,23 +71,38 @@
 		data() {
 			return {
 				subsection: {
-					list: ['最新', '历史'],
+					list: ['日', '统计'],
 					current: 0
 				},
-				weight: ((Math.random() * 15) + 50).toFixed(2),
+				weight: ((Math.random() * 25) + 40).toFixed(2),
 				height: ((Math.random() * 20) + 155).toFixed(2),
 				age: 15,
 				gender: "男",
-				date: '2023年3月20日',
+				currentSelectedDate: '2023年3月20日',
 				weightGuageOption: {},
-				weightLineChartOption: {}
+				weightLineChartOption: {},
+				tips: '',
 			}
 		},
+		computed: {},
 		created() {
 			this.initWeightGuageOption();
 			this.initWeightLineChartOption();
 		},
 		methods: {
+			openCalendar() {
+				this.$refs.calendar.open();
+			},
+			calendarConfirm(e) {
+				const date = new Date(e.fulldate);
+				
+				const year = date.getFullYear();
+				const month = date.getMonth() + 1;
+				const day = date.getDate();
+				
+				const formattedDate = `${year}年${month}月${day}日`;
+				this.currentSelectedDate = formattedDate;
+			},
 			sectionChange(index) {
 				this.subsection.current = index;
 			},
@@ -72,19 +113,51 @@
 			},
 			initWeightGuageOption() {
 				// 计算 BMI
-				let BMI = (this.weight / ((this.height / 100) ** 2)).toFixed(2);
+				const heightInMeters = this.height / 100;
+				const BMI = (this.weight / heightInMeters ** 2).toFixed(2);
 
-				let rate;
-				if (BMI <= 18.5) {
-					rate = (BMI - 0) / (18.5 - 0) * 0.25 + 0;
-				} else if (BMI <= 24.0) {
-					rate = (BMI - 18.5) / (24.0 - 18.5) * 0.25 + 0.25;
-				} else if (BMI <= 28.0) {
-					rate = (BMI - 24.0) / (28.0 - 24.0) * 0.25 + 0.5;
-				} else if (BMI <= 40) {
-					rate = (BMI - 28.0) / (40 - 28.0) * 0.25 + 0.75
+				const bmiRanges = [{
+						range: [0, 18.5],
+						rate: 0
+					},
+					{
+						range: [18.5, 24.0],
+						rate: 0.25
+					},
+					{
+						range: [24.0, 28.0],
+						rate: 0.5
+					},
+					{
+						range: [28.0, 40],
+						rate: 0.75
+					},
+					{
+						range: [40, Infinity],
+						rate: 1
+					},
+				];
+
+				// 计算 BMI 级别
+				let rate = 0;
+				for (const {
+						range,
+						rate: r
+					} of bmiRanges) {
+					if (BMI >= range[0] && BMI <= range[1]) {
+						rate = (BMI - range[0]) / (range[1] - range[0]) * 0.25 + r;
+						break;
+					}
+				}
+
+				if (rate <= 0.25) {
+					this.tips = 'BMI偏低，需改善您的小孩的饮食营养结构，尤其是增加优质蛋白的摄入，保持营养饮食均衡，运动方面增加力量训练如仰卧起坐、举重等，循序渐进。'
+				} else if (rate <= 0.5) {
+					this.tips = 'BMI正常，请保持您的小孩良好的饮食和运动习惯，防止腹部脂肪过多堆积';
+				} else if (rate <= 0.75) {
+					this.tips = 'BMI偏高，建议让您的小孩每周坚持运动锻炼，增加有氧运动比如跑步、跳绳等。同时控制饮食总摄入量，增加膳食纤维和优质蛋白的摄入，少吃油炸等高热量的食物。'
 				} else {
-					rate = 1;
+					this.tips = '长期处于肥胖状态的人，稍微运动会出现心悸气短、怕热、多汗、易疲劳的情况，甚至会有慢性疾病的风险。建议您的小孩的改善生活习惯，坚持控制饮食摄入量，坚持运动锻炼，减少脂肪的囤积。'
 				}
 
 				this.weightGuageOption = {
@@ -95,7 +168,7 @@
 						startAngle: 180,
 						endAngle: 0,
 						// center 和 radius: 控制仪表盘的位置和大小，这里的 center 为 ['50%', '75%'] 表示相对于容器宽度和高度的位置，radius 为 '100%' 表示宽度和高度都为 100%。
-						center: ['50%', '75%'],
+						center: ['50%', '90%'],
 						radius: '100%',
 						// min 和 max: 控制指针的取值范围，这里设置最小值为 0，最大值为 1。
 						min: 0,
@@ -108,8 +181,8 @@
 								width: 6,
 								color: [
 									[0.25, '#58D9F9'],
-									[0.5, '#FDDD60'],
-									[0.75, '#7CFFB2'],
+									[0.5, '#7CFFB2'],
+									[0.75, '#FDDD60'],
 									[1, '#FF6E76']
 								]
 							}
@@ -140,7 +213,7 @@
 						axisLabel: {
 							color: '#464646',
 							fontSize: 20,
-							distance: 20,
+							distance: -60,
 							rotate: 'tangential',
 							formatter: function(value) {
 								if (value === 0.75) {
@@ -182,12 +255,17 @@
 			initWeightLineChartOption() {
 				let fakeData1 = [];
 				for (let i = 0; i < 7; i++) {
-					fakeData1.push(((Math.random() * 15) + 50).toFixed(1));
+					fakeData1.push(((Math.random() * 20) + 45).toFixed(1));
 				}
 
 				let fakeData2 = [];
 				for (let i = 0; i < 7; i++) {
-					fakeData2.push(((Math.random() * 5) + 55).toFixed(1));
+					fakeData2.push(((Math.random() * 10) + 40).toFixed(1));
+				}
+
+				let fakeData3 = [];
+				for (let i = 0; i < 7; i++) {
+					fakeData3.push(((Math.random() * 20) + 45).toFixed(1));
 				}
 
 				this.weightLineChartOption = {
@@ -212,14 +290,18 @@
 							return result;
 						}
 					},
-					legend: {
-						data: ['班级平均体重', '您孩子的体重']
-					},
 					grid: {
 						left: '3%',
 						right: '4%',
-						bottom: '3%',
+						bottom: 60, // 较大的值，用于容纳 legend 的高度
 						containLabel: true
+					},
+					legend: {
+						type: 'scroll',
+						orient: 'horizontal',
+						left: 'center',
+						bottom: 20, // 使 legend 位于 grid 的下方
+						data: ['班级男生平均体重', '班级女生平均体重', '您孩子的体重']
 					},
 					xAxis: {
 						type: 'category',
@@ -240,14 +322,18 @@
 						},
 					},
 					series: [{
-							name: '班级平均体重',
+							name: '班级男生平均体重',
+							type: 'line',
+							data: fakeData1,
+						}, {
+							name: '班级女生平均体重',
 							type: 'line',
 							data: fakeData2,
 						},
 						{
 							name: '您孩子的体重',
 							type: 'line',
-							data: fakeData1
+							data: fakeData3
 						},
 					]
 				};
@@ -275,14 +361,16 @@
 	}
 
 	// 场景一：最新，最新包括数据区域、图表区域
-	.content>.latest {
+	.content>.day {
 		display: flex;
 		flex-direction: column;
+		width: 100%;
+		height: 100%;
 	}
 
-	.latest>.data-area {
-		width: 85%;
-		margin: 35rpx auto;
+	.day>.data-area {
+		width: 100%;
+		padding: 50rpx;
 	}
 
 	.data-area>.weight {
@@ -299,14 +387,71 @@
 	.weight>.unit {}
 
 	.data-area>.date {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-start;
+		align-items: center;
+	}
+
+	.date text {
 		font-size: 0.8rem;
 		color: $u-tips-color;
 	}
 
-	.latest>.charts-area {
+	.day>.charts-area {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+		width: 100%;
+	}
+
+	.charts-area .legend {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-start;
+		align-items: center;
+		width: 100%;
+	}
+
+	.legend .item {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		width: 25%;
+		padding: 0 30rpx;
+		text-align: center;
+	}
+
+	.item .box {
+		height: 25rpx;
+		width: 30rpx;
+		border-radius: 10rpx;
+	}
+
+	.box1 {
+		background-color: #58D9F9;
+	}
+
+	.box2 {
+		background-color: #7CFFB2;
+	}
+
+	.box3 {
+		background-color: #FDDD60;
+	}
+
+	.box4 {
+		background-color: #FF6E76;
+	}
+
+	.item text {
+		padding: 0 10rpx;
+	}
+
+	.charts-area .tips {
+		padding: 30rpx;
+		font-size: 0.8rem;
+		color: $u-tips-color;
 	}
 </style>

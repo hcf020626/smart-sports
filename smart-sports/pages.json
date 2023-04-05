@@ -177,7 +177,7 @@
             "path" : "pages/index/all/all",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "",
+                "navigationBarTitleText": "全部",
                 "enablePullDownRefresh": false
             }
             
