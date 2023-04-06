@@ -109,7 +109,8 @@
 		flex-direction: row;
 		justify-content: flex-start;
 		align-items: center;
-		font-size: 0.82rem;
+		font-size: 0.9rem;
+		line-height: 1.2rem;
 		color: whitesmoke;
 	}
 

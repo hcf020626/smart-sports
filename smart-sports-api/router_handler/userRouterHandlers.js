@@ -91,7 +91,7 @@ exports.userReg = async (req, resp, next) => {
 			msg: '邮箱或密码不能为空'
 		})
 	}
-
+	
 	try {
 		// 对 token 进行解密，取出其中保存的 email 和 token
 		const {
@@ -139,14 +139,99 @@ exports.userReg = async (req, resp, next) => {
 				})
 			}
 		} else {
-			resp.status(400).json({
+			resp.json({
 				status: 1,
 				msg: '验证码错误'
 			});
 		}
 	} catch (e) {
 		//TODO handle the exception
-		return resp.status(400).json({
+		return resp.json({
+			status: 1,
+			msg: '验证码已经过期'
+		})
+	}
+}
+
+// 用户忘记密码的处理函数
+exports.userForget = async (req, resp, next) => {
+	//接收表单数据
+	const user = req.body;
+
+	//判断邮箱和密码是否为空
+	if (user.email === '' || user.password === '') {
+		return resp.json({
+			status: 1,
+			msg: '邮箱或密码不能为空'
+		})
+	}
+	
+	
+	console.log("req.body.token: ",req.body.token);
+	
+	if(!req.body.token){
+		return resp.json({
+			status: 1,
+			msg: '请先获取验证码'
+		})
+	}
+	
+	try {
+		// 对 token 进行解密，取出其中保存的 email 和 token
+		const {
+			email,
+			code
+		} = jwt.decode(req.body.token, process.env.SECRET_KEY);
+
+		if (user.code === code.toString() && user.email === email) {
+			try {
+				//检测邮箱是否已注册
+				let sql = 'select * from t_parents where email=?';
+				let results = await db.exec(sql, [user.email], );
+
+				//如果查询记录为空，说明邮箱还未注册
+				if (results.length === 0) {
+					return resp.json({
+						status: 1,
+						msg: '邮箱还未注册，修改失败'
+					})
+				} else if(results.length > 1){
+					return resp.json({
+						status: 1,
+						msg: '服务器出现异常，修改密码失败'
+					})
+				}
+
+				sql = 'update t_parents set password=? where email=?';
+				results = await db.exec(sql, [md5(md5(user.password) + process.env.SECRET_KEY), user.email])
+
+				if (results.affectedRows !== 1) {
+					return resp.json({
+						status: 1,
+						msg: '服务器出现异常，修改密码失败'
+					})
+				}
+
+				resp.json({
+					status: 0,
+					msg: '修改密码成功！'
+				})
+			} catch (e) {
+				//TODO handle the exception
+				resp.json({
+					status: 1,
+					msg: '服务器出现错误，注册失败'
+				})
+			}
+		} else {
+			resp.json({
+				status: 1,
+				msg: '验证码错误'
+			});
+		}
+	} catch (e) {
+		//TODO handle the exception
+		return resp.json({
 			status: 1,
 			msg: '验证码已经过期'
 		})

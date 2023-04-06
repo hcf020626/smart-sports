@@ -14,14 +14,14 @@
 			<u-form :model="loginFormData" ref="uForm">
 				<u-form-item prop="email">
 					<!-- 邮箱输入框 -->
-					<u-input type="text" v-model="loginFormData.email" placeholder="请输入邮箱" clearable border="bottom">
+					<u-input v-model="loginFormData.email" placeholder="请输入邮箱" clearable border="bottom">
 						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-user" size="20">
 						</uni-icons>
 					</u-input>
 				</u-form-item>
 				<u-form-item prop="password">
 					<!-- 密码输入框 -->
-					<u-input prefixIcon="lock" type="password" v-model="loginFormData.password" placeholder="请输入密码"
+					<u-input type="password" v-model="loginFormData.password" placeholder="请输入密码"
 						clearable border="bottom">
 						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-old-password" size="20"></uni-icons>
 					</u-input>
@@ -55,7 +55,7 @@
 		mapState,
 		mapActions
 	} from 'vuex' // 导入vuex的辅助函数mapActions
-
+	import {baseURL} from '@/config.js'
 	import tfVerifyImg from '@/components/tf-verify-img/tf-verify-img.vue'; // 导入滑块验证组件
 
 	export default {
@@ -160,10 +160,12 @@
 								userInfo: data.userInfo
 							})
 				
-							
+							const fullSrc = baseURL + '/student/avatars/' + (data.studentInfo.gender === '女' ? (Math
+								.floor(Math.random() * 10) + 1) : (Math.floor(Math.random() * 8) +
+								11)) + '.png';
 							// 将学生信息保存到Vuex和本地存储中
 							this.updateStudentInfo({
-								avatar_url: this.studentInfo.avatar_url,
+								avatar_url: this.studentInfo.avatar_url ? this.studentInfo.avatar_url : fullSrc,
 								name: data.studentInfo.name,
 								gender: data.studentInfo.gender,
 								age: data.studentInfo.age,

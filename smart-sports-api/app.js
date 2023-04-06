@@ -29,7 +29,7 @@ app.use(express.json());
 // 导入自定义的身份验证中间件
 const {auth} = require('./utils/auth')
 // 将自定义的身份验证中间件注册为全局中间件
-app.use(auth(['/account/login', '/account/reg', '/account/send-verification-code', '/account/verify-code']))
+app.use(auth(['/account/login', '/account/reg', '/account/send-code', '/account/verify-code', '/account/forget']))
 
 
 // 导入并注册用户路由模块

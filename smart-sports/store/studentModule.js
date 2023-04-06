@@ -21,6 +21,7 @@ export default {
 		}
 	},
 	state: {
-		studentInfo: JSON.parse(uni.getStorageSync('studentInfo') || '{}')
+		studentInfo: JSON.parse(uni.getStorageSync('studentInfo') || '{}'),
+		weightData: {}
 	}
 }

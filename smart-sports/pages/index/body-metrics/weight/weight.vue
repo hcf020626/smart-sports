@@ -16,14 +16,14 @@
 						<text class="number">{{weight}}</text>
 						<text class="unit">kg</text>
 					</view>
-					<view class="date" @click="openCalendar">
-						<text>{{currentSelectedDate}}</text>
+					<view class="date" @click="openSingleCalendar">
+						<text>{{currentSelectedDate | formatDate }}</text>
 						<uni-icons customPrefix="iconfont" type="icon-arrow-down"></uni-icons>
 					</view>
 				</view>
 				<!-- 图表区域通过 l-echart 组件渲染了一个仪表盘图表 -->
 				<view class="charts-area">
-					<view style="width: 100%;">
+					<view style="width: 100%;height:300px;">
 						<l-echart ref="weightGuage" @finished="initWeightGuage"></l-echart>
 					</view>
 					<view class="legend">
@@ -51,14 +51,21 @@
 			<!-- 如果 subsection.current 为 1，渲染统计页面。 -->
 			<view class="stats" v-else>
 				<view class="charts-area">
-					<view style="width: 100%; margin-top: 30rpx;">
+					<view style="width: 100%;">
 						<l-echart ref="weightLineChart" @finished="initWeightLineChart"></l-echart>
 					</view>
 				</view>
+
+				<view class="range-date">
+					<text>{{startDate | formatDate }}</text><text>-</text><text>{{endDate | formatDate }}</text>
+					<uni-icons customPrefix="iconfont" type="icon-arrow-down" @click="openRangeCalendar"></uni-icons>
+				</view>
 			</view>
 
-			<uni-calendar ref="calendar" :insert="false" :start-date="'1970-1-1'" :end-date="new Date().toLocaleString()"
-				@confirm="calendarConfirm" />
+			<uni-calendar ref="singleCalendar" :insert="false" :start-date="'1970-1-1'"
+				:end-date="new Date().toLocaleString()" @confirm="singleCalendarConfirm" />
+			<uni-calendar ref="rangeCalendar" :range="true" :insert="false" :start-date="'1970-1-1'"
+				:end-date="new Date().toLocaleString()" @confirm="rangeCalendarConfirm" />
 		</view>
 	</view>
 </template>
@@ -78,10 +85,13 @@
 				height: ((Math.random() * 20) + 155).toFixed(2),
 				age: 15,
 				gender: "男",
-				currentSelectedDate: '2023年3月20日',
+				currentSelectedDate: '2023-3-20',
+				startDate: '2022-03-01',
+				endDate: '2023-3-20',
 				weightGuageOption: {},
 				weightLineChartOption: {},
 				tips: '',
+
 			}
 		},
 		computed: {},
@@ -90,18 +100,18 @@
 			this.initWeightLineChartOption();
 		},
 		methods: {
-			openCalendar() {
-				this.$refs.calendar.open();
+			openSingleCalendar() {
+				this.$refs.singleCalendar.open();
 			},
-			calendarConfirm(e) {
-				const date = new Date(e.fulldate);
-				
-				const year = date.getFullYear();
-				const month = date.getMonth() + 1;
-				const day = date.getDate();
-				
-				const formattedDate = `${year}年${month}月${day}日`;
-				this.currentSelectedDate = formattedDate;
+			openRangeCalendar() {
+				this.$refs.rangeCalendar.open();
+			},
+			singleCalendarConfirm(e) {
+				this.currentSelectedDate = e.fulldate;
+			},
+			rangeCalendarConfirm(e) {
+				this.startDate = e.range.before ? e.range.before : this.startDate;
+				this.endDate = e.range.after ? e.range.after : this.endDate;
 			},
 			sectionChange(index) {
 				this.subsection.current = index;
@@ -110,6 +120,11 @@
 				// init 是 echarts 初始化调用函数,第一个参数是传入echarts,第二个参数是回调函数，回调函数的参数是 chart 实例
 				const weightGuage = await this.$refs.weightGuage.init(echarts);
 				weightGuage.setOption(this.weightGuageOption)
+			},
+			async initWeightLineChart() {
+				// init 是 echarts 初始化调用函数,第一个参数是传入echarts,第二个参数是回调函数，回调函数的参数是 chart 实例
+				const weightLineChart = await this.$refs.weightLineChart.init(echarts);
+				weightLineChart.setOption(this.weightLineChartOption)
 			},
 			initWeightGuageOption() {
 				// 计算 BMI
@@ -247,11 +262,6 @@
 					}]
 				};
 			},
-			async initWeightLineChart() {
-				// init 是 echarts 初始化调用函数,第一个参数是传入echarts,第二个参数是回调函数，回调函数的参数是 chart 实例
-				const weightLineChart = await this.$refs.weightLineChart.init(echarts);
-				weightLineChart.setOption(this.weightLineChartOption)
-			},
 			initWeightLineChartOption() {
 				let fakeData1 = [];
 				for (let i = 0; i < 7; i++) {
@@ -300,12 +310,12 @@
 						type: 'scroll',
 						orient: 'horizontal',
 						left: 'center',
-						bottom: 20, // 使 legend 位于 grid 的下方
+						bottom: 5, // 使 legend 位于 grid 的下方
 						data: ['班级男生平均体重', '班级女生平均体重', '您孩子的体重']
 					},
 					xAxis: {
 						type: 'category',
-						data: ['2022年03月01日', '2023年6月20日', '2023年9月10日', '202年12月20日', '2023年01月12日', '2023年02月06日',
+						data: ['2022年03月01日', '2023年6月20日', '2023年9月10日', '2023年12月20日', '2023年01月12日', '2023年02月06日',
 							'2023年3月20日'
 						],
 						axisLabel: {
@@ -338,7 +348,20 @@
 					]
 				};
 			}
+		},
+		filters: {
+			formatDate(value) {
+				if (value) {
+					const date = new Date(value);
+					const year = date.getFullYear();
+					const month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
+					const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+					return `${year}年${month}月${day}日`;
+				}
+				return '';
+			}
 		}
+
 	}
 </script>
 
@@ -370,7 +393,7 @@
 
 	.day>.data-area {
 		width: 100%;
-		padding: 50rpx;
+		padding: 50rpx 50rpx 0 50rpx;
 	}
 
 	.data-area>.weight {
@@ -424,8 +447,8 @@
 	}
 
 	.item .box {
-		height: 25rpx;
-		width: 30rpx;
+		height: 10px;
+		width: 15px;
 		border-radius: 10rpx;
 	}
 
@@ -447,10 +470,29 @@
 
 	.item text {
 		padding: 0 10rpx;
+		white-space: nowrap;
 	}
 
 	.charts-area .tips {
 		padding: 30rpx;
+		font-size: 0.8rem;
+		color: $u-tips-color;
+	}
+
+	.stats {
+		width: 100%;
+	}
+
+	.stats .range-date {
+		width: 95%;
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-end;
+		align-items: center;
+		margin: 0 auto;
+	}
+
+	.stats .range-date text {
 		font-size: 0.8rem;
 		color: $u-tips-color;
 	}

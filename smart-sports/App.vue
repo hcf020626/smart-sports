@@ -4,6 +4,7 @@
 		mapActions
 	} from 'vuex'
 	import api from '@/api/index.js'
+	import {baseURL} from '@/config.js'
 	export default {
 		computed: {
 			// 获取用户信息
@@ -28,7 +29,6 @@
 					})
 				} else {
 					this.getAndUpdateTheLatestInfo()
-
 				}
 			},
 			async getAndUpdateTheLatestInfo() {
@@ -43,11 +43,10 @@
 							}
 						}
 					} = await api.account.getTheLatestInfo(this.userInfo.email);
-
 					if (!status) {
 						this.updateUserInfo(userInfo);
 						this.updateStudentInfo({
-							avatar_url: this.studentInfo.avatar_url,
+							avatar_url: this.studentInfo.avatar_url ,
 							name: studentInfo.name,
 							gender: studentInfo.gender,
 							age: studentInfo.age,
@@ -82,7 +81,7 @@
 	/* 在App.vue中首行的位置引入uView基础样式 */
 	@import "@/uni_modules/uview-ui/index.scss";
 
-	@import url('//at.alicdn.com/t/c/font_3944024_ssqr4625ca9.css');
+	@import url('//at.alicdn.com/t/c/font_3944024_14rryqypq87.css');
 	
 	@font-face {
 		font-family: leo-he;

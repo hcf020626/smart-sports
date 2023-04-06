@@ -30,11 +30,27 @@ export function reg ({email, password, code, token}){
 	})
 }
 
+// 用户忘记密码
+export function forget({email, password, code, token}){
+	return http.request({
+		method: 'POST',
+		url: '/account/forget',
+		data: {
+			email,
+			password,
+			code,
+			token
+		},
+		//可以加一些自定义参数，在拦截器等地方使用。比如这里我加了一个auth，可在拦截器里拿到，如果true就传token
+		custom: {auth: false}
+	})
+}
+
 // 发送邮箱验证码
 export function sendCode(email){
 	return http.request({
 		method: 'POST',
-		url: '/account/send-verification-code',
+		url: '/account/send-code',
 		data: {
 			email
 		},

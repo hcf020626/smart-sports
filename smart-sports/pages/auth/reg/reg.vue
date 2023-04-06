@@ -14,31 +14,30 @@
 			<u-form :model="regFormData" ref="uForm">
 				<!-- 邮箱输入框 -->
 				<u-form-item prop="email">
-					<u-input prefixIcon="account" type="text" v-model="regFormData.email" placeholder="请输入邮箱" clearable
-						border="bottom">
+					<u-input type="text" v-model="regFormData.email" placeholder="请输入邮箱" clearable border="bottom">
 						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-user" size="20">
 						</uni-icons>
 					</u-input>
 				</u-form-item>
 				<!-- 密码输入框 -->
 				<u-form-item prop="password">
-					<u-input prefixIcon="lock" type="password" v-model="regFormData.password" placeholder="请输入密码"
-						clearable border="bottom">
-						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-old-password" size="20"></uni-icons>
+					<u-input type="password" v-model="regFormData.password" placeholder="请输入密码" clearable
+						border="bottom">
+						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-old-password" size="20">
+						</uni-icons>
 					</u-input>
 				</u-form-item>
 				<!-- 再次输入密码输入框 -->
 				<u-form-item prop="password2">
-					<u-input prefixIcon="lock-fill" type="password" v-model="regFormData.password2"
-						placeholder="请再次输入密码" clearable border="bottom">
+					<u-input type="password" v-model="regFormData.password2" placeholder="请再次输入密码" clearable
+						border="bottom">
 						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-once-again-password" size="20">
 						</uni-icons>
 					</u-input>
 				</u-form-item>
 				<!-- 验证码输入框 -->
 				<u-form-item prop="code">
-					<u-input prefixIcon="email" type="number" v-model="regFormData.code" placeholder="请输入验证码" clearable
-						border="bottom">
+					<u-input type="number" v-model="regFormData.code" placeholder="请输入验证码" clearable border="bottom">
 						<uni-icons slot="prefix" custom-prefix="iconfont" type="icon-code" size="20"></uni-icons>
 						<template slot="suffix">
 							<u-code ref="uCode" @change="codeChange" seconds="120" startText="获取验证码" changeText="X秒重新获取"
@@ -157,12 +156,12 @@
 			},
 			regHandler() {
 				this.$refs.uForm.validate().then(res => {
+
 					//如果表单合法，isLoading变量会被设置为true，表示正在加载中
 					this.isLoading = true;
-					try {
-						// 使用setTimeout()函数模拟网络延迟
-						setTimeout(async () => {
-					
+					// 使用setTimeout()函数模拟网络延迟
+					setTimeout(async () => {
+						try {
 							// 调用api.account.reg()异步请求注册接口，获取返回的status、msg
 							const {
 								data: {
@@ -175,9 +174,7 @@
 								code: this.regFormData.code,
 								token: this.regFormData.token
 							});
-					
-							this.isLoading = false;
-					
+
 							if (!status) {
 								// 弹出注册成功的提示框
 								this.$refs.uToast.show({
@@ -186,9 +183,9 @@
 									icon: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
 									position: 'top'
 								})
-					
+
 								// 清空表单元素的值和错误提示
-								this.$refs.uForm.resetFields();
+								// this.$refs.uForm.resetFields();
 							} else {
 								// 弹出注册失败的提示框
 								this.$refs.uToast.show({
@@ -198,18 +195,20 @@
 									position: 'top'
 								})
 							}
-						},500)
-					} catch (e) {
-						//TODO handle the exception
-						this.$refs.uToast.show({
-							type: 'error',
-							message: '注册发生异常，请稍后再试',
-							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-							position: 'top'
-						})
-					}
+						} catch (e) {
+							//TODO handle the exception
+							this.$refs.uToast.show({
+								type: 'error',
+								message: '注册发生异常，请稍后再试',
+								icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+								position: 'top'
+							})
+						} finally {
+							this.isLoading = false;
+						}
+					}, 500)
 				}).catch(errors => {
-					console.log("errors: ",errors);
+					console.log("errors: ", errors);
 					// 如果表单不合法，则在页面上弹出错误提示框
 					return this.$refs.uToast.show({
 						type: 'error',
@@ -223,66 +222,79 @@
 				this.regFormData.tips = text;
 			},
 			getCode() {
-				if (this.$refs.uCode.canGetCode) {
-					uni.showLoading({
-						title: '正在获取验证码'
-					})
-
-					try {
-						setTimeout(async ()=>{
-							try{
-								// 调用api.account.sendCode()异步请求注册接口，获取返回的status、msg和token
-								const {
-									data: {
-										msg,
-										status,
-										token
-									}
-								} = await api.account.sendCode(this.regFormData.email);
-								if (!status) {
-									this.regFormData.token = token;
-									this.$refs.uToast.show({
-										type: 'success',
-										message: msg,
-										icon: 'https://cdn.uviewui.com/uview/demo/toast/sucess.png',
-										position: 'top'
-									})
-									// 通知验证码组件内部开始倒计时
-									this.$refs.uCode.start();
-								} else {
-									this.$refs.uToast.show({
-										type: 'error',
-										message: msg,
-										icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-										position: 'top'
-									})
-								}
-							}catch(e){
-								//TODO handle the exception
-								console.log("e: ",e);
-								this.$refs.uToast.show({
-									type: 'error',
-									message: '请求发生问题，请稍后再试',
-									icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-									position: 'top'
-								})
-							}finally{
-								uni.hideLoading()
-							}
-						}, 500)
-						
-					} catch (e) {
-						//TODO handle the exception
-						this.$refs.uToast.show({
+				this.$refs.uForm.validateField('email', (errorsRes) => {
+					if (errorsRes.length) {
+						console.log("errors: ", errorsRes);
+						// 如果邮箱字段校验失败，则在页面上弹出错误提示框
+						return this.$refs.uToast.show({
 							type: 'error',
-							message: e.errMsg,
+							message: errorsRes[0].message,
 							icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
 							position: 'top'
 						})
 					}
-				} else {
-					uni.$u.toast('倒计时结束后再发送');
-				}
+
+					if (this.$refs.uCode.canGetCode) {
+						uni.showLoading({
+							title: '正在获取验证码'
+						})
+
+						try {
+							setTimeout(async () => {
+								try {
+									// 调用api.account.sendCode()异步请求注册接口，获取返回的status、msg和token
+									const {
+										data: {
+											msg,
+											status,
+											token
+										}
+									} = await api.account.sendCode(this.regFormData.email);
+									if (!status) {
+										this.regFormData.token = token;
+										this.$refs.uToast.show({
+											type: 'success',
+											message: msg,
+											icon: 'https://cdn.uviewui.com/uview/demo/toast/sucess.png',
+											position: 'top'
+										})
+										// 通知验证码组件内部开始倒计时
+										this.$refs.uCode.start();
+									} else {
+										this.$refs.uToast.show({
+											type: 'error',
+											message: msg,
+											icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+											position: 'top'
+										})
+									}
+								} catch (e) {
+									//TODO handle the exception
+									console.log("e: ", e);
+									this.$refs.uToast.show({
+										type: 'error',
+										message: '请求发生问题，请稍后再试',
+										icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+										position: 'top'
+									})
+								} finally {
+									uni.hideLoading()
+								}
+							}, 500)
+
+						} catch (e) {
+							//TODO handle the exception
+							this.$refs.uToast.show({
+								type: 'error',
+								message: e.errMsg,
+								icon: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+								position: 'top'
+							})
+						}
+					} else {
+						uni.$u.toast('倒计时结束后再发送');
+					}
+				})
 			},
 		},
 		// 必须要在onReady生命周期，因为onLoad生命周期组件可能尚未创建完毕

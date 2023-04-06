@@ -9,14 +9,17 @@
 		<!-- content 部分 -->
 		<view class="content">
 			<!-- 如果 subsection.current 为 0，渲染最新页面，该页面包含了一个数据区域和一个图表区域 -->
-			<view class="latest" v-if="!subsection.current">
+			<view class="day" v-if="!subsection.current">
 				<!-- 数据区域显示了当前的身高和日期 -->
 				<view class="data-area">
 					<view class="height">
 						<text class="number">{{height}}</text>
 						<text class="unit">cm</text>
 					</view>
-					<view class="date">{{date}}</view>
+					<view class="date" @click="openSingleCalendar">
+						<text>{{currentSelectedDate | formatDate }}</text>
+						<uni-icons customPrefix="iconfont" type="icon-arrow-down"></uni-icons>
+					</view>
 				</view>
 				<!-- 图表区域通过 l-echart 组件渲染了一个仪表盘图表 -->
 				<view class="charts-area">
@@ -26,13 +29,23 @@
 				</view>
 			</view>
 			<!-- 如果 subsection.current 为 1，渲染历史页面。 -->
-			<view class="history" v-else>
+			<view class="stats" v-else>
 				<view class="charts-area">
-					<view style="width: 100%; margin-top: 30rpx;">
+					<view style="width: 100%;">
 						<l-echart ref="heightLineChart" @finished="initHeightLineChart"></l-echart>
 					</view>
 				</view>
+				
+				<view class="range-date">
+					<text>{{startDate | formatDate }}</text><text>-</text><text>{{endDate | formatDate }}</text>
+					<uni-icons customPrefix="iconfont" type="icon-arrow-down" @click="openRangeCalendar"></uni-icons>
+				</view>
 			</view>
+
+			<uni-calendar ref="singleCalendar" :insert="false" :start-date="'1970-1-1'"
+				:end-date="new Date().toLocaleString()" @confirm="singleCalendarConfirm" />
+			<uni-calendar ref="rangeCalendar" :range="true" :insert="false" :start-date="'1970-1-1'"
+				:end-date="new Date().toLocaleString()" @confirm="rangeCalendarConfirm" />
 		</view>
 	</view>
 </template>
@@ -47,13 +60,16 @@
 		data() {
 			return {
 				subsection: {
-					list: ['最新', '历史'],
+					list: ['日', '统计'],
 					current: 0
 				},
+				weight: ((Math.random() * 25) + 40).toFixed(2),
 				height: ((Math.random() * 20) + 155).toFixed(2),
 				age: 15,
 				gender: "男",
-				currentDate: '2023年3月20日',
+				currentSelectedDate: '2023-3-20',
+				startDate: '2022-03-01',
+				endDate: '2023-3-20',
 				heightGuageOption: {},
 				heightLineChartOption: {}
 			}
@@ -63,6 +79,19 @@
 			this.initHeightLineChartOption();
 		},
 		methods: {
+			openSingleCalendar() {
+				this.$refs.singleCalendar.open();
+			},
+			openRangeCalendar() {
+				this.$refs.rangeCalendar.open();
+			},
+			singleCalendarConfirm(e) {
+				this.currentSelectedDate = e.fulldate;
+			},
+			rangeCalendarConfirm(e) {
+				this.startDate = e.range.before ? e.range.before : this.startDate;
+				this.endDate = e.range.after ? e.range.after : this.endDate;
+			},
 			sectionChange(index) {
 				this.subsection.current = index;
 			},
@@ -77,9 +106,6 @@
 				// init 是 echarts 初始化调用函数,第一个参数是传入echarts,第二个参数是回调函数，回调函数的参数是 chart 实例
 				const heightLineChart = await this.$refs.heightLineChart.init(echarts);
 				heightLineChart.setOption(this.heightLineChartOption)
-			},
-			getRate(height) {
-
 			},
 			initHeightGuageOption() {
 				const height = this.height;
@@ -126,7 +152,7 @@
 						startAngle: 180,
 						endAngle: 0,
 						// center 和 radius: 控制仪表盘的位置和大小，这里的 center 为 ['50%', '75%'] 表示相对于容器宽度和高度的位置，radius 为 '100%' 表示宽度和高度都为 100%。
-						center: ['50%', '75%'],
+						center: ['50%', '90%'],
 						radius: '100%',
 						// min 和 max: 控制指针的取值范围，这里设置最小值为 0，最大值为 1。
 						min: 0,
@@ -139,8 +165,8 @@
 								width: 6,
 								color: [
 									[0.25, '#58D9F9'],
-									[0.5, '#FDDD60'],
-									[0.75, '#7CFFB2'],
+									[0.5, '#7CFFB2'],
+									[0.75, '#FDDD60'],
 									[1, '#FF6E76']
 								]
 							}
@@ -149,13 +175,13 @@
 							icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z',
 							length: '12%',
 							width: 20,
-							offsetCenter: [0, '-60%'],
+							offsetCenter: [0, '-55%'],
 							itemStyle: {
 								color: '#333333'
 							}
 						},
 						axisTick: {
-							length: 12,
+							length: 10,
 							lineStyle: {
 								color: '#333333',
 								width: 2
@@ -209,12 +235,17 @@
 			initHeightLineChartOption() {
 				let fakeData1 = [];
 				for (let i = 0; i < 7; i++) {
-					fakeData1.push(((Math.random() * 20) + 155).toFixed(1));
+					fakeData1.push(((Math.random() * 10) + 160).toFixed(1));
 				}
 
 				let fakeData2 = [];
 				for (let i = 0; i < 7; i++) {
-					fakeData2.push(((Math.random() * 10) + 160).toFixed(1));
+					fakeData2.push(((Math.random() * 10) + 155).toFixed(1));
+				}
+
+				let fakeData3 = [];
+				for (let i = 0; i < 7; i++) {
+					fakeData3.push(((Math.random() * 20) + 155).toFixed(1));
 				}
 
 				this.heightLineChartOption = {
@@ -239,14 +270,18 @@
 							return result;
 						}
 					},
-					legend: {
-						data: ['班级平均身高', '您孩子的身高']
-					},
 					grid: {
 						left: '3%',
 						right: '4%',
-						bottom: '3%',
+						bottom: 60, // 较大的值，用于容纳 legend 的高度
 						containLabel: true
+					},
+					legend: {
+						type: 'scroll',
+						orient: 'horizontal',
+						left: 'center',
+						bottom: 5, // 使 legend 位于 grid 的下方
+						data: ['班级男生平均身高', '班级女生平均身高', '您孩子的身高']
 					},
 					xAxis: {
 						type: 'category',
@@ -267,17 +302,34 @@
 						},
 					},
 					series: [{
-							name: '班级平均身高',
+							name: '班级男生平均身高',
+							type: 'line',
+							data: fakeData1,
+						},
+						{
+							name: '班级女生平均身高',
 							type: 'line',
 							data: fakeData2,
 						},
 						{
 							name: '您孩子的身高',
 							type: 'line',
-							data: fakeData1
+							data: fakeData3
 						},
 					]
 				};
+			}
+		},
+		filters: {
+			formatDate(value) {
+				if (value) {
+					const date = new Date(value);
+					const year = date.getFullYear();
+					const month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
+					const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+					return `${year}年${month}月${day}日`;
+				}
+				return '';
 			}
 		}
 	}
@@ -302,12 +354,12 @@
 	}
 
 	// 场景一：最新，最新包括数据区域、图表区域
-	.content>.latest {
+	.content>.day {
 		display: flex;
 		flex-direction: column;
 	}
 
-	.latest>.data-area {
+	.day>.data-area {
 		width: 85%;
 		margin: 35rpx auto;
 	}
@@ -330,10 +382,28 @@
 		color: $u-tips-color;
 	}
 
-	.latest>.charts-area {
+	.day>.charts-area {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+	}
+	
+	.stats {
+		width: 100%;
+	}
+	
+	.stats .range-date {
+		width: 95%;
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-end;
+		align-items: center;
+		margin: 0 auto;
+	}
+	
+	.stats .range-date text {
+		font-size: 0.8rem;
+		color: $u-tips-color;
 	}
 </style>

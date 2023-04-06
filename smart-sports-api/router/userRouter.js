@@ -10,6 +10,9 @@ userRouter.post('/login', require('../router_handler/userRouterHandlers').userLo
 // 用户注册
 userRouter.post('/reg', require('../router_handler/userRouterHandlers').userReg)
 
+// 用户忘记密码
+userRouter.post('/forget', require('../router_handler/userRouterHandlers').userForget)
+
 // 发送邮箱验证码
 userRouter.post('/send-code', require('../router_handler/userRouterHandlers').sendCode)
 
