@@ -10,3 +10,14 @@ export function getStudentsByIdcard(idcard){
 		custom: {auth: true}
 	})
 }
+
+export function getWeightById(id){
+	return http.request({
+		method: 'POST',
+		url: '/student/get-weight-by-id',
+		data: {
+			id
+		},
+		custom: {auth: true}
+	})
+}

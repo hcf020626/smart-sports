@@ -123,7 +123,7 @@
 				const visibleEnd = value.substr(value.length - visibleDigitsEnd, visibleDigitsEnd)
 				return `${visibleStart}${masked}${visibleEnd}`
 			}
-		}
+		},
 	}
 </script>
 

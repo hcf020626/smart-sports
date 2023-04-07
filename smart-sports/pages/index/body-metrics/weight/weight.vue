@@ -21,8 +21,10 @@
 						<uni-icons customPrefix="iconfont" type="icon-arrow-down"></uni-icons>
 					</view>
 				</view>
+				<u-empty text="数据为空" icon="../../../../static/images/empty/data-empty.png" :show="isDayEmpty">
+				</u-empty>
 				<!-- 图表区域通过 l-echart 组件渲染了一个仪表盘图表 -->
-				<view class="charts-area">
+				<view class="charts-area" v-show="!isDayEmpty">
 					<view style="width: 100%;height:300px;">
 						<l-echart ref="weightGuage" @finished="initWeightGuage"></l-echart>
 					</view>
@@ -61,9 +63,9 @@
 					<uni-icons customPrefix="iconfont" type="icon-arrow-down" @click="openRangeCalendar"></uni-icons>
 				</view>
 			</view>
-
-			<uni-calendar ref="singleCalendar" :insert="false" :start-date="'1970-1-1'"
-				:end-date="new Date().toLocaleString()" @confirm="singleCalendarConfirm" />
+			<uni-calendar :selected="singleCalendarSelected" :date="currentSelectedDate" ref="singleCalendar"
+				:insert="false" :start-date="'1970-1-1'" :end-date="new Date().toLocaleString()"
+				@confirm="singleCalendarConfirm" />
 			<uni-calendar ref="rangeCalendar" :range="true" :insert="false" :start-date="'1970-1-1'"
 				:end-date="new Date().toLocaleString()" @confirm="rangeCalendarConfirm" />
 		</view>
@@ -73,7 +75,11 @@
 <script>
 	// 引入 echarts，用于绘制图表
 	import * as echarts from '@/uni_modules/lime-echart/static/echarts.min'
-
+	import {
+		mapState,
+		mapActions
+	} from 'vuex'
+	import api from '@/api/index.js'
 	export default {
 		data() {
 			return {
@@ -81,25 +87,52 @@
 					list: ['日', '统计'],
 					current: 0
 				},
-				weight: ((Math.random() * 25) + 40).toFixed(2),
-				height: ((Math.random() * 20) + 155).toFixed(2),
-				age: 15,
-				gender: "男",
-				currentSelectedDate: '2023-3-20',
+				weight: '',
+				height: '',
+				currentSelectedDate: '',
 				startDate: '2022-03-01',
 				endDate: '2023-3-20',
 				weightGuageOption: {},
 				weightLineChartOption: {},
 				tips: '',
-
+				isLoading: false,
+				isDayEmpty: false,
+				singleCalendarSelected: []
 			}
 		},
-		computed: {},
-		created() {
-			this.initWeightGuageOption();
-			this.initWeightLineChartOption();
+		computed: {
+			// 获取学生信息，需要studentInfo的height
+			...mapState('studentModule', ['studentInfo', 'weightData']),
+		},
+		watch: {
+			// 监视当前选择的日期的变化，日期变化时更新"日"页面的数据
+			currentSelectedDate(newValue, oldValue) {
+				if (oldValue) {
+					const targetData = this.weightData.find(d => d.date === newValue);
+					if (!targetData) {
+						this.weight = '无'
+						return this.isDayEmpty = true;
+					} else {
+						this.isDayEmpty = false;
+					}
+					this.weight = targetData ? targetData.weight : 0;
+					this.height = targetData ? targetData.height : 0;
+					this.updateWeightGuageOption(this.height, this.weight)
+					this.$refs.weightGuage.setOption(this.weightGuageOption)
+				}
+			}
+		},
+		// 页面加载时初始化页面数据。注意，只有初次加载时，才有下拉刷新的效果。
+		onLoad() {
+			this.initPageData();
+			uni.startPullDownRefresh();
+		},
+		// 页面刷新时获取页面数据
+		onPullDownRefresh() {
+			this.getPageData()
 		},
 		methods: {
+			...mapActions('studentModule', ['updateWeightData']),
 			openSingleCalendar() {
 				this.$refs.singleCalendar.open();
 			},
@@ -116,20 +149,61 @@
 			sectionChange(index) {
 				this.subsection.current = index;
 			},
+			// 获取页面数据
+			getPageData() {
+				this.isLoading = true;
+				setTimeout(async () => {
+					try {
+						const {
+							data: {
+								status,
+								msg,
+								weightData
+							}
+						} = await api.student.getWeightById(this.studentInfo.id);
+						if (!status) {
+							this.updateWeightData(weightData);
+						}
+
+						this.initPageData()
+					} catch (e) {
+						//TODO handle the exception
+						console.log("e: ", e);
+					} finally {
+						uni.stopPullDownRefresh();
+						this.isLoading = false;
+					}
+				}, 1500)
+			},
+			// 初始化页面数据
+			initPageData() {
+				this.weightData.forEach((item)=>{
+					this.singleCalendarSelected.push({date: item.date, info: '有数据'})
+				})
+				
+				this.currentSelectedDate = this.weightData[this.weightData.length - 1].date;
+				this.weight = this.weightData[this.weightData.length - 1].weight;
+				this.height = this.weightData[this.weightData.length - 1].height;
+				this.updateWeightGuageOption(this.height, this.weight)
+				this.updateWeightLineChartOption()
+			},
+			// 初始化仪表盘
 			async initWeightGuage() {
 				// init 是 echarts 初始化调用函数,第一个参数是传入echarts,第二个参数是回调函数，回调函数的参数是 chart 实例
-				const weightGuage = await this.$refs.weightGuage.init(echarts);
-				weightGuage.setOption(this.weightGuageOption)
+				const weightLineChart = await this.$refs.weightGuage.init(echarts);
+				weightLineChart.setOption(this.weightGuageOption)
 			},
+			// 初始化折线图
 			async initWeightLineChart() {
 				// init 是 echarts 初始化调用函数,第一个参数是传入echarts,第二个参数是回调函数，回调函数的参数是 chart 实例
 				const weightLineChart = await this.$refs.weightLineChart.init(echarts);
 				weightLineChart.setOption(this.weightLineChartOption)
 			},
-			initWeightGuageOption() {
+			// 更新仪表盘的配置选项
+			updateWeightGuageOption(height, weight) {
 				// 计算 BMI
-				const heightInMeters = this.height / 100;
-				const BMI = (this.weight / heightInMeters ** 2).toFixed(2);
+				const heightInMeters = height / 100;
+				const BMI = (weight / heightInMeters ** 2).toFixed(2);
 
 				const bmiRanges = [{
 						range: [0, 18.5],
@@ -262,7 +336,8 @@
 					}]
 				};
 			},
-			initWeightLineChartOption() {
+			// 更新折线图的配置选项
+			updateWeightLineChartOption() {
 				let fakeData1 = [];
 				for (let i = 0; i < 7; i++) {
 					fakeData1.push(((Math.random() * 20) + 45).toFixed(1));
@@ -350,6 +425,7 @@
 			}
 		},
 		filters: {
+			// 将YYYY-MM-DD形式的日期格式化成YYYY年MM月DD日
 			formatDate(value) {
 				if (value) {
 					const date = new Date(value);

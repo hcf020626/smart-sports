@@ -1,5 +1,5 @@
 import {login, reg, forget, sendCode, saveUserInfo, updatePassword, changeBonding, getTheLatestInfo} from './account.js'
-import {getStudentsByIdcard} from './student.js'
+import {getStudentsByIdcard, getWeightById} from './student.js'
 
 export default {
 	account: {
@@ -13,7 +13,8 @@ export default {
 		getTheLatestInfo
 	},
 	student: {
-		getStudentsByIdcard
+		getStudentsByIdcard,
+		getWeightById
 	},
 	
 }

@@ -1,0 +1,175 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 3944024 */
+  src: url('/static/iconfont/icon/iconfont.woff2?t=1680794199556') format('woff2'),
+       url('/static/iconfont/icon/iconfont.woff?t=1680794199556') format('woff'),
+       url('/static/iconfont/icon/iconfont.ttf?t=1680794199556') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-source-code:before {
+  content: "\e626";
+}
+
+.icon-bilibili:before {
+  content: "\e60a";
+}
+
+.icon-github:before {
+  content: "\e886";
+}
+
+.icon-gitee:before {
+  content: "\e60d";
+}
+
+.icon-arrow-right:before {
+  content: "\e622";
+}
+
+.icon-project-description:before {
+  content: "\e61d";
+}
+
+.icon-author:before {
+  content: "\e67b";
+}
+
+.icon-tech-support:before {
+  content: "\e62a";
+}
+
+.icon-title:before {
+  content: "\e6b6";
+}
+
+.icon-arrow-down:before {
+  content: "\e6b9";
+}
+
+.icon-pull-ups:before {
+  content: "\e64c";
+}
+
+.icon-swimming:before {
+  content: "\e63f";
+}
+
+.icon-long-jump:before {
+  content: "\e628";
+}
+
+.icon-solid-ball:before {
+  content: "\e62c";
+}
+
+.icon-rope-skipping:before {
+  content: "\ee57";
+}
+
+.icon-old-password:before {
+  content: "\e694";
+}
+
+.icon-new-password:before {
+  content: "\e882";
+}
+
+.icon-once-again-password:before {
+  content: "\e7d0";
+}
+
+.icon-edit-password:before {
+  content: "\e600";
+}
+
+.icon-edit-profile:before {
+  content: "\e636";
+}
+
+.icon-user:before {
+  content: "\e6a4";
+}
+
+.icon-code:before {
+  content: "\e656";
+}
+
+.icon-parent-child:before {
+  content: "\e609";
+}
+
+.icon-exit:before {
+  content: "\e608";
+}
+
+.icon-about:before {
+  content: "\e654";
+}
+
+.icon-auth:before {
+  content: "\e60f";
+}
+
+.icon-sit-and-reaches:before {
+  content: "\e606";
+}
+
+.icon-all:before {
+  content: "\e713";
+}
+
+.icon-lung-capacity:before {
+  content: "\e602";
+}
+
+.icon-sit-ups:before {
+  content: "\e60c";
+}
+
+.icon-push-ups:before {
+  content: "\e783";
+}
+
+.icon-weight:before {
+  content: "\e651";
+}
+
+.icon-blood-pressure:before {
+  content: "\e653";
+}
+
+.icon-height:before {
+  content: "\e885";
+}
+
+.icon-vision:before {
+  content: "\e8f2";
+}
+
+.icon-running:before {
+  content: "\e658";
+}
+
+.icon-pull-ups1:before {
+  content: "\e63c";
+}
+
+.icon-circle:before {
+  content: "\e616";
+}
+
+.icon-index:before {
+  content: "\e617";
+}
+
+.icon-user-center:before {
+  content: "\e618";
+}
+

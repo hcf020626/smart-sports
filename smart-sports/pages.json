@@ -85,7 +85,7 @@
 			"path": "pages/index/body-metrics/weight/weight",
 			"style": {
 				"navigationBarTitleText": "体重",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 
 		},{

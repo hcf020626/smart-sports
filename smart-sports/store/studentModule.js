@@ -8,6 +8,9 @@ export default {
 		clearStudentInfo(context, value){
 			context.commit('CLEAR_STUDENT_INFO', value)
 		},
+		updateWeightData(context, value){
+			context.commit('UPDATE_WEIGHT_DATE', value)
+		}
 	},
 	mutations: {
 		UPDATE_STUDENT_INFO(state, studentInfo){
@@ -17,11 +20,16 @@ export default {
 		},
 		CLEAR_STUDENT_INFO(state){
 			state.studentInfo = {};
-			console.log("state: ",state);
+			uni.clearStorageSync();
+		},
+		UPDATE_WEIGHT_DATE(state, weightData){
+			state.weightData = weightData;
+			uni.setStorageSync('weightData', JSON.stringify(state.weightData));
 		}
 	},
 	state: {
 		studentInfo: JSON.parse(uni.getStorageSync('studentInfo') || '{}'),
-		weightData: {}
+		// 测量日期，学生体重，班级男生平均体重，班级女生平均体重
+		weightData: JSON.parse(uni.getStorageSync('weightData') || '[]')
 	}
 }
