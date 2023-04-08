@@ -6,7 +6,7 @@ const path = require('path');
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         // 设置上传文件的存储路径
-        cb(null, 'uploads/avatars');
+        cb(null, 'uploads/avatars/parents');
     },
     filename: (req, file, cb) => {
         // 设置上传文件的文件名

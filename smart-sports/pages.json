@@ -78,7 +78,7 @@
 			"path": "pages/index/body-metrics/height/height",
 			"style": {
 				"navigationBarTitleText": "身高",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 
 		},{

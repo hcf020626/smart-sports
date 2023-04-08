@@ -9,8 +9,8 @@ const cors = require('cors')
 app.use(cors())
 
 // 使用 express.static() 向外开放uploads/avatars文件下的头像图片
-app.use('/account/avatars',express.static('uploads/avatars'))
-app.use('/student/avatars',express.static('static/student/avatars'))
+app.use('/parents/avatars',express.static('uploads/avatars/parents'))
+app.use('/students/avatars',express.static('uploads/avatars/students'))
 app.use('/account',express.static('pages'))
 
 // 使用中间件记录请求的方法和路径

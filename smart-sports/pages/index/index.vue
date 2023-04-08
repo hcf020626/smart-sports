@@ -5,7 +5,7 @@
 					class="link">亲子绑定</navigator>
 			</view>
 		</view>
-		<view class="errMsg" v-else-if="userInfo.cur_bonding_id === ''">
+		<view class="errMsg" v-else-if="userInfo.cur_bonding_id === '' || userInfo.cur_bonding_id === null">
 			<view>您当前未进行亲子绑定或者亲子绑定失败，请亲子绑定成功后再操作！<navigator url="../user-center/bonding/bonding" open-type="navigate"
 					class="link">亲子绑定</navigator>
 			</view>
@@ -37,13 +37,17 @@
 					</view>
 				</view>
 			</view>
+			<u-button @click="clearWeightData" type="primary">
+				clearWeightData
+			</u-button>
 		</template>
 	</view>
 </template>
 
 <script>
 	import {
-		mapState
+		mapState,
+		mapActions
 	} from 'vuex'
 	export default {
 		data() {
@@ -72,6 +76,7 @@
 			}
 		},
 		methods: {
+			...mapActions('studentModule', ['clearWeightData']),
 			goToPage(path) {
 				uni.navigateTo({
 					url: path
@@ -105,6 +110,8 @@
 		background-color: mediumslateblue;
 		margin: 0 auto;
 		border-radius: 15rpx;
+		box-shadow: 0 5px 20px rgba(0, 0, 0, 0.35);
+		position: relative;
 		display: flex;
 		flex-direction: row;
 		justify-content: flex-start;

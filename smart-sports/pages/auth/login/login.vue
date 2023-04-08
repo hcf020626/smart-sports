@@ -159,13 +159,10 @@
 								token,
 								userInfo: data.userInfo
 							})
-				
-							const fullSrc = baseURL + '/student/avatars/' + (data.studentInfo.gender === '女' ? (Math
-								.floor(Math.random() * 10) + 1) : (Math.floor(Math.random() * 8) +
-								11)) + '.png';
+							
 							// 将学生信息保存到Vuex和本地存储中
 							this.updateStudentInfo({
-								avatar_url: this.studentInfo.avatar_url ? this.studentInfo.avatar_url : fullSrc,
+								avatar_url: baseURL + data.studentInfo.avatar_url,
 								name: data.studentInfo.name,
 								gender: data.studentInfo.gender,
 								age: data.studentInfo.age,

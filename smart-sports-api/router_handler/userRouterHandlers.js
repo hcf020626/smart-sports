@@ -6,9 +6,6 @@ const md5 = require('md5')
 const jwt = require('jwt-simple')
 //导入时间处理模块
 const moment = require('moment')
-const {
-	fields
-} = require('../utils/MulterHelper')
 // 将 .env 文件中配置的环境变量加载到 process.env 中
 require('dotenv').config()
 
@@ -315,7 +312,7 @@ exports.saveUserInfo = async (req, resp, next) => {
 
 		const cur_bonding_id = req.body.cur_bonding_id === 'null' ? null : req.body.cur_bonding_id;
 
-		const avatar_url = '/account/avatars/' + filename;
+		const avatar_url = '/parents/avatars/' + req.file.filename;
 
 		const sql =
 			"update t_parents set realname=?, gender=?, phone=?, idCard=? , avatar_url=?, cur_bonding_id=? where email=?"

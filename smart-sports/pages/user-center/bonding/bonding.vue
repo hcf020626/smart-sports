@@ -6,7 +6,6 @@
 		<!-- 弹窗组件，用于显示“确定要换绑吗？” -->
 		<u-modal :show="modalInfo.show" :content="modalInfo.content" @confirm="changeBonding" :showCancelButton="true"
 			@cancel="modalInfo.show=false" :asyncClose="true"></u-modal>
-
 		<view class="cell-group" v-if="userInfo.idcard && cellItems.length">
 			<!-- 单元格分组 -->
 			<u-cell-group :border="false">
@@ -15,7 +14,7 @@
 					:label="item.studentInfo.gender + ' ' + item.studentInfo.age + '岁 ' + item.studentInfo.school + ' ' + item.studentInfo.class"
 					:title="item.studentInfo.name" :border="false">
 					<!-- 单元格左侧图标，使用 u-avatar 组件显示学生头像 -->
-					<u-avatar slot="icon" :src="item.studentInfo.imgSrc"></u-avatar>
+					<u-avatar slot="icon" :src="item.studentInfo.avatar_url"></u-avatar>
 					<!-- 单元格右侧图标，使用 u-switch 组件实现单选按钮效果 -->
 					<u-switch slot="right-icon" v-model="item.checked" asyncChange
 						@change="showModal(item.studentInfo.id)"></u-switch>
@@ -42,6 +41,7 @@
 	} from '@/config.js'
 	import {
 		mapState,
+		mapGetters,
 		mapActions
 	} from 'vuex'
 	import api from '@/api/index.js'
@@ -64,7 +64,7 @@
 		},
 		computed: {
 			// 获取用户信息
-			...mapState('accountModule', ['userInfo']),
+			...mapState('accountModule', ['userInfo', 'token']),
 		},
 		methods: {
 			...mapActions('accountModule', ['updateUserInfo']),
@@ -122,7 +122,7 @@
 									item.checked = true
 									// 更新vuex和本地中的数据
 									this.updateStudentInfo({
-										avatar_url: item.studentInfo.imgSrc,
+										avatar_url: item.studentInfo.avatar_url,
 										name: item.studentInfo.name,
 										gender: item.studentInfo.gender,
 										age: item.studentInfo.age,
@@ -163,18 +163,13 @@
 						data: {
 							status,
 							msg,
-							data
+							students
 						}
 					} = await api.student.getStudentsByIdcard(idcard);
 					if (!status) {
-						data.forEach((item) => {
-							//对于每个学生信息，我们需要根据其性别来生成对应的头像
-							const fullSrc = baseURL + '/student/avatars/' + (item.gender === '女' ? (Math
-								.floor(Math.random() * 10) + 1) : (Math.floor(Math.random() * 8) +
-								11)) + '.png';
-							// 为每个学生信息对象添加一个 imgSrc 属性，用于显示学生头像，其值为随机生成的头像的url
-							this.$set(item, 'imgSrc', fullSrc);
-							//将处理后的学生信息对象以及一个表示该学生是否被选中的布尔值（这里我们用checked表示）封装成一个对象，并将该对象推入到cellItems数组中。
+						students.forEach((item) => {
+							item.avatar_url = baseURL + item.avatar_url;
+							//将学生信息对象和一个表示该学生是否被选中的布尔值（这里我们用checked表示）封装成一个对象，并将该对象推入到cellItems数组中。
 							this.cellItems.push({
 								studentInfo: item,
 								checked: this.userInfo.cur_bonding_id === item.id

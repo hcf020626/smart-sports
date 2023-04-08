@@ -10,6 +10,9 @@ studentRouter.post('/get-students-by-idcard', require('../router_handler/student
 // 根据学生id查询测量日期，学生体重，班级男生平均体重，班级女生平均体重
 studentRouter.post('/get-weight-by-id', require('../router_handler/studentRouterHandlers').getWeightById)
 
+// 根据学生id查询测量日期，学生身高，班级男生平均身高，班级女生平均身高
+studentRouter.post('/get-height-by-id', require('../router_handler/studentRouterHandlers').getHeightById)
+
 // 向外导入路由对象
 module.exports = studentRouter
 

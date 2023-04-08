@@ -21,3 +21,14 @@ export function getWeightById(id){
 		custom: {auth: true}
 	})
 }
+
+export function getHeightById(id){
+	return http.request({
+		method: 'POST',
+		url: '/student/get-height-by-id',
+		data: {
+			id
+		},
+		custom: {auth: true}
+	})
+}
