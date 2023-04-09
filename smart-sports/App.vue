@@ -8,12 +8,12 @@
 	export default {
 		computed: {
 			// 获取用户信息
-			...mapState('accountModule', ['userInfo', 'token']),
+			...mapState('parentModule', ['parentInfo', 'token']),
 			// 获取学生信息
 			...mapState('studentModule', ['studentInfo']),
 		},
 		methods: {
-			...mapActions('accountModule', ['updateUserInfo']),
+			...mapActions('parentModule', ['updateParentInfo']),
 			...mapActions('studentModule', ['updateStudentInfo']),
 			checkIsLogin() {
 				// 判断用户是否登录
@@ -38,13 +38,13 @@
 							msg,
 							status,
 							data: {
-								userInfo,
+								parentInfo,
 								studentInfo
 							}
 						}
-					} = await api.account.getTheLatestInfo(this.userInfo.email);
+					} = await api.parent.getTheLatestInfo(this.parentInfo.email);
 					if (!status) {
-						this.updateUserInfo(userInfo);
+						this.updateParentInfo(parentInfo);
 						this.updateStudentInfo({
 							avatar_url: this.studentInfo.avatar_url ,
 							name: studentInfo.name,

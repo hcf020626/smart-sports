@@ -13,7 +13,7 @@
 			<view class="day" v-if="!subsection.current">
 				<!-- 数据区域显示了当前的体重和日期 -->
 				<view class="data-area" v-show="weightData.length">
-					<view class="weight">
+					<view class="value">
 						<text class="number">{{weight}}</text>
 						<text class="unit" v-show="!isSingleSelectedEmtpy">kg</text>
 					</view>
@@ -520,18 +520,18 @@
 		padding: 50rpx 50rpx 0 50rpx;
 	}
 
-	.data-area>.weight {
+	.data-area>.value {
 		display: flex;
 		flex-direction: row;
 		align-items: baseline;
 	}
 
-	.weight>.number {
+	.value>.number {
 		font-size: 2rem;
 		font-weight: bold;
 	}
 
-	.weight>.unit {}
+	.value>.unit {}
 
 	.data-area>.date {
 		display: flex;

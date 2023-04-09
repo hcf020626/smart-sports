@@ -13,6 +13,9 @@ studentRouter.post('/get-weight-by-id', require('../router_handler/studentRouter
 // 根据学生id查询测量日期，学生身高，班级男生平均身高，班级女生平均身高
 studentRouter.post('/get-height-by-id', require('../router_handler/studentRouterHandlers').getHeightById)
 
+// 根据学生id查询测量日期，班级平均左眼视力，班级平均右眼视力，学生左眼视力，学生右眼视力
+studentRouter.post('/get-vision-by-id', require('../router_handler/studentRouterHandlers').getVisionById)
+
 // 向外导入路由对象
 module.exports = studentRouter
 

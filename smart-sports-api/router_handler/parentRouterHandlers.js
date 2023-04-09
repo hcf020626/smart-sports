@@ -1,6 +1,6 @@
 // 导入自己封装好的数据库工具
 const db = require('../utils/DBHelper')
-//导入对用户密码进行 md5 加密的模块
+//导入对家长密码进行 md5 加密的模块
 const md5 = require('md5')
 // 导入 JWT 模块
 const jwt = require('jwt-simple')
@@ -9,13 +9,13 @@ const moment = require('moment')
 // 将 .env 文件中配置的环境变量加载到 process.env 中
 require('dotenv').config()
 
-// 用户登录的处理函数
-exports.userLogin = async (req, resp, next) => {
+// 家长登录的处理函数
+exports.parentLogin = async (req, resp, next) => {
 	// 接收表单数据：
-	const user = req.body;
+	const parent = req.body;
 
 	//判断邮箱和密码是否为空
-	if (user.email === '' || user.password === '') {
+	if (parent.email === '' || parent.password === '') {
 		return resp.json({
 			status: 1,
 			msg: '邮箱或密码不能为空'
@@ -23,30 +23,30 @@ exports.userLogin = async (req, resp, next) => {
 	}
 
 	try {
-		let userInfo, studentInfo;
+		let parentInfo, studentInfo;
 		let sql = 'select * from t_parents where email=?'
-		let results = await db.exec(sql, [user.email]);
+		let results = await db.exec(sql, [parent.email]);
 
-		// 判断查询结果，如果查询到的数据不唯一，则表示用户不存在；如果查询到的数据唯一，则继续执行下一步。
+		// 判断查询结果，如果查询到的数据不唯一，则表示家长不存在；如果查询到的数据唯一，则继续执行下一步。
 		if (results.length !== 1) {
 			return resp.json({
 				status: 1,
-				msg: '用户不存在'
+				msg: '家长不存在'
 			})
 		}
 
-		// 判断用户输入的登录密码是否和数据库中的密码一致
-		if (md5(md5(user.password) + process.env.SECRET_KEY) !== results[0].password) {
+		// 判断家长输入的登录密码是否和数据库中的密码一致
+		if (md5(md5(parent.password) + process.env.SECRET_KEY) !== results[0].password) {
 			return resp.json({
 				status: 1,
 				msg: '邮箱或密码错误'
 			})
 		}
 
-		userInfo = results[0];
+		parentInfo = results[0];
 
 		sql = 'select * from t_students where id=?'
-		results = await db.exec(sql, [userInfo.cur_bonding_id]);
+		results = await db.exec(sql, [parentInfo.cur_bonding_id]);
 
 		if (results.length !== 1) {
 			studentInfo = {}
@@ -54,17 +54,17 @@ exports.userLogin = async (req, resp, next) => {
 			studentInfo = results[0];
 		}
 
-		console.log("userInfo, studentInfo: ", userInfo, studentInfo);
+		console.log("parentInfo, studentInfo: ", parentInfo, studentInfo);
 
 		resp.json({
 			status: 0,
 			msg: '登录成功!',
 			data: {
-				userInfo,
+				parentInfo,
 				studentInfo
 			},
 			// 为了方便客户端使用 Token，在服务器端直接拼接上 Bearer 的前缀
-			token: 'Bearer ' + jwt.encode(userInfo.email, process.env.SECRET_KEY)
+			token: 'Bearer ' + jwt.encode(parentInfo.email, process.env.SECRET_KEY)
 		})
 	} catch (e) {
 		//TODO handle the exception
@@ -76,13 +76,13 @@ exports.userLogin = async (req, resp, next) => {
 	}
 }
 
-// 用户注册的处理函数
-exports.userReg = async (req, resp, next) => {
+// 家长注册的处理函数
+exports.parentReg = async (req, resp, next) => {
 	//接收表单数据
-	const user = req.body;
+	const parent = req.body;
 
 	//判断邮箱和密码是否为空
-	if (user.email === '' || user.password === '') {
+	if (parent.email === '' || parent.password === '') {
 		return resp.json({
 			status: 1,
 			msg: '邮箱或密码不能为空'
@@ -96,11 +96,11 @@ exports.userReg = async (req, resp, next) => {
 			code
 		} = jwt.decode(req.body.token, process.env.SECRET_KEY);
 
-		if (user.code === code.toString() && user.email === email) {
+		if (parent.code === code.toString() && parent.email === email) {
 			try {
 				//检测邮箱是否被占用
 				let sql = 'select * from t_parents where email=?';
-				let results = await db.exec(sql, [user.email], );
+				let results = await db.exec(sql, [parent.email], );
 
 				//如果查询记录不止一条，说明邮箱被占用
 				if (results.length > 0) {
@@ -112,8 +112,8 @@ exports.userReg = async (req, resp, next) => {
 
 				sql = 'insert into t_parents(`email`, `password`, `reg_time`)values(?, ?, ?)';
 				results = await db.exec(sql, [
-					user.email,
-					md5(md5(user.password) + process.env.SECRET_KEY),
+					parent.email,
+					md5(md5(parent.password) + process.env.SECRET_KEY),
 					moment().format('YYYY-MM-DD HH:mm:ss')
 				])
 
@@ -150,13 +150,13 @@ exports.userReg = async (req, resp, next) => {
 	}
 }
 
-// 用户忘记密码的处理函数
-exports.userForget = async (req, resp, next) => {
+// 家长忘记密码的处理函数
+exports.parentForget = async (req, resp, next) => {
 	//接收表单数据
-	const user = req.body;
+	const parent = req.body;
 
 	//判断邮箱和密码是否为空
-	if (user.email === '' || user.password === '') {
+	if (parent.email === '' || parent.password === '') {
 		return resp.json({
 			status: 1,
 			msg: '邮箱或密码不能为空'
@@ -180,11 +180,11 @@ exports.userForget = async (req, resp, next) => {
 			code
 		} = jwt.decode(req.body.token, process.env.SECRET_KEY);
 
-		if (user.code === code.toString() && user.email === email) {
+		if (parent.code === code.toString() && parent.email === email) {
 			try {
 				//检测邮箱是否已注册
 				let sql = 'select * from t_parents where email=?';
-				let results = await db.exec(sql, [user.email], );
+				let results = await db.exec(sql, [parent.email], );
 
 				//如果查询记录为空，说明邮箱还未注册
 				if (results.length === 0) {
@@ -200,7 +200,7 @@ exports.userForget = async (req, resp, next) => {
 				}
 
 				sql = 'update t_parents set password=? where email=?';
-				results = await db.exec(sql, [md5(md5(user.password) + process.env.SECRET_KEY), user.email])
+				results = await db.exec(sql, [md5(md5(parent.password) + process.env.SECRET_KEY), parent.email])
 
 				if (results.affectedRows !== 1) {
 					return resp.json({
@@ -300,7 +300,7 @@ exports.sendCode = (req, resp) => {
 }
 
 
-exports.saveUserInfo = async (req, resp, next) => {
+exports.saveParentInfo = async (req, resp, next) => {
 	try {
 		const {
 			email,
@@ -331,7 +331,7 @@ exports.saveUserInfo = async (req, resp, next) => {
 		resp.json({
 			status: 0,
 			msg: '保存成功！',
-			updatedUserInfo: {
+			updatedParentInfo: {
 				email,
 				realname,
 				gender,
@@ -449,7 +449,7 @@ exports.getTheLatestInfo = async (req, resp, next) => {
 	console.log("email: ", email);
 
 	try {
-		let userInfo, studentInfo;
+		let parentInfo, studentInfo;
 		let sql = 'select * from t_parents where email=?'
 		let results = await db.exec(sql, [email]);
 
@@ -461,10 +461,10 @@ exports.getTheLatestInfo = async (req, resp, next) => {
 			})
 		}
 
-		userInfo = results[0];
+		parentInfo = results[0];
 
 		sql = 'select * from t_students where id=?'
-		results = await db.exec(sql, [userInfo.cur_bonding_id]);
+		results = await db.exec(sql, [parentInfo.cur_bonding_id]);
 
 		if (results.length !== 1) {
 			studentInfo = {}
@@ -472,13 +472,13 @@ exports.getTheLatestInfo = async (req, resp, next) => {
 			studentInfo = results[0];
 		}
 
-		console.log("userInfo, studentInfo: ", userInfo, studentInfo);
+		console.log("parentInfo, studentInfo: ", parentInfo, studentInfo);
 
 		resp.json({
 			status: 0,
 			msg: '获取成功!',
 			data: {
-				userInfo,
+				parentInfo,
 				studentInfo
 			},
 		})
@@ -496,14 +496,14 @@ exports.getTheLatestInfo = async (req, resp, next) => {
 DROP TABLE IF EXISTS `t_parents`;
 
 CREATE TABLE `t_parents` (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '用户id',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '家长id',
   `email` varchar(255) DEFAULT NULL COMMENT '电子邮箱',
   `password` varchar(255) NOT NULL COMMENT '密码',
   `realname` varchar(255) DEFAULT NULL COMMENT '真实姓名',
   `gender` varchar(10) DEFAULT NULL COMMENT '性别',
   `idcard` varchar(20) DEFAULT NULL COMMENT '身份证号',
   `phone` varchar(255) DEFAULT NULL COMMENT '手机号码',
-  `avatar_url` varchar(255) DEFAULT NULL COMMENT '用户头像地址',
+  `avatar_url` varchar(255) DEFAULT NULL COMMENT '家长头像地址',
   `status` char(1) DEFAULT '1' COMMENT '状态:1可用,0不可用',
   `reg_time` datetime NOT NULL COMMENT '注册时间',
   PRIMARY KEY (`id`),

@@ -20,6 +20,12 @@ export default {
 		clearHeightData(context, value){
 			context.commit('CLEAR_HEIGHT_DATE', value)
 		},
+		updateVisionData(context, value){
+			context.commit('UPDATE_VISION_DATE', value)
+		},
+		clearVisionData(context, value){
+			context.commit('CLEAR_VISION_DATE', value)
+		},
 	},
 	mutations: {
 		UPDATE_STUDENT_INFO(state, studentInfo){
@@ -49,6 +55,14 @@ export default {
 			state.heightData = [];
 			uni.removeStorageSync('heightData')
 		},
+		UPDATE_VISION_DATE(state, visionData){
+			state.visionData = visionData;
+			uni.setStorageSync('visionData', JSON.stringify(state.visionData));
+		},
+		CLEAR_VISION_DATE(state){
+			state.visionData = [];
+			uni.removeStorageSync('visionData')
+		},
 	},
 	getters: {
 		full_avatar_url(state){
@@ -60,5 +74,6 @@ export default {
 		// 测量日期，学生体重，班级男生平均体重，班级女生平均体重
 		weightData: JSON.parse(uni.getStorageSync('weightData') || '[]'),
 		heightData: JSON.parse(uni.getStorageSync('heightData') || '[]'),
+		visionData: JSON.parse(uni.getStorageSync('visionData') || '[]'),
 	}
 }

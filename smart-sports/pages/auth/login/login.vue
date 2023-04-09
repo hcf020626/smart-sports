@@ -108,7 +108,7 @@
 			...mapState('studentModule', ['studentInfo']),
 		},
 		methods: {
-			...mapActions('accountModule', ['userLogin']),
+			...mapActions('parentModule', ['parentLogin']),
 			...mapActions('studentModule', ['updateStudentInfo']),
 			clickLoginBtn() {
 				this.$refs.uForm.validate().then(res => {
@@ -140,7 +140,7 @@
 				// 使用setTimeout()函数模拟网络延迟
 				setTimeout(async () => {
 					try {
-						// 调用api.account.login()异步请求登录接口，获取返回的status、msg、token和data等数据
+						// 调用api.parent.login()异步请求登录接口，获取返回的status、msg、token和data等数据
 						const {
 							data: {
 								status,
@@ -148,16 +148,16 @@
 								token,
 								data
 							}
-						} = await api.account.login({
+						} = await api.parent.login({
 							email: this.loginFormData.email,
 							password: this.loginFormData.password
 						});
 				
 						if (!status) {
 							// 将用户信息和token保存到Vuex和本地存储中
-							this.userLogin({
+							this.parentLogin({
 								token,
-								userInfo: data.userInfo
+								parentInfo: data.parentInfo
 							})
 							
 							// 将学生信息保存到Vuex和本地存储中

@@ -1,11 +1,11 @@
 <template>
 	<view class="container">
-		<view class="errMsg" v-if="userInfo.cur_bonding_id === '-1'">
+		<view class="errMsg" v-if="parentInfo.cur_bonding_id === '-1'">
 			<view>您当前的身份证号码已发送变更，请重新进行亲子绑定再操作！<navigator url="../user-center/bonding/bonding" open-type="navigate"
 					class="link">亲子绑定</navigator>
 			</view>
 		</view>
-		<view class="errMsg" v-else-if="userInfo.cur_bonding_id === '' || userInfo.cur_bonding_id === null">
+		<view class="errMsg" v-else-if="parentInfo.cur_bonding_id === '' || parentInfo.cur_bonding_id === null">
 			<view>您当前未进行亲子绑定或者亲子绑定失败，请亲子绑定成功后再操作！<navigator url="../user-center/bonding/bonding" open-type="navigate"
 					class="link">亲子绑定</navigator>
 			</view>
@@ -85,7 +85,7 @@
 		},
 		computed: {
 			// 获取用户信息
-			...mapState('accountModule', ['userInfo']),
+			...mapState('parentModule', ['parentInfo']),
 			// 获取学生信息
 			...mapState('studentModule', ['studentInfo']),
 		},

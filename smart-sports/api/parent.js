@@ -1,10 +1,10 @@
 import http from '@/utils/request.js'
 
-// 用户登录
+// 家长登录
 export function login ({email, password}){
 	return http.request({
 		method: 'POST',
-		url: '/account/login',
+		url: '/parent/login',
 		data: {
 			email,
 			password
@@ -14,11 +14,11 @@ export function login ({email, password}){
 	})
 }
 
-// 用户注册
+// 家长注册
 export function reg ({email, password, code, token}){
 	return http.request({
 		method: 'POST',
-		url: '/account/reg',
+		url: '/parent/reg',
 		data: {
 			email,
 			password,
@@ -30,11 +30,11 @@ export function reg ({email, password, code, token}){
 	})
 }
 
-// 用户忘记密码
+// 家长忘记密码
 export function forget({email, password, code, token}){
 	return http.request({
 		method: 'POST',
-		url: '/account/forget',
+		url: '/parent/forget',
 		data: {
 			email,
 			password,
@@ -50,7 +50,7 @@ export function forget({email, password, code, token}){
 export function sendCode(email){
 	return http.request({
 		method: 'POST',
-		url: '/account/send-code',
+		url: '/parent/send-code',
 		data: {
 			email
 		},
@@ -59,9 +59,9 @@ export function sendCode(email){
 	})
 }
 
-// 保存用户信息
-export function saveUserInfo({email, realname, gender, idcard, phone, avatar_url, cur_bonding_id}){
-	return http.upload('/account/save-user-info', {
+// 保存家长信息
+export function saveParentInfo({email, realname, gender, idcard, phone, avatar_url, cur_bonding_id}){
+	return http.upload('/parent/save-parent-info', {
 		filePath: avatar_url,	// 要上传文件资源的路径。
 		name: 'avatar',	// 文件对应的 key , 开发者在服务器端通过这个 key 可以获取到文件二进制内容
 		formData: {
@@ -81,7 +81,7 @@ export function saveUserInfo({email, realname, gender, idcard, phone, avatar_url
 export function updatePassword({email, oldPassword, newPassword}){
 	return http.request({
 		method: 'POST',
-		url: '/account/update-password',
+		url: '/parent/update-password',
 		data: {
 			email,
 			oldPassword,
@@ -95,7 +95,7 @@ export function updatePassword({email, oldPassword, newPassword}){
 export function changeBonding({email, id}){
 	return http.request({
 		method: 'POST',
-		url: '/account/change-bonding',
+		url: '/parent/change-bonding',
 		data: {
 			email,
 			id
@@ -104,11 +104,11 @@ export function changeBonding({email, id}){
 	})
 }
 
-// 获取最新的用户和对应的学生信息
+// 获取最新的家长和对应的学生信息
 export function getTheLatestInfo(email){
 	return http.request({
 		method: 'POST',
-		url: '/account/get-the-latest-info',
+		url: '/parent/get-the-latest-info',
 		data: {
 			email
 		},

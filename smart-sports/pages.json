@@ -92,7 +92,7 @@
 			"path": "pages/index/body-metrics/vision/vision",
 			"style": {
 				"navigationBarTitleText": "视力",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 
 		},{

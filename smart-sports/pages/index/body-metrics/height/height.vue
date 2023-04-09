@@ -13,7 +13,7 @@
 			<view class="day" v-if="!subsection.current">
 				<!-- 数据区域显示了当前的身高和日期 -->
 				<view class="data-area" v-show="heightData.length">
-					<view class="height">
+					<view class="value">
 						<text class="number">{{height}}</text>
 						<text class="unit" v-show="!isSingleSelectedEmtpy">cm</text>
 					</view>
@@ -64,7 +64,7 @@
 		mapState,
 		mapActions
 	} from 'vuex'
-	import api from '@/api/index.js'	
+	import api from '@/api/index.js'
 	// 引入 heightRefTable.js，该文件是一个身高参考表
 	import heightRefTable from './heightRefTable.js'
 	export default {
@@ -227,7 +227,6 @@
 			},
 			// 更新仪表盘的配置选项
 			updateHeightGuageOption(height) {
-				console.log("this.studentInfo.gender: ",this.studentInfo.gender);
 				const heightRefTableElem = heightRefTable[this.studentInfo.gender][this.studentInfo.age - 1];
 				const heightRanges = [{
 						range: [0, heightRefTableElem[0]],
@@ -260,93 +259,41 @@
 						break;
 					}
 				}
+				
+				if (rate <= 0.25) {
+				this.tips = '身高较矮小，建议督促您的小孩增加膳食营养素摄入，尤其是优质蛋白质和钙元素等，保持营养饮食均衡，适当进行力量训练以促进生长发育。'
+				} else if (rate <= 0.5) {
+				this.tips = '身高偏矮，建议您的小孩加强营养摄入，注意饮食平衡，多吃富含蛋白质、维生素和矿物质的食物，如瘦肉、蛋类、奶类、豆类、蔬菜水果等，同时进行适度的运动锻炼。'
+				} else if (rate <= 0.75) {
+				this.tips = '身高正常，建议您的小孩继续保持健康饮食和适度运动，注意睡眠质量，合理利用生长发育期，促进身高的增长。'
+				} else {
+				this.tips = '身高偏高，建议您的小孩继续保持健康饮食和适量运动，注意避免过量进食和不良饮食习惯，如过多摄入高热量、高脂肪、高糖分的食物等。'
+				}
+				
 				this.heightGuageOption = {
+					tooltip: {
+						formatter: '{a}\n{b} : {c}cm'
+					},
 					series: [{
-						// type: 设置图表类型为 gauge，即仪表盘类型。
+						name: 'Height',
 						type: 'gauge',
-						// startAngle 和 endAngle: 指定仪表盘起始和结束的角度，这里起始角度为 180，结束角度为 0，即逆时针旋转。
-						startAngle: 180,
-						endAngle: 0,
-						// center 和 radius: 控制仪表盘的位置和大小，这里的 center 为 ['50%', '75%'] 表示相对于容器宽度和高度的位置，radius 为 '100%' 表示宽度和高度都为 100%。
-						center: ['50%', '90%'],
-						radius: '100%',
-						// min 和 max: 控制指针的取值范围，这里设置最小值为 0，最大值为 1。
 						min: 0,
-						max: 1,
-						// splitNumber: 控制仪表盘轴线的分割段数。
-						splitNumber: 8,
-						// axisLine: 设置仪表盘轴线的样式，包括线宽和颜色。
-						axisLine: {
-							lineStyle: {
-								width: 6,
-								color: [
-									[0.25, '#58D9F9'],
-									[0.5, '#7CFFB2'],
-									[0.75, '#FDDD60'],
-									[1, '#FF6E76']
-								]
-							}
-						},
-						pointer: {
-							icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z',
-							length: '12%',
-							width: 20,
-							offsetCenter: [0, '-55%'],
-							itemStyle: {
-								color: '#333333'
-							}
-						},
-						axisTick: {
-							length: 10,
-							lineStyle: {
-								color: '#333333',
-								width: 2
-							}
-						},
-						splitLine: {
-							length: 20,
-							lineStyle: {
-								color: '#333333',
-								width: 4
-							}
-						},
-						axisLabel: {
-							color: '#464646',
-							fontSize: 20,
-							distance: -60,
-							rotate: 'tangential',
-							formatter: function(value) {
-								if (value === 0.875) {
-									return '高';
-								} else if (value === 0.625) {
-									return '标准';
-								} else if (value === 0.375) {
-									return '偏矮';
-								} else if (value === 0.125) {
-									return '矮小';
-								}
-								return '';
-							}
-						},
-						title: {
-							offsetCenter: [0, '-10%'],
-							fontSize: 20
+						max: 200,
+						progress: {
+							show: true
 						},
 						detail: {
-							fontSize: 25,
-							offsetCenter: [0, '-35%'],
 							valueAnimation: true,
-							formatter: function(value) {
-								return height + 'cm';
-							},
-							color: 'inherit'
+							formatter: '{value}cm',
+							fontSize: 18,
+
 						},
 						data: [{
-							value: rate,
-							name: 'Height Rating'
+							value: height,
+							name: '身高',
 						}]
 					}]
-				}
+				};
 			},
 			// 更新折线图的配置选项
 			updateHeightLineChartOption(startDate, endDate) {
@@ -488,18 +435,18 @@
 		padding: 50rpx 50rpx 0 50rpx;
 	}
 
-	.data-area>.height {
+	.data-area>.value {
 		display: flex;
 		flex-direction: row;
 		align-items: baseline;
 	}
 
-	.height>.number {
+	.value>.number {
 		font-size: 2rem;
 		font-weight: bold;
 	}
 
-	.height>.unit {}
+	.value>.unit {}
 
 	.data-area>.date {
 		display: flex;

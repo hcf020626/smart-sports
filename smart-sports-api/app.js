@@ -29,11 +29,11 @@ app.use(express.json());
 // 导入自定义的身份验证中间件
 const {auth} = require('./utils/auth')
 // 将自定义的身份验证中间件注册为全局中间件
-app.use(auth(['/account/login', '/account/reg', '/account/send-code', '/account/verify-code', '/account/forget']))
+app.use(auth(['/parent/login', '/parent/reg', '/parent/send-code', '/parent/verify-code', '/parent/forget']))
 
 
-// 导入并注册用户路由模块
-app.use('/account', require('./router/userRouter'))
+// 导入并注册家长路由模块
+app.use('/parent', require('./router/parentRouter'))
 //导入并注册学生路由模块
 app.use('/student', require('./router/studentRouter'))
 

@@ -6,7 +6,7 @@
 		<!-- 弹窗组件，用于显示“确定要换绑吗？” -->
 		<u-modal :show="modalInfo.show" :content="modalInfo.content" @confirm="changeBonding" :showCancelButton="true"
 			@cancel="modalInfo.show=false" :asyncClose="true"></u-modal>
-		<view class="cell-group" v-if="userInfo.idcard && cellItems.length">
+		<view class="cell-group" v-if="parentInfo.idcard && cellItems.length">
 			<!-- 单元格分组 -->
 			<u-cell-group :border="false">
 				<!-- 单元格，使用 v-for 循环渲染 cellItems 数组中的元素 -->
@@ -22,7 +22,7 @@
 			</u-cell-group>
 		</view>
 
-		<view class="errMsg" v-else-if="userInfo.idcard && cellItems.length === 0" >
+		<view class="errMsg" v-else-if="parentInfo.idcard && cellItems.length === 0" >
 			<u-empty icon="../../../static/images/list.png" :text="errMsg.msg" :show="errMsg.show">
 			</u-empty>
 		</view>
@@ -64,10 +64,10 @@
 		},
 		computed: {
 			// 获取用户信息
-			...mapState('accountModule', ['userInfo', 'token']),
+			...mapState('parentModule', ['parentInfo', 'token']),
 		},
 		methods: {
-			...mapActions('accountModule', ['updateUserInfo']),
+			...mapActions('parentModule', ['updateParentInfo']),
 			...mapActions('studentModule', ['updateStudentInfo', 'clearStudentInfo']),
 			// 在showModal方法中，我们将modalInfo.show属性设置为true，表示弹出模态框，同时将被点击的学生信息对象的id属性赋值给modalInfo.data.id属性。
 			showModal(id) {
@@ -96,14 +96,14 @@
 							status,
 							msg
 						}
-					} = await api.account.changeBonding({
-						email: this.userInfo.email,
+					} = await api.parent.changeBonding({
+						email: this.parentInfo.email,
 						id: isRemove ? null : id
 					});
 					
 					if (!status) {
 						// 更新vuex和本地存储中的用户绑定信息
-						this.updateUserInfo({cur_bonding_id: isRemove ? '' : id});
+						this.updateParentInfo({cur_bonding_id: isRemove ? '' : id});
 						
 						// 更新单元格右边开关的状态
 						if(isRemove){	// 如果isRemove为true，表明要执行移除绑定的操作
@@ -158,7 +158,7 @@
 			setTimeout(async () => {
 				try{
 					// 首先通过用户身份证号获取到该用户所关联的所有学生信息
-					const idcard = this.userInfo.idcard
+					const idcard = this.parentInfo.idcard
 					const {
 						data: {
 							status,
@@ -172,7 +172,7 @@
 							//将学生信息对象和一个表示该学生是否被选中的布尔值（这里我们用checked表示）封装成一个对象，并将该对象推入到cellItems数组中。
 							this.cellItems.push({
 								studentInfo: item,
-								checked: this.userInfo.cur_bonding_id === item.id
+								checked: this.parentInfo.cur_bonding_id === item.id
 							});
 						})
 					} else {

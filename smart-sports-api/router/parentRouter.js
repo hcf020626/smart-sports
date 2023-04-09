@@ -2,35 +2,35 @@
 const express = require('express')
 
 // 创建路由对象
-const userRouter = express.Router()
+const parentRouter = express.Router()
 
 // 用户登录
-userRouter.post('/login', require('../router_handler/userRouterHandlers').userLogin)
+parentRouter.post('/login', require('../router_handler/parentRouterHandlers').parentLogin)
 
 // 用户注册
-userRouter.post('/reg', require('../router_handler/userRouterHandlers').userReg)
+parentRouter.post('/reg', require('../router_handler/parentRouterHandlers').parentReg)
 
 // 用户忘记密码
-userRouter.post('/forget', require('../router_handler/userRouterHandlers').userForget)
+parentRouter.post('/forget', require('../router_handler/parentRouterHandlers').parentForget)
 
 // 发送邮箱验证码
-userRouter.post('/send-code', require('../router_handler/userRouterHandlers').sendCode)
+parentRouter.post('/send-code', require('../router_handler/parentRouterHandlers').sendCode)
 
 
 // 保存用户信息
-userRouter.post('/save-user-info', require('../utils/MulterHelper').single('avatar'), require('../router_handler/userRouterHandlers').saveUserInfo)
+parentRouter.post('/save-parent-info', require('../utils/MulterHelper').single('avatar'), require('../router_handler/parentRouterHandlers').saveParentInfo)
 
 //修改用户密码
-userRouter.post('/update-password', require('../router_handler/userRouterHandlers').updatePassword)
+parentRouter.post('/update-password', require('../router_handler/parentRouterHandlers').updatePassword)
 
 // 换绑
-userRouter.post('/change-bonding', require('../router_handler/userRouterHandlers').changeBonding)
+parentRouter.post('/change-bonding', require('../router_handler/parentRouterHandlers').changeBonding)
 
 // 获取最新的用户和对应的学生信息
-userRouter.post('/get-the-latest-info', require('../router_handler/userRouterHandlers').getTheLatestInfo)
+parentRouter.post('/get-the-latest-info', require('../router_handler/parentRouterHandlers').getTheLatestInfo)
 
 // 向外导出路由对象
-module.exports = userRouter
+module.exports = parentRouter
 
 /*
 	module.exports 和 exports 的区别和联系

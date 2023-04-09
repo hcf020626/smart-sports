@@ -92,7 +92,7 @@
 			}
 		},
 		methods: {
-			...mapActions('accountModule', ['updateUserInfo']),
+			...mapActions('parentModule', ['updateParentInfo']),
 			clickSaveBtn(){
 				this.$refs.uForm.validate().then(res => {
 					// 显示滑块验证
@@ -130,13 +130,13 @@
 								status,
 								password
 							}
-						} = await api.account.updatePassword({
-							email: this.$store.state.accountModule.userInfo.email,
+						} = await api.parent.updatePassword({
+							email: this.$store.state.parentModule.parentInfo.email,
 							oldPassword: this.formData.oldPassword,
 							newPassword: this.formData.newPassword2,
 						});
 						if (!status) {
-							this.updateUserInfo({password});
+							this.updateParentInfo({password});
 							this.$refs.uToast.show({
 								type: 'success',
 								message: msg,

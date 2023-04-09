@@ -162,13 +162,13 @@
 					// 使用setTimeout()函数模拟网络延迟
 					setTimeout(async () => {
 						try {
-							// 调用api.account.reg()异步请求注册接口，获取返回的status、msg
+							// 调用api.parent.reg()异步请求注册接口，获取返回的status、msg
 							const {
 								data: {
 									msg,
 									status
 								}
-							} = await api.account.reg({
+							} = await api.parent.reg({
 								email: this.regFormData.email,
 								password: this.regFormData.password2,
 								code: this.regFormData.code,
@@ -242,14 +242,14 @@
 						try {
 							setTimeout(async () => {
 								try {
-									// 调用api.account.sendCode()异步请求注册接口，获取返回的status、msg和token
+									// 调用api.parent.sendCode()异步请求注册接口，获取返回的status、msg和token
 									const {
 										data: {
 											msg,
 											status,
 											token
 										}
-									} = await api.account.sendCode(this.regFormData.email);
+									} = await api.parent.sendCode(this.regFormData.email);
 									if (!status) {
 										this.regFormData.token = token;
 										this.$refs.uToast.show({

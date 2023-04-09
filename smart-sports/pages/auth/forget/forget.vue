@@ -117,13 +117,13 @@
 					// 使用setTimeout()函数模拟网络延迟
 					setTimeout(async () => {
 						try {
-							// 调用api.account.reg()异步请求修改密码接口，获取返回的status、msg
+							// 调用api.parent.reg()异步请求修改密码接口，获取返回的status、msg
 							const {
 								data: {
 									msg,
 									status
 								}
-							} = await api.account.forget({
+							} = await api.parent.forget({
 								email: this.forgetFormData.email,
 								password: this.forgetFormData.newPassword,
 								code: this.forgetFormData.code,
@@ -198,14 +198,14 @@
 						try {
 							setTimeout(async () => {
 								try {
-									// 调用api.account.sendCode()异步请求修改密码接口，获取返回的status、msg和token
+									// 调用api.parent.sendCode()异步请求修改密码接口，获取返回的status、msg和token
 									const {
 										data: {
 											msg,
 											status,
 											token
 										}
-									} = await api.account.sendCode(this.forgetFormData.email);
+									} = await api.parent.sendCode(this.forgetFormData.email);
 									if (!status) {
 										this.forgetFormData.token = token;
 										this.$refs.uToast.show({

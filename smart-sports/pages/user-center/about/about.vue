@@ -69,9 +69,6 @@
 </template>
 
 <script>
-	import {
-		mapState
-	} from 'vuex'
 	export default {
 		data() {
 			return {
@@ -97,27 +94,6 @@
 				]
 			}
 		},
-		onLoad() {
-
-		},
-		computed: {
-			...mapState('accountModule', ['userInfo', 'token']),
-			...mapState('studentModule', ['studentInfo']),
-		},
-		methods: {
-			showUserInfo() {
-				console.log("this.userInfo: ", this.userInfo);
-				console.log("this.token: ", this.token);
-			},
-			showStudentInfo() {
-				console.log("this.studentInfo: ", this.studentInfo);
-			},
-			openUrl(url){
-				uni.openUrl({
-					url
-				})
-			}
-		}
 	}
 </script>
 

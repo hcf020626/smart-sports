@@ -1,13 +1,13 @@
-import {login, reg, forget, sendCode, saveUserInfo, updatePassword, changeBonding, getTheLatestInfo} from './account.js'
-import {getStudentsByIdcard, getWeightById, getHeightById} from './student.js'
+import {login, reg, forget, sendCode, saveParentInfo, updatePassword, changeBonding, getTheLatestInfo} from './parent.js'
+import {getStudentsByIdcard, getWeightById, getHeightById, getVisionById} from './student.js'
 
 export default {
-	account: {
+	parent: {
 		login,
 		reg,
 		forget,
 		sendCode,
-		saveUserInfo,
+		saveParentInfo,
 		updatePassword,
 		changeBonding,
 		getTheLatestInfo
@@ -15,7 +15,8 @@ export default {
 	student: {
 		getStudentsByIdcard,
 		getWeightById,
-		getHeightById
+		getHeightById,
+		getVisionById
 	},
 	
 }

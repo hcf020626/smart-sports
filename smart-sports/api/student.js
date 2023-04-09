@@ -32,3 +32,14 @@ export function getHeightById(id){
 		custom: {auth: true}
 	})
 }
+
+export function getVisionById(id){
+	return http.request({
+		method: 'POST',
+		url: '/student/get-vision-by-id',
+		data: {
+			id
+		},
+		custom: {auth: true}
+	})
+}

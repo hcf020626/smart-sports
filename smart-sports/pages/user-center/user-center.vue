@@ -7,10 +7,10 @@
 				<!-- 单元格左侧图标，使用 u-avatar 组件显示用户头像 -->
 				<u-avatar slot="icon" :src="full_avatar_url" size="70"></u-avatar>
 				<template slot="title">
-					<u-text :text="userInfo.realname?userInfo.realname:'亲，您还未设置真实姓名'"></u-text>
+					<u-text :text="parentInfo.realname?parentInfo.realname:'亲，您还未设置真实姓名'"></u-text>
 				</template>
 				<!-- 标题下方的描述信息 -->
-				<u-text slot="label" :text="userInfo.phone | phoneMask" color="#909399" size="13.5" :show-sex="true"></u-text>
+				<u-text slot="label" :text="parentInfo.phone | phoneMask" color="#909399" size="13.5" :show-sex="true"></u-text>
 			</u-cell>
 		</u-cell-group>
 		<!-- 功能入口展示区域 -->
@@ -90,7 +90,7 @@
 			}
 		},
 		methods: { // 定义methods方法
-			...mapActions('accountModule', ['userLogout']), // 映射store中的actions到方法中
+			...mapActions('parentModule', ['userLogout']), // 映射store中的actions到方法中
 			showModal() { // 定义showModal方法
 				this.modalInfo.show = true; // 修改modalInfo的show属性
 			},
@@ -107,9 +107,9 @@
 			}
 		},
 		computed: {
-			// 使用mapState和mapGetters函数从Vuex store中获取accountModule模块的userInfo状态和fullAvatarURL计算属性。
-			...mapState('accountModule', ['userInfo']),
-			...mapGetters('accountModule', ['full_avatar_url'])
+			// 使用mapState和mapGetters函数从Vuex store中获取parentModule模块的parentInfo状态和fullAvatarURL计算属性。
+			...mapState('parentModule', ['parentInfo']),
+			...mapGetters('parentModule', ['full_avatar_url'])
 		},
 		filters: {
 			// 电话号码脱敏

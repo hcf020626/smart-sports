@@ -34,9 +34,9 @@
 				</u-input>
 			</u-form-item>
 
-			<!--保存按钮，点击触发 saveUserInfo 事件-->
+			<!--保存按钮，点击触发 saveParentInfo 事件-->
 			<u-form-item>
-				<u-button type="primary" :loading="isLoading" loading-text="保存" @click="saveUserInfo">保存</u-button>
+				<u-button type="primary" :loading="isLoading" loading-text="保存" @click="saveParentInfo">保存</u-button>
 			</u-form-item>
 		</u-form>
 
@@ -124,11 +124,11 @@
 			}
 		},
 		computed: {
-			...mapState('accountModule', ['userInfo']),
-			...mapGetters('accountModule', ['full_avatar_url'])
+			...mapState('parentModule', ['parentInfo']),
+			...mapGetters('parentModule', ['full_avatar_url'])
 		},
 		methods: {
-			...mapActions('accountModule', ['updateUserInfo']),
+			...mapActions('parentModule', ['updateParentInfo']),
 			selectGender(index) {
 				this.formData.gender = index.name
 			},
@@ -140,7 +140,7 @@
 					}
 				})
 			},
-			saveUserInfo() {
+			saveParentInfo() {
 				this.$refs.uForm.validate().then(res => {
 					//如果表单合法，isLoading变量会被设置为true，表示正在加载中
 					this.isLoading = true;
@@ -148,29 +148,29 @@
 					// 使用setTimeout()函数模拟网络延迟
 					setTimeout(async () => {
 						try {
-							// 调用api.account.saveUserInfo()异步请求保存用户接口，获取返回的status、msg、token和data等数据
+							// 调用api.parent.saveParentInfo()异步请求保存用户接口，获取返回的status、msg、token和data等数据
 							const {
 								data: {
 									msg,
 									status,
-									updatedUserInfo
+									updatedParentInfo
 								}
-							} = await api.account.saveUserInfo({
-								email: this.userInfo.email,
+							} = await api.parent.saveParentInfo({
+								email: this.parentInfo.email,
 								realname: this.formData.realname,
 								gender: this.formData.gender,
 								idcard: this.formData.idcard,
 								phone: this.formData.phone,
 								avatar_url: this.formData.avatar_url,
-								cur_bonding_id: this.userInfo.idcard === this.formData
-									.idcard ? this.userInfo.cur_bonding_id : null
+								cur_bonding_id: this.parentInfo.idcard === this.formData
+									.idcard ? this.parentInfo.cur_bonding_id : null
 							});
 							if (!status) {
 								// 请求成功，更新本地用户信息，如果用户身份证信息发生变更，将本地的cur_bonding_id设置为1，提示用户需要重新进行亲子绑定。
-								this.updateUserInfo({
-									...updatedUserInfo,
-									cur_bonding_id: this.userInfo.idcard === this.formData
-										.idcard ? this.userInfo.cur_bonding_id : '-1'
+								this.updateParentInfo({
+									...updatedParentInfo,
+									cur_bonding_id: this.parentInfo.idcard === this.formData
+										.idcard ? this.parentInfo.cur_bonding_id : '-1'
 								})
 								// 弹出保存成功的提示框
 								this.$refs.uToast.show({
@@ -212,10 +212,10 @@
 			}
 		},
 		created() {
-			this.formData.realname = this.userInfo.realname;
-			this.formData.gender = this.userInfo.gender;
-			this.formData.phone = this.userInfo.phone;
-			this.formData.idcard = this.userInfo.idcard;
+			this.formData.realname = this.parentInfo.realname;
+			this.formData.gender = this.parentInfo.gender;
+			this.formData.phone = this.parentInfo.phone;
+			this.formData.idcard = this.parentInfo.idcard;
 			this.formData.avatar_url = this.full_avatar_url;
 		},
 		onReady() {
