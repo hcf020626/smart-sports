@@ -50,7 +50,7 @@
 						</view>
 					</view>
 
-					<view class="tips" v-show="pullUpsData.length">{{tips}}</view>
+					<view class="tips" v-show="pullUpsData.length && studentInfo.gender === '男'">{{tips}}</view>
 				</view>
 			</view>
 
@@ -197,25 +197,25 @@
 			},
 			// 初始化页面数据
 			initPageData() {
-				if (!this.pullUpsData.length) {
-					if (this.studentInfo.gender === '女') {
-						uni.stopPullDownRefresh();
-						return this.pullUpsGuageOption = this.pullUpsLineChartOption = {
-							// 设置一个空的 series
-							series: [],
-							// 设置一个 empty 效果
-							graphic: {
-								type: 'text',
-								left: 'center',
-								top: 'middle',
-								style: {
-									fill: '#999',
-									text: '女生不需要做引体向上',
-									font: 'bold 20px Microsoft YaHei'
-								}
+				if (this.studentInfo.gender === '女') {
+					uni.stopPullDownRefresh();
+					return this.pullUpsGuageOption = this.pullUpsLineChartOption = {
+						// 设置一个空的 series
+						series: [],
+						// 设置一个 empty 效果
+						graphic: {
+							type: 'text',
+							left: 'center',
+							top: 'middle',
+							style: {
+								fill: '#999',
+								text: '女生不需要做引体向上',
+								font: 'bold 20px Microsoft YaHei'
 							}
-						};
-					}
+						}
+					};
+				}
+				if (!this.pullUpsData.length) {
 					console.log('The pull ups data is empty');
 					return this.pullUpsGuageOption = this.pullUpsLineChartOption = {
 						// 设置一个空的 series

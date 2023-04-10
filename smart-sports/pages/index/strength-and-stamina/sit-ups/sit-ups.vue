@@ -50,7 +50,7 @@
 						</view>
 					</view>
 
-					<view class="tips" v-show="sitUpsData.length">{{tips}}</view>
+					<view class="tips" v-show="sitUpsData.length && studentInfo.gender === '女'">{{tips}}</view>
 				</view>
 			</view>
 
@@ -197,25 +197,26 @@
 			},
 			// 初始化页面数据
 			initPageData() {
-				if (!this.sitUpsData.length) {
-					if(this.studentInfo.gender === '男'){
-						uni.stopPullDownRefresh();
-						return this.sitUpsGuageOption = this.sitUpsLineChartOption = {
-							// 设置一个空的 series
-							series: [],
-							// 设置一个 empty 效果
-							graphic: {
-								type: 'text',
-								left: 'center',
-								top: 'middle',
-								style: {
-									fill: '#999',
-									text: '男生不需要做仰卧起坐',
-									font: 'bold 20px Microsoft YaHei'
-								}
+				if(this.studentInfo.gender === '男'){
+					uni.stopPullDownRefresh();
+					return this.sitUpsGuageOption = this.sitUpsLineChartOption = {
+						// 设置一个空的 series
+						series: [],
+						// 设置一个 empty 效果
+						graphic: {
+							type: 'text',
+							left: 'center',
+							top: 'middle',
+							style: {
+								fill: '#999',
+								text: '男生不需要做仰卧起坐',
+								font: 'bold 20px Microsoft YaHei'
 							}
-						};
-					}
+						}
+					};
+				}
+				
+				if (!this.sitUpsData.length) {
 					console.log('The sit ups data is empty');
 					return this.sitUpsGuageOption = this.sitUpsLineChartOption = {
 						// 设置一个空的 series

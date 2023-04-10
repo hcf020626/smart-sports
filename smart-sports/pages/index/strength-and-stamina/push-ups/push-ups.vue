@@ -50,7 +50,7 @@
 						</view>
 					</view>
 
-					<view class="tips" v-show="pushUpsData.length">{{tips}}</view>
+					<view class="tips" v-show="pushUpsData.length  && studentInfo.gender === '男'">{{tips}}</view>
 				</view>
 			</view>
 
@@ -109,15 +109,15 @@
 		// 页面加载时初始化页面数据，并开启下拉刷新。
 		onLoad() {
 			this.initPageData();
-			if(this.studentInfo.gender === '男'){
+			if (this.studentInfo.gender === '男') {
 				uni.startPullDownRefresh();
 			}
 		},
 		// 页面刷新时获取页面数据
 		onPullDownRefresh() {
-			if(this.studentInfo.gender === '男'){
+			if (this.studentInfo.gender === '男') {
 				this.getPageData();
-			}else{
+			} else {
 				uni.stopPullDownRefresh();
 			}
 		},
@@ -197,25 +197,25 @@
 			},
 			// 初始化页面数据
 			initPageData() {
-				if (!this.pushUpsData.length) {
-					if(this.studentInfo.gender === '女'){
-						uni.stopPullDownRefresh();
-						return this.pushUpsGuageOption = this.pushUpsLineChartOption = {
-							// 设置一个空的 series
-							series: [],
-							// 设置一个 empty 效果
-							graphic: {
-								type: 'text',
-								left: 'center',
-								top: 'middle',
-								style: {
-									fill: '#999',
-									text: '女生不需要做俯卧撑',
-									font: 'bold 20px Microsoft YaHei'
-								}
+				if (this.studentInfo.gender === '女') {
+					uni.stopPullDownRefresh();
+					return this.pushUpsGuageOption = this.pushUpsLineChartOption = {
+						// 设置一个空的 series
+						series: [],
+						// 设置一个 empty 效果
+						graphic: {
+							type: 'text',
+							left: 'center',
+							top: 'middle',
+							style: {
+								fill: '#999',
+								text: '女生不需要做俯卧撑',
+								font: 'bold 20px Microsoft YaHei'
 							}
-						};
-					}
+						}
+					};
+				}
+				if (!this.pushUpsData.length) {
 					console.log('The push ups data is empty');
 					return this.pushUpsGuageOption = this.pushUpsLineChartOption = {
 						// 设置一个空的 series
@@ -233,7 +233,7 @@
 						}
 					};
 				}
-			
+
 				this.pushUpsData.forEach((item) => {
 					this.calendarSelected.push({
 						date: item.date,
