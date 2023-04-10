@@ -16,6 +16,15 @@ studentRouter.post('/get-height-by-id', require('../router_handler/studentRouter
 // 根据学生id查询测量日期，班级平均左眼视力，班级平均右眼视力，学生左眼视力，学生右眼视力
 studentRouter.post('/get-vision-by-id', require('../router_handler/studentRouterHandlers').getVisionById)
 
+// 根据学生id查询测量日期，学生收缩压，学生舒张压
+studentRouter.post('/get-blood-pressure-by-id', require('../router_handler/studentRouterHandlers').getBloodPressureById)
+
+// 根据学生id查询测量日期，学生肺活量，班级男生平均肺活量，班级女生平均肺活量
+studentRouter.post('/get-lung-capacity-by-id', require('../router_handler/studentRouterHandlers').getLungCapacityById)
+
+// 根据学生id查询测量日期，学生俯卧撑数，班级男生平均俯卧撑数
+studentRouter.post('/get-push-ups-by-id', require('../router_handler/studentRouterHandlers').getPushUpsById)
+
 // 向外导入路由对象
 module.exports = studentRouter
 

@@ -117,7 +117,7 @@
 				let leftVision = targetData ? targetData.leftVision : 0;
 				let rightVision = targetData ? targetData.rightVision : 0;
 				this.vision = `${leftVision}/${rightVision}`;
-				this.updateWeightGuageOption(leftVision, rightVision)
+				this.updateVisionGuageOption(leftVision, rightVision)
 				this.$refs.visionGuage.setOption(this.visionGuageOption)
 			},
 			rangeCalendarConfirm(e) {
@@ -205,7 +205,7 @@
 				let leftVision = this.visionData[this.visionData.length - 1].leftVision;
 				let rightVision = this.visionData[this.visionData.length - 1].rightVision;
 				this.vision = `${leftVision}/${rightVision}`;
-				this.updateWeightGuageOption(leftVision, rightVision);
+				this.updateVisionGuageOption(leftVision, rightVision);
 
 				this.startDate = this.visionData[0].date;
 				this.endDate = this.visionData[this.visionData.length - 1].date;
@@ -228,7 +228,7 @@
 				});
 			},
 			// 更新仪表盘的配置选项
-			updateWeightGuageOption(leftVision, rightVision) {
+			updateVisionGuageOption(leftVision, rightVision) {
 				const gaugeData = [{
 						value: leftVision,
 						name: '左眼视力值\n',

@@ -43,3 +43,36 @@ export function getVisionById(id){
 		custom: {auth: true}
 	})
 }
+
+export function getBloodPressureById(id){
+	return http.request({
+		method: 'POST',
+		url: '/student/get-blood-pressure-by-id',
+		data: {
+			id
+		},
+		custom: {auth: true}
+	})
+}
+
+export function getLungCapacityById(id){
+	return http.request({
+		method: 'POST',
+		url: '/student/get-lung-capacity-by-id',
+		data: {
+			id
+		},
+		custom: {auth: true}
+	})
+}
+
+export function getPushUpsById(id){
+	return http.request({
+		method: 'POST',
+		url: '/student/get-push-ups-by-id',
+		data: {
+			id
+		},
+		custom: {auth: true}
+	})
+}

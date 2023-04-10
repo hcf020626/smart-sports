@@ -26,6 +26,24 @@ export default {
 		clearVisionData(context, value){
 			context.commit('CLEAR_VISION_DATE', value)
 		},
+		updateBloodPressureData(context, value){
+			context.commit('UPDATE_BLOOD_PRESSURE_DATE', value)
+		},
+		clearBloodPressureData(context, value){
+			context.commit('CLEAR_BLOOD_PRESSURE_DATE', value)
+		},
+		updateLungCapacityData(context, value){
+			context.commit('UPDATE_LUNG_CAPACITY_DATE', value)
+		},
+		clearLungCapacityData(context, value){
+			context.commit('CLEAR_LUNG_CAPACITY_DATE', value)
+		},
+		updatePushUpsData(context, value){
+			context.commit('UPDATE_PUSH_UPS_DATE', value)
+		},
+		clearPushUpsData(context, value){
+			context.commit('CLEAR_PUSH_UPS_DATE', value)
+		},
 	},
 	mutations: {
 		UPDATE_STUDENT_INFO(state, studentInfo){
@@ -63,6 +81,30 @@ export default {
 			state.visionData = [];
 			uni.removeStorageSync('visionData')
 		},
+		UPDATE_BLOOD_PRESSURE_DATE(state, bloodPressureData){
+			state.bloodPressureData = bloodPressureData;
+			uni.setStorageSync('bloodPressureData', JSON.stringify(state.bloodPressureData));
+		},
+		CLEAR_BLOOD_PRESSURE_DATE(state){
+			state.bloodPressureData = [];
+			uni.removeStorageSync('bloodPressureData')
+		},
+		UPDATE_LUNG_CAPACITY_DATE(state, lungCapacityData){
+			state.lungCapacityData = lungCapacityData;
+			uni.setStorageSync('lungCapacityData', JSON.stringify(state.lungCapacityData));
+		},
+		CLEAR_PUSH_UPS_DATE(state){
+			state.lungCapacityData = [];
+			uni.removeStorageSync('lungCapacityData')
+		},
+		UPDATE_PUSH_UPS_DATE(state, pushUpsData){
+			state.pushUpsData = pushUpsData;
+			uni.setStorageSync('pushUpsData', JSON.stringify(state.pushUpsData));
+		},
+		CLEAR_LUNG_CAPACITY_DATE(state){
+			state.pushUpsData = [];
+			uni.removeStorageSync('pushUpsData')
+		},
 	},
 	getters: {
 		full_avatar_url(state){
@@ -75,5 +117,8 @@ export default {
 		weightData: JSON.parse(uni.getStorageSync('weightData') || '[]'),
 		heightData: JSON.parse(uni.getStorageSync('heightData') || '[]'),
 		visionData: JSON.parse(uni.getStorageSync('visionData') || '[]'),
+		bloodPressureData: JSON.parse(uni.getStorageSync('bloodPressureData') || '[]'),
+		lungCapacityData: JSON.parse(uni.getStorageSync('lungCapacityData') || '[]'),
+		pushUpsData: JSON.parse(uni.getStorageSync('pushUpsData') || '[]'),
 	}
 }

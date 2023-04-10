@@ -103,7 +103,7 @@
 						pagePath: '/pages/index/coordination/rope-skipping/rope-skipping'
 					}]
 				}, {
-					label: '柔韧度',
+					label: '柔韧性',
 					items: [{
 						iconName: 'icon-sit-and-reaches',
 						iconColor: 'red',

@@ -99,28 +99,28 @@
 			"path": "pages/index/body-metrics/blood-pressure/blood-pressure",
 			"style": {
 				"navigationBarTitleText": "血压",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 
 		},{
 			"path": "pages/index/body-metrics/lung-capacity/lung-capacity",
 			"style": {
 				"navigationBarTitleText": "肺活量",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 
 		},{
 			"path": "pages/index/strength-and-stamina/sit-ups/sit-ups",
 			"style": {
 				"navigationBarTitleText": "仰卧起坐",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 
 		},{
 			"path": "pages/index/strength-and-stamina/push-ups/push-ups",
 			"style": {
 				"navigationBarTitleText": "俯卧撑",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 
 		},{
