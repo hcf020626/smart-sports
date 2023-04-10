@@ -44,6 +44,24 @@ export default {
 		clearPushUpsData(context, value){
 			context.commit('CLEAR_PUSH_UPS_DATE', value)
 		},
+		updateSitUpsData(context, value){
+			context.commit('UPDATE_SIT_UPS_DATE', value)
+		},
+		clearSitUpsData(context, value){
+			context.commit('CLEAR_SIT_UPS_DATE', value)
+		},
+		updatePullUpsData(context, value){
+			context.commit('UPDATE_PULL_UPS_DATE', value)
+		},
+		clearPullUpsData(context, value){
+			context.commit('CLEAR_PULL_UPS_DATE', value)
+		},
+		updateLongJumpData(context, value){
+			context.commit('UPDATE_LONG_JUMP_DATE', value)
+		},
+		clearLongJumpData(context, value){
+			context.commit('CLEAR_LONG_JUMP_DATE', value)
+		},
 	},
 	mutations: {
 		UPDATE_STUDENT_INFO(state, studentInfo){
@@ -93,7 +111,7 @@ export default {
 			state.lungCapacityData = lungCapacityData;
 			uni.setStorageSync('lungCapacityData', JSON.stringify(state.lungCapacityData));
 		},
-		CLEAR_PUSH_UPS_DATE(state){
+		CLEAR_LUNG_CAPACITY_DATE(state){
 			state.lungCapacityData = [];
 			uni.removeStorageSync('lungCapacityData')
 		},
@@ -101,9 +119,33 @@ export default {
 			state.pushUpsData = pushUpsData;
 			uni.setStorageSync('pushUpsData', JSON.stringify(state.pushUpsData));
 		},
-		CLEAR_LUNG_CAPACITY_DATE(state){
+		CLEAR_PUSH_UPS_DATE(state){
 			state.pushUpsData = [];
 			uni.removeStorageSync('pushUpsData')
+		},
+		UPDATE_SIT_UPS_DATE(state, sitUpsData){
+			state.sitUpsData = sitUpsData;
+			uni.setStorageSync('sitUpsData', JSON.stringify(state.sitUpsData));
+		},
+		CLEAR_SIT_UPS_DATE(state){
+			state.sitUpsData = [];
+			uni.removeStorageSync('sitUpsData')
+		},
+		UPDATE_PULL_UPS_DATE(state, pullUpsData){
+			state.pullUpsData = pullUpsData;
+			uni.setStorageSync('pullUpsData', JSON.stringify(state.pullUpsData));
+		},
+		CLEAR_PULL_UPS_DATE(state){
+			state.pullUpsData = [];
+			uni.removeStorageSync('pullUpsData')
+		},
+		UPDATE_LONG_JUMP_DATE(state, longJumpData){
+			state.longJumpData = longJumpData;
+			uni.setStorageSync('longJumpData', JSON.stringify(state.longJumpData));
+		},
+		CLEAR_LONG_JUMP_DATE(state){
+			state.longJumpData = [];
+			uni.removeStorageSync('longJumpData')
 		},
 	},
 	getters: {
@@ -120,5 +162,8 @@ export default {
 		bloodPressureData: JSON.parse(uni.getStorageSync('bloodPressureData') || '[]'),
 		lungCapacityData: JSON.parse(uni.getStorageSync('lungCapacityData') || '[]'),
 		pushUpsData: JSON.parse(uni.getStorageSync('pushUpsData') || '[]'),
+		sitUpsData: JSON.parse(uni.getStorageSync('sitUpsData') || '[]'),
+		pullUpsData: JSON.parse(uni.getStorageSync('pullUpsData') || '[]'),
+		longJumpData: JSON.parse(uni.getStorageSync('longJumpData') || '[]'),
 	}
 }

@@ -115,7 +115,11 @@
 		},
 		// 页面刷新时获取页面数据
 		onPullDownRefresh() {
-			this.getPageData()
+			if(this.studentInfo.gender === '男'){
+				this.getPageData();
+			}else{
+				uni.stopPullDownRefresh();
+			}
 		},
 		methods: {
 			...mapActions('studentModule', ['updatePushUpsData']),
@@ -146,7 +150,7 @@
 
 				this.startDate = e.range.data[0];
 				this.endDate = e.range.data[e.range.data.length - 1];
-				this.updateVisionLineChartOption(this.startDate, this.endDate);
+				this.updatePushUpsLineChartOption(this.startDate, this.endDate);
 				this.$refs.pushUpsLineChart.setOption(this.pushUpsLineChartOption);
 			},
 			sectionChange(index) {
@@ -194,6 +198,24 @@
 			// 初始化页面数据
 			initPageData() {
 				if (!this.pushUpsData.length) {
+					if(this.studentInfo.gender === '女'){
+						uni.stopPullDownRefresh();
+						return this.pushUpsGuageOption = this.pushUpsLineChartOption = {
+							// 设置一个空的 series
+							series: [],
+							// 设置一个 empty 效果
+							graphic: {
+								type: 'text',
+								left: 'center',
+								top: 'middle',
+								style: {
+									fill: '#999',
+									text: '女生不需要做俯卧撑',
+									font: 'bold 20px Microsoft YaHei'
+								}
+							}
+						};
+					}
 					console.log('The push ups data is empty');
 					return this.pushUpsGuageOption = this.pushUpsLineChartOption = {
 						// 设置一个空的 series
@@ -211,25 +233,7 @@
 						}
 					};
 				}
-				
-				if(this.studentInfo.gender === '女'){
-					return this.pushUpsGuageOption = this.pushUpsLineChartOption = {
-						// 设置一个空的 series
-						series: [],
-						// 设置一个 empty 效果
-						graphic: {
-							type: 'text',
-							left: 'center',
-							top: 'middle',
-							style: {
-								fill: '#999',
-								text: '女生不需要做俯卧撑',
-								font: 'bold 20px Microsoft YaHei'
-							}
-						}
-					};
-				}
-
+			
 				this.pushUpsData.forEach((item) => {
 					this.calendarSelected.push({
 						date: item.date,
@@ -243,7 +247,7 @@
 
 				this.startDate = this.pushUpsData[0].date;
 				this.endDate = this.pushUpsData[this.pushUpsData.length - 1].date;
-				this.updateVisionLineChartOption(this.startDate, this.endDate);
+				this.updatePushUpsLineChartOption(this.startDate, this.endDate);
 			},
 			// 初始化仪表盘
 			initPushUpsGuage() {
@@ -335,7 +339,7 @@
 				};
 			},
 			// 更新折线图的配置选项
-			updateVisionLineChartOption(startDate, endDate) {
+			updatePushUpsLineChartOption(startDate, endDate) {
 				let date = [];
 				let maleAvgPushUps = [];
 				let pushUps = []
@@ -368,7 +372,7 @@
 							var result = params[0].name + '\n';
 							for (var i = 0, l = params.length; i < l; i++) {
 								var series = params[i];
-								result += series.marker + series.seriesName + ' : ' + series.value + '';
+								result += series.marker + series.seriesName + ' : ' + series.value + '个';
 								// 添加了一个条件语句来检查是否为最后一个系列，如果不是，则添加一个换行符。这样就可以确保最后没有多余的换行符了。
 								if (i !== l - 1) {
 									result += '\n';

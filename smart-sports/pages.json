@@ -127,49 +127,49 @@
 			"path": "pages/index/strength-and-stamina/pull-ups/pull-ups",
 			"style": {
 				"navigationBarTitleText": "引体向上",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 
 		},{
 			"path": "pages/index/strength-and-stamina/running/running",
 			"style": {
 				"navigationBarTitleText": "跑步",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 
 		},{
 			"path": "pages/index/strength-and-stamina/swimming/swimming",
 			"style": {
 				"navigationBarTitleText": "游泳",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 
 		},{
 			"path": "pages/index/flexibility/sit-and-reaches/sit-and-reaches",
 			"style": {
 				"navigationBarTitleText": "坐位体前屈",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 
 		},{
 			"path": "pages/index/explosiveness/long-jump/long-jump",
 			"style": {
 				"navigationBarTitleText": "立定跳远",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 
 		},{
 			"path": "pages/index/explosiveness/solid-ball/solid-ball",
 			"style": {
 				"navigationBarTitleText": "投掷实心球",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 
 		},{
 			"path": "pages/index/coordination/rope-skipping/rope-skipping",
 			"style": {
 				"navigationBarTitleText": "跳绳",
-				"enablePullDownRefresh": false
+				"enablePullDownRefresh": true
 			}
 
 		}

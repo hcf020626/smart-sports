@@ -1,5 +1,25 @@
-import {login, reg, forget, sendCode, saveParentInfo, updatePassword, changeBonding, getTheLatestInfo} from './parent.js'
-import {getStudentsByIdcard, getWeightById, getHeightById, getVisionById, getBloodPressureById, getLungCapacityById, getPushUpsById} from './student.js'
+import {
+	login,
+	reg,
+	forget,
+	sendCode,
+	saveParentInfo,
+	updatePassword,
+	changeBonding,
+	getTheLatestInfo
+} from './parent.js'
+import {
+	getStudentsByIdcard,
+	getWeightById,
+	getHeightById,
+	getVisionById,
+	getBloodPressureById,
+	getLungCapacityById,
+	getPushUpsById,
+	getSitUpsById,
+	getPullUpsById,
+	getLongJumpById
+} from './student.js'
 
 export default {
 	parent: {
@@ -19,7 +39,10 @@ export default {
 		getVisionById,
 		getBloodPressureById,
 		getLungCapacityById,
-		getPushUpsById
+		getPushUpsById,
+		getSitUpsById,
+		getPullUpsById,
+		getLongJumpById
 	},
-	
+
 }

@@ -76,3 +76,36 @@ export function getPushUpsById(id){
 		custom: {auth: true}
 	})
 }
+
+export function getSitUpsById(id){
+	return http.request({
+		method: 'POST',
+		url: '/student/get-sit-ups-by-id',
+		data: {
+			id
+		},
+		custom: {auth: true}
+	})
+}
+
+export function getPullUpsById(id){
+	return http.request({
+		method: 'POST',
+		url: '/student/get-pull-ups-by-id',
+		data: {
+			id
+		},
+		custom: {auth: true}
+	})
+}
+
+export function getLongJumpById(id){
+	return http.request({
+		method: 'POST',
+		url: '/student/get-long-jump-by-id',
+		data: {
+			id
+		},
+		custom: {auth: true}
+	})
+}

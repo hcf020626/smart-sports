@@ -539,3 +539,249 @@ exports.getPushUpsById = async (req, resp, next) => {
 		})
 	}
 }
+
+exports.getSitUpsById = async (req, resp, next) => {
+	const {
+		id
+	} = req.body;
+
+	console.log("id: ", id);
+
+	try {
+
+		const sql = `
+			SELECT measurement_date, sit_ups FROM t_students_performance WHERE student_id=?;
+			
+			SELECT measurement_date, ROUND(AVG(sit_ups), 2) AS female_avg_sit_ups
+			FROM t_students_performance
+			WHERE student_id IN (
+			  SELECT id
+			  FROM t_students
+			  WHERE class = (
+			    SELECT class
+			    FROM t_students
+			    WHERE id = ?
+			  )
+			  AND gender = '女'
+			)
+			GROUP BY measurement_date;
+		`;
+		const results = await db.exec(sql, [id, id, id]);
+
+		if (results.length !== 2) {
+			return resp.json({
+				status: 1,
+				msg: '查询结果存在异常，查询失败'
+			})
+		}
+		for (let i = 0; i < results.length; i++) {
+			results[i].forEach(row => {
+				row.measurement_date.setDate(row.measurement_date.getDate() + 1);
+			});
+		}
+
+		const sitUpsMap = results[0].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			map[date] = row.sit_ups;
+			return map;
+		}, {});
+
+		const femaleAvgSitUpsMap = results[1].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			map[date] = row.female_avg_sit_ups;
+			return map;
+		}, {});
+
+		const dates = Object.keys(sitUpsMap);
+		const result = dates.map(date => ({
+			date,
+			sitUps: sitUpsMap[date],
+			femaleAvgSitUps: femaleAvgSitUpsMap[date] ? femaleAvgSitUpsMap[date] : null,
+		}));
+
+		resp.json({
+			status: 0,
+			msg: '查询成功',
+			sitUpsData: result,
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，查找学生信息失败'
+		})
+	}
+}
+
+exports.getPullUpsById = async (req, resp, next) => {
+	const {
+		id
+	} = req.body;
+
+	console.log("id: ", id);
+
+	try {
+
+		const sql = `
+			SELECT measurement_date, pull_ups FROM t_students_performance WHERE student_id=?;
+			
+			SELECT measurement_date, ROUND(AVG(pull_ups), 2) AS male_avg_pull_ups
+			FROM t_students_performance
+			WHERE student_id IN (
+			  SELECT id
+			  FROM t_students
+			  WHERE class = (
+			    SELECT class
+			    FROM t_students
+			    WHERE id = ?
+			  )
+			  AND gender = '男'
+			)
+			GROUP BY measurement_date;
+		`;
+		const results = await db.exec(sql, [id, id, id]);
+
+		if (results.length !== 2) {
+			return resp.json({
+				status: 1,
+				msg: '查询结果存在异常，查询失败'
+			})
+		}
+		for (let i = 0; i < results.length; i++) {
+			results[i].forEach(row => {
+				row.measurement_date.setDate(row.measurement_date.getDate() + 1);
+			});
+		}
+
+		const pullUpsMap = results[0].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			map[date] = row.pull_ups;
+			return map;
+		}, {});
+
+		const maleAvgPullUpsMap = results[1].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			map[date] = row.male_avg_pull_ups;
+			return map;
+		}, {});
+
+		const dates = Object.keys(pullUpsMap);
+		const result = dates.map(date => ({
+			date,
+			pullUps: pullUpsMap[date],
+			maleAvgPullUps: maleAvgPullUpsMap[date] ? maleAvgPullUpsMap[date] : null,
+		}));
+
+		resp.json({
+			status: 0,
+			msg: '查询成功',
+			pullUpsData: result,
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，查找学生信息失败'
+		})
+	}
+}
+
+exports.getLongJumpById = async (req, resp, next) => {
+	const {
+		id
+	} = req.body;
+
+	console.log("id: ", id);
+
+	try {
+
+		const sql = `
+			SELECT measurement_date, long_jump FROM t_students_performance WHERE student_id=?;
+			
+			SELECT measurement_date, ROUND(AVG(long_jump), 2) AS male_avg_long_jump
+			FROM t_students_performance
+			WHERE student_id IN (
+			  SELECT id
+			  FROM t_students
+			  WHERE class = (
+			    SELECT class
+			    FROM t_students
+			    WHERE id = ?
+			  )
+			  AND gender = '男'
+			)
+			GROUP BY measurement_date;
+			
+			
+			SELECT measurement_date, ROUND(AVG(long_jump), 2) AS female_avg_long_jump
+			FROM t_students_performance
+			WHERE student_id IN (
+			  SELECT id
+			  FROM t_students
+			  WHERE class = (
+			    SELECT class
+			    FROM t_students
+			    WHERE id = ?
+			  )
+			  AND gender = '女'
+			)
+			GROUP BY measurement_date;
+		`;
+		const results = await db.exec(sql, [id, id, id]);
+		
+
+		if (results.length !== 3) {
+			return resp.json({
+				status: 1,
+				msg: '查询结果存在异常，查询失败'
+			})
+		}
+		for (let i = 0; i < results.length; i++) {
+			results[i].forEach(row => {
+				row.measurement_date.setDate(row.measurement_date.getDate() + 1);
+			});
+		}
+
+		const longJumpMap = results[0].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			map[date] = row.long_jump;
+			return map;
+		}, {});
+
+		const maleAvgLongJumpMap = results[1].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			console.log(row);
+			map[date] = row.male_avg_long_jump;
+			return map;
+		}, {});
+
+		const femaleAvgLongJumpMap = results[2].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			map[date] = row.female_avg_long_jump;
+			return map;
+		}, {});
+
+		const dates = Object.keys(longJumpMap);
+		const result = dates.map(date => ({
+			date,
+			longJump: longJumpMap[date],
+			maleAvgLongJump: maleAvgLongJumpMap[date] ? maleAvgLongJumpMap[date] : null,
+			femaleAvgLongJump: femaleAvgLongJumpMap[date] ? femaleAvgLongJumpMap[date] : null
+		}));
+
+		resp.json({
+			status: 0,
+			msg: '查询成功',
+			longJumpData: result,
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，查找学生信息失败'
+		})
+	}
+}

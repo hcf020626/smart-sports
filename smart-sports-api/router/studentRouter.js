@@ -25,6 +25,15 @@ studentRouter.post('/get-lung-capacity-by-id', require('../router_handler/studen
 // 根据学生id查询测量日期，学生俯卧撑数，班级男生平均俯卧撑数
 studentRouter.post('/get-push-ups-by-id', require('../router_handler/studentRouterHandlers').getPushUpsById)
 
+// 根据学生id查询测量日期，学生仰卧起坐数，班级女生平均仰卧起坐数
+studentRouter.post('/get-sit-ups-by-id', require('../router_handler/studentRouterHandlers').getSitUpsById)
+
+// 根据学生id查询测量日期，学生引体向上数，班级男生平均引体向上数
+studentRouter.post('/get-pull-ups-by-id', require('../router_handler/studentRouterHandlers').getPullUpsById)
+
+// 根据学生id查询测量日期，学生跳远距离，班级男生平均跳远距离，班级女生平均跳远距离
+studentRouter.post('/get-long-jump-by-id', require('../router_handler/studentRouterHandlers').getLongJumpById)
+
 // 向外导入路由对象
 module.exports = studentRouter
 
