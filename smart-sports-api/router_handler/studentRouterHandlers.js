@@ -785,3 +785,395 @@ exports.getLongJumpById = async (req, resp, next) => {
 		})
 	}
 }
+
+exports.getSitAndReachesById = async (req, resp, next) => {
+	const {
+		id
+	} = req.body;
+
+	console.log("id: ", id);
+
+	try {
+
+		const sql = `
+			SELECT measurement_date, sit_and_reaches FROM t_students_performance WHERE student_id=?;
+			
+			SELECT measurement_date, ROUND(AVG(sit_and_reaches), 2) AS male_avg_sit_and_reaches
+			FROM t_students_performance
+			WHERE student_id IN (
+			  SELECT id
+			  FROM t_students
+			  WHERE class = (
+			    SELECT class
+			    FROM t_students
+			    WHERE id = ?
+			  )
+			  AND gender = '男'
+			)
+			GROUP BY measurement_date;
+			
+			
+			SELECT measurement_date, ROUND(AVG(sit_and_reaches), 2) AS female_avg_sit_and_reaches
+			FROM t_students_performance
+			WHERE student_id IN (
+			  SELECT id
+			  FROM t_students
+			  WHERE class = (
+			    SELECT class
+			    FROM t_students
+			    WHERE id = ?
+			  )
+			  AND gender = '女'
+			)
+			GROUP BY measurement_date;
+		`;
+		const results = await db.exec(sql, [id, id, id]);
+		
+
+		if (results.length !== 3) {
+			return resp.json({
+				status: 1,
+				msg: '查询结果存在异常，查询失败'
+			})
+		}
+		for (let i = 0; i < results.length; i++) {
+			results[i].forEach(row => {
+				row.measurement_date.setDate(row.measurement_date.getDate() + 1);
+			});
+		}
+
+		const sitAndReachesMap = results[0].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			map[date] = row.sit_and_reaches;
+			return map;
+		}, {});
+
+		const maleAvgSitAndReachesMap = results[1].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			console.log(row);
+			map[date] = row.male_avg_sit_and_reaches;
+			return map;
+		}, {});
+
+		const femaleAvgSitAndReachesMap = results[2].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			map[date] = row.female_avg_sit_and_reaches;
+			return map;
+		}, {});
+
+		const dates = Object.keys(sitAndReachesMap);
+		const result = dates.map(date => ({
+			date,
+			sitAndReaches: sitAndReachesMap[date],
+			maleAvgSitAndReaches: maleAvgSitAndReachesMap[date] ? maleAvgSitAndReachesMap[date] : null,
+			femaleAvgSitAndReaches: femaleAvgSitAndReachesMap[date] ? femaleAvgSitAndReachesMap[date] : null
+		}));
+
+		resp.json({
+			status: 0,
+			msg: '查询成功',
+			sitAndReachesData: result,
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，查找学生信息失败'
+		})
+	}
+}
+
+exports.getRopeSkippingById = async (req, resp, next) => {
+	const {
+		id
+	} = req.body;
+
+	console.log("id: ", id);
+
+	try {
+
+		const sql = `
+			SELECT measurement_date, rope_skipping FROM t_students_performance WHERE student_id=?;
+			
+			SELECT measurement_date, ROUND(AVG(rope_skipping), 2) AS male_avg_rope_skipping
+			FROM t_students_performance
+			WHERE student_id IN (
+			  SELECT id
+			  FROM t_students
+			  WHERE class = (
+			    SELECT class
+			    FROM t_students
+			    WHERE id = ?
+			  )
+			  AND gender = '男'
+			)
+			GROUP BY measurement_date;
+			
+			
+			SELECT measurement_date, ROUND(AVG(rope_skipping), 2) AS female_avg_rope_skipping
+			FROM t_students_performance
+			WHERE student_id IN (
+			  SELECT id
+			  FROM t_students
+			  WHERE class = (
+			    SELECT class
+			    FROM t_students
+			    WHERE id = ?
+			  )
+			  AND gender = '女'
+			)
+			GROUP BY measurement_date;
+		`;
+		const results = await db.exec(sql, [id, id, id]);
+		
+
+		if (results.length !== 3) {
+			return resp.json({
+				status: 1,
+				msg: '查询结果存在异常，查询失败'
+			})
+		}
+		for (let i = 0; i < results.length; i++) {
+			results[i].forEach(row => {
+				row.measurement_date.setDate(row.measurement_date.getDate() + 1);
+			});
+		}
+
+		const ropeSkippingMap = results[0].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			map[date] = row.rope_skipping;
+			return map;
+		}, {});
+
+		const maleAvgRopeSkippingMap = results[1].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			console.log(row);
+			map[date] = row.male_avg_rope_skipping;
+			return map;
+		}, {});
+
+		const femaleAvgRopeSkippingMap = results[2].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			map[date] = row.female_avg_rope_skipping;
+			return map;
+		}, {});
+
+		const dates = Object.keys(ropeSkippingMap);
+		const result = dates.map(date => ({
+			date,
+			ropeSkipping: ropeSkippingMap[date],
+			maleAvgRopeSkipping: maleAvgRopeSkippingMap[date] ? maleAvgRopeSkippingMap[date] : null,
+			femaleAvgRopeSkipping: femaleAvgRopeSkippingMap[date] ? femaleAvgRopeSkippingMap[date] : null
+		}));
+
+		resp.json({
+			status: 0,
+			msg: '查询成功',
+			ropeSkippingData: result,
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，查找学生信息失败'
+		})
+	}
+}
+
+exports.getSolidBallById = async (req, resp, next) => {
+	const {
+		id
+	} = req.body;
+
+	console.log("id: ", id);
+
+	try {
+
+		const sql = `
+			SELECT measurement_date, solid_ball FROM t_students_performance WHERE student_id=?;
+			
+			SELECT measurement_date, ROUND(AVG(solid_ball), 2) AS male_avg_solid_ball
+			FROM t_students_performance
+			WHERE student_id IN (
+			  SELECT id
+			  FROM t_students
+			  WHERE class = (
+			    SELECT class
+			    FROM t_students
+			    WHERE id = ?
+			  )
+			  AND gender = '男'
+			)
+			GROUP BY measurement_date;
+			
+			
+			SELECT measurement_date, ROUND(AVG(solid_ball), 2) AS female_avg_solid_ball
+			FROM t_students_performance
+			WHERE student_id IN (
+			  SELECT id
+			  FROM t_students
+			  WHERE class = (
+			    SELECT class
+			    FROM t_students
+			    WHERE id = ?
+			  )
+			  AND gender = '女'
+			)
+			GROUP BY measurement_date;
+		`;
+		const results = await db.exec(sql, [id, id, id]);
+		
+
+		if (results.length !== 3) {
+			return resp.json({
+				status: 1,
+				msg: '查询结果存在异常，查询失败'
+			})
+		}
+		for (let i = 0; i < results.length; i++) {
+			results[i].forEach(row => {
+				row.measurement_date.setDate(row.measurement_date.getDate() + 1);
+			});
+		}
+
+		const solidBallMap = results[0].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			map[date] = row.solid_ball;
+			return map;
+		}, {});
+
+		const maleAvgSolidBallMap = results[1].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			console.log(row);
+			map[date] = row.male_avg_solid_ball;
+			return map;
+		}, {});
+
+		const femaleAvgSolidBallMap = results[2].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			map[date] = row.female_avg_solid_ball;
+			return map;
+		}, {});
+
+		const dates = Object.keys(solidBallMap);
+		const result = dates.map(date => ({
+			date,
+			solidBall: solidBallMap[date],
+			maleAvgSolidBall: maleAvgSolidBallMap[date] ? maleAvgSolidBallMap[date] : null,
+			femaleAvgSolidBall: femaleAvgSolidBallMap[date] ? femaleAvgSolidBallMap[date] : null
+		}));
+
+		resp.json({
+			status: 0,
+			msg: '查询成功',
+			solidBallData: result,
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，查找学生信息失败'
+		})
+	}
+}
+
+exports.getSwimmingById = async (req, resp, next) => {
+	const {
+		id
+	} = req.body;
+
+	console.log("id: ", id);
+
+	try {
+
+		const sql = `
+			SELECT measurement_date, swimming FROM t_students_performance WHERE student_id=?;
+			
+			SELECT measurement_date, ROUND(AVG(swimming), 2) AS male_avg_swimming
+			FROM t_students_performance
+			WHERE student_id IN (
+			  SELECT id
+			  FROM t_students
+			  WHERE class = (
+			    SELECT class
+			    FROM t_students
+			    WHERE id = ?
+			  )
+			  AND gender = '男'
+			)
+			GROUP BY measurement_date;
+			
+			
+			SELECT measurement_date, ROUND(AVG(swimming), 2) AS female_avg_swimming
+			FROM t_students_performance
+			WHERE student_id IN (
+			  SELECT id
+			  FROM t_students
+			  WHERE class = (
+			    SELECT class
+			    FROM t_students
+			    WHERE id = ?
+			  )
+			  AND gender = '女'
+			)
+			GROUP BY measurement_date;
+		`;
+		const results = await db.exec(sql, [id, id, id]);
+		
+
+		if (results.length !== 3) {
+			return resp.json({
+				status: 1,
+				msg: '查询结果存在异常，查询失败'
+			})
+		}
+		for (let i = 0; i < results.length; i++) {
+			results[i].forEach(row => {
+				row.measurement_date.setDate(row.measurement_date.getDate() + 1);
+			});
+		}
+
+		const swimmingMap = results[0].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			map[date] = row.swimming;
+			return map;
+		}, {});
+
+		const maleAvgSwimmingMap = results[1].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			console.log(row);
+			map[date] = row.male_avg_swimming;
+			return map;
+		}, {});
+
+		const femaleAvgSwimmingMap = results[2].reduce((map, row) => {
+			const date = new Date(row.measurement_date).toISOString().slice(0, 10);
+			map[date] = row.female_avg_swimming;
+			return map;
+		}, {});
+
+		const dates = Object.keys(swimmingMap);
+		const result = dates.map(date => ({
+			date,
+			swimming: swimmingMap[date],
+			maleAvgSwimming: maleAvgSwimmingMap[date] ? maleAvgSwimmingMap[date] : null,
+			femaleAvgSwimming: femaleAvgSwimmingMap[date] ? femaleAvgSwimmingMap[date] : null
+		}));
+
+		resp.json({
+			status: 0,
+			msg: '查询成功',
+			swimmingData: result,
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，查找学生信息失败'
+		})
+	}
+}

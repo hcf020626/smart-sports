@@ -109,3 +109,47 @@ export function getLongJumpById(id){
 		custom: {auth: true}
 	})
 }
+
+export function getSitAndReachesById(id){
+	return http.request({
+		method: 'POST',
+		url: '/student/get-sit-and-reaches-by-id',
+		data: {
+			id
+		},
+		custom: {auth: true}
+	})
+}
+
+export function getRopeSkippingById(id){
+	return http.request({
+		method: 'POST',
+		url: '/student/get-rope-skipping-by-id',
+		data: {
+			id
+		},
+		custom: {auth: true}
+	})
+}
+
+export function getSolidBallById(id){
+	return http.request({
+		method: 'POST',
+		url: '/student/get-solid-ball-by-id',
+		data: {
+			id
+		},
+		custom: {auth: true}
+	})
+}
+
+export function getSwimmingById(id){
+	return http.request({
+		method: 'POST',
+		url: '/student/get-swimming-by-id',
+		data: {
+			id
+		},
+		custom: {auth: true}
+	})
+}

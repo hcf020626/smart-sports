@@ -18,7 +18,11 @@ import {
 	getPushUpsById,
 	getSitUpsById,
 	getPullUpsById,
-	getLongJumpById
+	getLongJumpById,
+	getSitAndReachesById,
+	getRopeSkippingById,
+	getSolidBallById,
+	getSwimmingById
 } from './student.js'
 
 export default {
@@ -42,7 +46,11 @@ export default {
 		getPushUpsById,
 		getSitUpsById,
 		getPullUpsById,
-		getLongJumpById
+		getLongJumpById,
+		getSitAndReachesById,
+		getRopeSkippingById,
+		getSolidBallById,
+		getSwimmingById
 	},
 
 }

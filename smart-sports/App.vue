@@ -81,8 +81,8 @@
 	/* 在App.vue中首行的位置引入uView基础样式 */
 	@import "@/uni_modules/uview-ui/index.scss";
 
-	@import url('//at.alicdn.com/t/c/font_3944024_14rryqypq87.css');
-	@import url('static/iconfont/icon/iconfont.css');
+	@import url('//at.alicdn.com/t/c/font_3944024_ltodab52kj.css');
+	// @import url('static/iconfont/icon/iconfont.css');
 	
 	@font-face {
 		font-family: leo-he;

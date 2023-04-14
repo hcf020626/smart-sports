@@ -34,6 +34,18 @@ studentRouter.post('/get-pull-ups-by-id', require('../router_handler/studentRout
 // 根据学生id查询测量日期，学生跳远距离，班级男生平均跳远距离，班级女生平均跳远距离
 studentRouter.post('/get-long-jump-by-id', require('../router_handler/studentRouterHandlers').getLongJumpById)
 
+// 根据学生id查询测量日期，学生坐位体前屈距离，班级男生平均坐位体前屈距离，班级女生平均坐位体前屈距离
+studentRouter.post('/get-sit-and-reaches-by-id', require('../router_handler/studentRouterHandlers').getSitAndReachesById)
+
+// 根据学生id查询测量日期，学生跳绳个数，班级男生平均跳绳个数，班级女生平均跳绳个数
+studentRouter.post('/get-rope-skipping-by-id', require('../router_handler/studentRouterHandlers').getRopeSkippingById)
+
+// 根据学生id查询测量日期，学生实心球投掷距离，班级男生平均实心球投掷距离，班级女生平均实心球投掷距离
+studentRouter.post('/get-solid-ball-by-id', require('../router_handler/studentRouterHandlers').getSolidBallById)
+
+// 根据学生id查询测量日期，学生100米游泳耗时，班级男生平均100米游泳耗时，班级女生平均100米游泳耗时
+studentRouter.post('/get-swimming-by-id', require('../router_handler/studentRouterHandlers').getSwimmingById)
+
 // 向外导入路由对象
 module.exports = studentRouter
 
