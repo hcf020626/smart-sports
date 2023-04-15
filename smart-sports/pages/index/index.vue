@@ -37,9 +37,6 @@
 					</view>
 				</view>
 			</view>
-			<u-button @click="clearWeightData" type="primary">
-				clearWeightData
-			</u-button>
 		</template>
 	</view>
 </template>
@@ -76,7 +73,6 @@
 			}
 		},
 		methods: {
-			...mapActions('studentModule', ['clearWeightData']),
 			goToPage(path) {
 				uni.navigateTo({
 					url: path
@@ -93,7 +89,7 @@
 </script>
 
 
-<style scoped>
+<style scoped lang="scss">
 	.container {
 		width: 100vw;
 		height: 100vh;
@@ -101,7 +97,12 @@
 		background-image: url('@/static/images/bg.png');
 		background-repeat: no-repeat;
 		background-size: 100%;
+		// #ifndef APP
 		background-position: center;
+		// #endif
+		// #ifdef APP
+		background-position: center 60%;
+		// #endif
 	}
 
 	.card {

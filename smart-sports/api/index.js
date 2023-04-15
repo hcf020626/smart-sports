@@ -22,7 +22,8 @@ import {
 	getSitAndReachesById,
 	getRopeSkippingById,
 	getSolidBallById,
-	getSwimmingById
+	getSwimmingById,
+	getRunningById
 } from './student.js'
 
 export default {
@@ -50,7 +51,8 @@ export default {
 		getSitAndReachesById,
 		getRopeSkippingById,
 		getSolidBallById,
-		getSwimmingById
+		getSwimmingById,
+		getRunningById
 	},
 
 }

@@ -346,7 +346,7 @@
 						containLabel: true
 					},
 					legend: {
-						type: 'scroll',
+						// type: 'scroll',
 						orient: 'horizontal',
 						left: 'center',
 						bottom: 5, // 使 legend 位于 grid 的下方

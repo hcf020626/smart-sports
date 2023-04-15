@@ -133,10 +133,14 @@
 		},{
 			"path": "pages/index/strength-and-stamina/running/running",
 			"style": {
-				// "navigationBarTitleText": "跑步",
 				"navigationStyle": "custom",
 				"navigationBarTextStyle": "black",
-				"enablePullDownRefresh": true
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"pullToRefresh": {
+						"offset": "44px"
+					}
+				}
 			}
 
 		},{

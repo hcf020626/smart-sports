@@ -44,12 +44,12 @@
 						pagePath: '/pages/index/body-metrics/vision/vision'
 					}, {
 						iconName: 'icon-blood-pressure',
-						iconColor: 'red',
+						iconColor: '#FF0000',
 						title: '血压',
 						pagePath: '/pages/index/body-metrics/blood-pressure/blood-pressure'
 					}, {
 						iconName: 'icon-lung-capacity',
-						iconColor: 'lightgreen',
+						iconColor: '#00FF00',
 						title: '肺活量',
 						pagePath: '/pages/index/body-metrics/lung-capacity/lung-capacity'
 					}]
@@ -57,17 +57,17 @@
 					label: '体能和耐力',
 					items: [{
 						iconName: 'icon-push-ups',
-						iconColor: 'red',
+						iconColor: '#0000FF',
 						title: '俯卧撑',
 						pagePath: '/pages/index/strength-and-stamina/push-ups/push-ups'
 					}, {
 						iconName: 'icon-sit-ups',
-						iconColor: 'blue',
+						iconColor: 'black',
 						title: '仰卧起坐',
 						pagePath: '/pages/index/strength-and-stamina/sit-ups/sit-ups'
 					}, {
 						iconName: 'icon-pull-ups',
-						iconColor: 'darkgreen',
+						iconColor: '#18b566',
 						title: '引体向上',
 						pagePath: '/pages/index/strength-and-stamina/pull-ups/pull-ups'
 					}, {
@@ -77,7 +77,7 @@
 						pagePath: '/pages/index/strength-and-stamina/running/running'
 					}, {
 						iconName: 'icon-swimming',
-						iconColor: 'purple',
+						iconColor: '#606266',
 						title: '游泳',
 						pagePath: '/pages/index/strength-and-stamina/swimming/swimming'
 					}]
@@ -85,12 +85,12 @@
 					label: '爆发力',
 					items: [{
 						iconName: 'icon-long-jump',
-						iconColor: 'red',
+						iconColor: 'blue',
 						title: '立定跳远',
 						pagePath: '/pages/index/explosiveness/long-jump/long-jump'
 					}, {
 						iconName: 'icon-solid-ball',
-						iconColor: 'blue',
+						iconColor: 'purple',
 						title: '实心球',
 						pagePath: '/pages/index/explosiveness/solid-ball/solid-ball'
 					}]
@@ -98,7 +98,7 @@
 					label: '协调力',
 					items: [{
 						iconName: 'icon-rope-skipping',
-						iconColor: 'red',
+						iconColor: '#000',
 						title: '跳绳',
 						pagePath: '/pages/index/coordination/rope-skipping/rope-skipping'
 					}]
@@ -106,7 +106,7 @@
 					label: '柔韧性',
 					items: [{
 						iconName: 'icon-sit-and-reaches',
-						iconColor: 'red',
+						iconColor: 'green',
 						title: '坐位体前屈',
 						pagePath: '/pages/index/flexibility/sit-and-reaches/sit-and-reaches'
 					}]

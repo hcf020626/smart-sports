@@ -86,6 +86,12 @@ export default {
 		clearSwimmingData(context, value){
 			context.commit('CLEAR_SWIMMING_DATA', value)
 		},
+		updateRunningData(context, value){
+			context.commit('UPDATE_SWIMMING_DATA', value)
+		},
+		clearRunningData(context, value){
+			context.commit('CLEAR_SWIMMING_DATA', value)
+		},
 	},
 	mutations: {
 		UPDATE_STUDENT_INFO(state, studentInfo){
@@ -203,6 +209,14 @@ export default {
 			state.swimmingData = [];
 			uni.removeStorageSync('swimmingData')
 		},
+		UPDATE_SWIMMING_DATA(state, runningData){
+			state.runningData = runningData;
+			uni.setStorageSync('runningData', JSON.stringify(state.runningData));
+		},
+		CLEAR_SWIMMING_DATA(state){
+			state.runningData = [];
+			uni.removeStorageSync('runningData')
+		},
 	},
 	getters: {
 		full_avatar_url(state){
@@ -225,5 +239,6 @@ export default {
 		ropeSkippingData: JSON.parse(uni.getStorageSync('ropeSkippingData') || '[]'),
 		solidBallData: JSON.parse(uni.getStorageSync('solidBallData') || '[]'),
 		swimmingData: JSON.parse(uni.getStorageSync('swimmingData') || '[]'),
+		runningData: JSON.parse(uni.getStorageSync('runningData') || '[]'),
 	}
 }

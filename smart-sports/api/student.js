@@ -153,3 +153,14 @@ export function getSwimmingById(id){
 		custom: {auth: true}
 	})
 }
+
+export function getRunningById(id){
+	return http.request({
+		method: 'POST',
+		url: '/student/get-running-by-id',
+		data: {
+			id
+		},
+		custom: {auth: true}
+	})
+}

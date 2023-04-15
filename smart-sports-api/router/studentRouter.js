@@ -46,6 +46,9 @@ studentRouter.post('/get-solid-ball-by-id', require('../router_handler/studentRo
 // 根据学生id查询测量日期，学生100米游泳耗时，班级男生平均100米游泳耗时，班级女生平均100米游泳耗时
 studentRouter.post('/get-swimming-by-id', require('../router_handler/studentRouterHandlers').getSwimmingById)
 
+// 根据学生id查询测量日期，学生短跑耗时，学生长跑耗时，班级男生平均短跑耗时，班级女生平均短跑耗时，班级男生平均长跑耗时，班级女生平均长跑耗时
+studentRouter.post('/get-running-by-id', require('../router_handler/studentRouterHandlers').getRunningById)
+
 // 向外导入路由对象
 module.exports = studentRouter
 
