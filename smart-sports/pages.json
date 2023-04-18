@@ -179,15 +179,6 @@
 			}
 
 		}
-        ,{
-            "path" : "pages/index/all/all",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "全部",
-                "enablePullDownRefresh": false
-            }
-            
-        }
     ],
 	"tabBar": {
 		"color": "#303133 ",
