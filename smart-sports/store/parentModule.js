@@ -1,4 +1,5 @@
-import {baseURL} from '../config.js'
+import {baseURL, defaultSwiperCards} from '../config.js'
+
 export default {
 	namespaced:true,//开启命名空间
 	actions: {
@@ -11,7 +12,7 @@ export default {
 		},
 		updateParentInfo(context, value){
 			context.commit('UPDATE_PARENT_INFO', value)
-		}
+		},
 	},
 	mutations: {
 		//mutations中的方法一般大写，用于区分actions中的方法。
@@ -46,10 +47,27 @@ export default {
 	getters: {
 		full_avatar_url(state){
 			return baseURL + state.parentInfo.avatar_url
+		},
+		filteredSwiperCards(state){
+			let filteredSwiperCards = [];
+			state.swiperCards.forEach((swiperCard)=>{
+				let label = swiperCard.label;
+				let icons = swiperCard.icons.filter((icon)=>{
+					return icon.show;
+				})
+				filteredSwiperCards.push({label, icons});
+			})
+			
+			filteredSwiperCards = filteredSwiperCards.filter((swiperCard)=>{
+				return swiperCard.icons.length > 0;
+			})
+			
+			return filteredSwiperCards;
 		}
 	},
 	state: {
 		token: uni.getStorageSync('token') || '',
 		parentInfo: JSON.parse(uni.getStorageSync('parentInfo') || '{}'),
+		swiperCards: JSON.parse(uni.getStorageSync('swiperCards') || '[]').length <= 0 ? defaultSwiperCards : JSON.parse(uni.getStorageSync('swiperCards') || '[]')
 	}
 }

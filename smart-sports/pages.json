@@ -179,6 +179,15 @@
 			}
 
 		}
+        ,{
+            "path" : "pages/index/display-settings/display-settings",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "所有健康数据",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"tabBar": {
 		"color": "#303133 ",

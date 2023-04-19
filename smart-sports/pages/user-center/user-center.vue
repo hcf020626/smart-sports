@@ -90,12 +90,12 @@
 			}
 		},
 		methods: { // 定义methods方法
-			...mapActions('parentModule', ['userLogout']), // 映射store中的actions到方法中
+			...mapActions('parentModule', ['parentLogout']), // 映射store中的actions到方法中
 			showModal() { // 定义showModal方法
 				this.modalInfo.show = true; // 修改modalInfo的show属性
 			},
 			logout() { // 定义logout方法
-				this.userLogout() // 调用userLogout action
+				this.parentLogout() // 调用parentLogout action
 				uni.reLaunch({ // 重新启动应用
 					url: '/pages/auth/login/login?status=1' // 跳转到登录页
 				})

@@ -29,31 +29,48 @@
 						<view>学号：{{studentInfo.id}}</view>
 					</view>
 					<view class="icons">
-						<uni-icons customPrefix="iconfont" :type="icons.data[icons.currentIcon].type" @click="toggleStudentCard"></uni-icons>
+						<uni-icons customPrefix="iconfont" :type="icons.data[icons.currentIcon].type"
+							@click="toggleStudentCard"></uni-icons>
 						<text>{{icons.data[icons.currentIcon].desc}}</text>
 					</view>
 				</view>
 			</view>
 			<view class="content">
-				<z-swiper v-model="categories" :options="options">
-					<z-swiper-item :custom-style="{width:'500rpx',height:'500rpx'}" v-for="(category,index) in categories" :key="index">
-							<view class="category">
-								<view class="label">{{category.label}}</view>
-								<view class="items">
-									<view class="item" v-for="(item, index) in category.items" :key="index"
-										@click="goToPage(item.pagePath)">
-										<view>
-											<uni-icons customPrefix="iconfont" :type="item.iconName" :color="item.iconColor" size="28">
-											</uni-icons>
-										</view>
-										<view>
-											<u-text :text="item.title"></u-text>
-										</view>
+				<swiper class="swiper" circular>
+					<swiper-item v-for="(swiperCard,swiperCardIndex) in filteredSwiperCards" :key="swiperCardIndex">
+						<view class="swiper-card">
+							<view class="label">
+								<text>{{swiperCard.label}}</text>
+								<uni-icons customPrefix="iconfont" type="icon-settings" @click="goToPage('/pages/index/display-settings/display-settings')"></uni-icons>
+							</view>
+							<u-line length="90%" margin="0 auto"></u-line>
+							<view class="icons">
+								<view class="icon" v-for="(icon, iconIndex) in swiperCard.icons" :key="iconIndex"
+									@click="goToPage(icon.pagePath)">
+									<view>
+										<uni-icons customPrefix="iconfont" :type="icon.iconName" :color="icon.iconColor"
+											size="28"></uni-icons>
+									</view>
+									<view>
+										<u-text :text="icon.title"></u-text>
 									</view>
 								</view>
 							</view>
-					</z-swiper-item>
-				</z-swiper>
+						</view>
+					</swiper-item>
+					<swiper-item v-if="filteredSwiperCards.length === 0">
+						<view class="swiper-card">
+							<view class="label">
+								<text>空</text>
+								<uni-icons customPrefix="iconfont" type="icon-settings" @click="goToPage('/pages/index/display-settings/display-settings')"></uni-icons>
+							</view>
+							<u-line length="90%" margin="0 auto"></u-line>
+							<view class="empty-tips">
+								这里什么都没有~
+							</view>
+						</view>
+					</swiper-item>
+				</swiper>
 			</view>
 		</template>
 	</view>
@@ -62,7 +79,8 @@
 <script>
 	import {
 		mapState,
-		mapActions
+		mapActions,
+		mapGetters
 	} from 'vuex'
 	export default {
 		data() {
@@ -84,106 +102,7 @@
 						type: 'icon-arrow-up',
 						desc: '收起'
 					}]
-				},
-				options: {
-					effect: 'coverflow',
-					centeredSlides: true,
-					slidesPerView: 'auto',
-					coverflowEffect: {
-						rotate: 50,
-						stretch: 0,
-						depth: 100,
-						modifier: 1,
-						slideShadows: true,
-					},
-					loop: true
-				},
-				categories: [{
-					label: '身体指标',
-					items: [{
-						iconName: 'icon-height',
-						iconColor: '#2b85e4 ',
-						title: '身高',
-						pagePath: '/pages/index/body-metrics/height/height'
-					}, {
-						iconName: 'icon-weight',
-						iconColor: '#18b566',
-						title: '体重',
-						pagePath: '/pages/index/body-metrics/weight/weight'
-					}, {
-						iconName: 'icon-vision',
-						iconColor: '#606266',
-						title: '视力',
-						pagePath: '/pages/index/body-metrics/vision/vision'
-					}, {
-						iconName: 'icon-blood-pressure',
-						iconColor: '#FF0000',
-						title: '血压',
-						pagePath: '/pages/index/body-metrics/blood-pressure/blood-pressure'
-					}, {
-						iconName: 'icon-lung-capacity',
-						iconColor: '#00FF00',
-						title: '肺活量',
-						pagePath: '/pages/index/body-metrics/lung-capacity/lung-capacity'
-					}]
-				}, {
-					label: '体能和耐力',
-					items: [{
-						iconName: 'icon-push-ups',
-						iconColor: '#0000FF',
-						title: '俯卧撑',
-						pagePath: '/pages/index/strength-and-stamina/push-ups/push-ups'
-					}, {
-						iconName: 'icon-sit-ups',
-						iconColor: 'black',
-						title: '仰卧起坐',
-						pagePath: '/pages/index/strength-and-stamina/sit-ups/sit-ups'
-					}, {
-						iconName: 'icon-pull-ups',
-						iconColor: '#18b566',
-						title: '引体向上',
-						pagePath: '/pages/index/strength-and-stamina/pull-ups/pull-ups'
-					}, {
-						iconName: 'icon-running',
-						iconColor: 'purple',
-						title: '跑步',
-						pagePath: '/pages/index/strength-and-stamina/running/running'
-					}, {
-						iconName: 'icon-swimming',
-						iconColor: '#606266',
-						title: '游泳',
-						pagePath: '/pages/index/strength-and-stamina/swimming/swimming'
-					}]
-				}, {
-					label: '爆发力',
-					items: [{
-						iconName: 'icon-long-jump',
-						iconColor: 'blue',
-						title: '立定跳远',
-						pagePath: '/pages/index/explosiveness/long-jump/long-jump'
-					}, {
-						iconName: 'icon-solid-ball',
-						iconColor: 'purple',
-						title: '实心球',
-						pagePath: '/pages/index/explosiveness/solid-ball/solid-ball'
-					}]
-				}, {
-					label: '协调力',
-					items: [{
-						iconName: 'icon-rope-skipping',
-						iconColor: '#000',
-						title: '跳绳',
-						pagePath: '/pages/index/coordination/rope-skipping/rope-skipping'
-					}]
-				}, {
-					label: '柔韧性',
-					items: [{
-						iconName: 'icon-sit-and-reaches',
-						iconColor: 'green',
-						title: '坐位体前屈',
-						pagePath: '/pages/index/flexibility/sit-and-reaches/sit-and-reaches'
-					}]
-				}, ],
+				}
 			}
 		},
 		methods: {
@@ -198,16 +117,17 @@
 
 				this.imgSizeStyle.imgBoxMaxSize = !this.imgSizeStyle.imgBoxMaxSize;
 				this.imgSizeStyle.imgBoxMinSize = !this.imgSizeStyle.imgBoxMinSize;
-				
+
 				this.icons.currentIcon = this.icons.currentIcon === 1 ? 0 : 1;
 			}
 		},
 		computed: {
 			// 获取用户信息
 			...mapState('parentModule', ['parentInfo']),
+			...mapGetters('parentModule', ['filteredSwiperCards']),
 			// 获取学生信息
 			...mapState('studentModule', ['studentInfo']),
-		}
+		},
 	}
 </script>
 
@@ -312,14 +232,14 @@
 		font-weight: 500;
 		opacity: 0.5;
 	}
-	
+
 	.card .details {
 		width: 70%;
 		font-size: 0.8em;
 		font-weight: 500;
 		opacity: 0.5;
 	}
-	
+
 	.card .icons {
 		font-size: 0.7em;
 		font-weight: 500;
@@ -329,36 +249,53 @@
 		justify-content: center;
 		align-items: center;
 	}
+
+	.content {
+		flex-grow: 1;
+		width: 100%;
+	}
 	
-	.category {
+	.swiper {
+		width: 100%;
+		height: 450rpx;
+		margin-top: 40rpx;
+	}
+	
+	.swiper-card {
 		display: flex;
 		flex-direction: column;
-		width: 95%;
-		height: 450rpx;
-		margin: 25rpx auto;
+		justify-content: flex-start;
+		align-items: flex-start;
+		box-sizing: border-box;
+		width: 90%;
+		height: 100%;
+		margin: 0 auto;
 		background-color: rgba(255, 255, 255, 0.5);
 		border-radius: 20rpx;
 	}
-	
-	.content {
-		flex-grow: 1;
-	}
-	
-	.category .label {
-		padding: 25rpx 50rpx 0 50rpx;
-	}
-	
-	.category .items {
+
+	.swiper-card .label {
+		width: 90%;
+		height: 85rpx;
 		display: flex;
-		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0 30rpx;
+	}
+	
+	.swiper-card .label .uni-icons:active {
+		opacity: 0.25;
+	}
+
+	.swiper-card .icons {
+		display: flex;
 		justify-content: flex-start;
 		align-items: center;
 		flex-wrap: wrap;
 		width: 100%;
-		margin: 30rpx auto;
 	}
-	
-	.category .items .item {
+
+	.swiper-card .icons .icon {
 		display: flex;
 		flex-direction: column;
 		justify-content: space-around;
@@ -368,8 +305,17 @@
 		font-size: 0.9rem;
 	}
 	
-	.category .items .item:active {
-		opacity: 0.5;
+	.swiper-card .icons .icon:active {
+		opacity: 0.25;
+	}
+	
+	.swiper .empty-tips {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+		height: 100%;
+		color: #555;
 	}
 
 	.errMsg {
