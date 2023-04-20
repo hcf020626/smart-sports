@@ -4,8 +4,8 @@
 			
 		</view> -->
 		
-		<u-collapse :accordion="true" :border="false">
-			<u-collapse-item v-for="(swiperCard,swiperCardIndex) in swiperCards" :key="swiperCardIndex" :title="swiperCard.label">
+		<u-collapse :accordion="true" :border="false" :value="defaultOpenItem">
+			<u-collapse-item v-for="(swiperCard,swiperCardIndex) in swiperCards" :key="swiperCardIndex" :title="swiperCard.label" :name="swiperCardIndex">
 				<u-cell-group >
 					<u-cell v-for="(icon, iconIndex) in swiperCard.icons" :key="iconIndex" :title="icon.title">
 						<uni-icons slot="icon" customPrefix="iconfont" :type="icon.iconName" :color="icon.iconColor" size="20"></uni-icons>
@@ -25,7 +25,7 @@
 	export default {
 		data() {
 			return {
-
+				defaultOpenItem: -1
 			}
 		},
 		methods: {
@@ -35,6 +35,9 @@
 		},
 		computed: {
 			...mapState('parentModule', ['swiperCards']),
+		},
+		onLoad(option) {
+			this.defaultOpenItem = option.item;
 		}
 	}
 </script>

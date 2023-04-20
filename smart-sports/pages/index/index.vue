@@ -36,12 +36,12 @@
 				</view>
 			</view>
 			<view class="content">
-				<swiper class="swiper" circular>
+				<swiper class="swiper" indicator-dots>
 					<swiper-item v-for="(swiperCard,swiperCardIndex) in filteredSwiperCards" :key="swiperCardIndex">
 						<view class="swiper-card">
 							<view class="label">
 								<text>{{swiperCard.label}}</text>
-								<uni-icons customPrefix="iconfont" type="icon-settings" @click="goToPage('/pages/index/display-settings/display-settings')"></uni-icons>
+								<uni-icons customPrefix="iconfont" type="icon-settings" @click="goToPage('/pages/index/display-settings/display-settings', swiperCardIndex)"></uni-icons>
 							</view>
 							<u-line length="90%" margin="0 auto"></u-line>
 							<view class="icons">
@@ -106,9 +106,9 @@
 			}
 		},
 		methods: {
-			goToPage(path) {
+			goToPage(path, index) {
 				uni.navigateTo({
-					url: path
+					url: `${path}?item=${index}`,
 				})
 			},
 			toggleStudentCard() {

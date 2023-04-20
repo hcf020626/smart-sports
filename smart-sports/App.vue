@@ -46,7 +46,7 @@
 					if (!status) {
 						this.updateParentInfo(parentInfo);
 						this.updateStudentInfo({
-							avatar_url: this.studentInfo.avatar_url ,
+							avatar_url: baseURL + studentInfo.avatar_url ,
 							name: studentInfo.name,
 							gender: studentInfo.gender,
 							age: studentInfo.age,
