@@ -6,7 +6,15 @@ import {
 	saveParentInfo,
 	updatePassword,
 	changeBonding,
-	getTheLatestInfo
+	getUserListByKeyword,
+	createFriendship,
+	deleteFriendship,
+	getTheLatestInfo,
+	getFriendListById,
+	getParticularStepsRating,
+	getParticularSteps,
+	updateSteps,
+	updateParticularLike
 } from './parent.js'
 import {
 	getStudentsByIdcard,
@@ -35,7 +43,15 @@ export default {
 		saveParentInfo,
 		updatePassword,
 		changeBonding,
-		getTheLatestInfo
+		getUserListByKeyword,
+		createFriendship,
+		deleteFriendship,
+		getTheLatestInfo,
+		getFriendListById,
+		getParticularStepsRating,
+		getParticularSteps,
+		updateSteps,
+		updateParticularLike
 	},
 	student: {
 		getStudentsByIdcard,

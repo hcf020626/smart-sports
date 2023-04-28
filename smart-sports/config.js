@@ -1,6 +1,8 @@
-// export const baseURL = 'http://192.168.194.83:3000'
-// export const baseURL = 'http://172.27.208.164:3000'
-export const baseURL = 'http://192.168.254.83:3000'
+// export const baseURL = 'http://172.27.24.16:3000'
+// export const baseWSURL = 'wss://172.27.24.16:3000'
+
+export const baseURL = 'http://172.27.73.29:3000'
+export const baseWSURL = 'ws://172.27.73.29:3000'
 
 export const defaultSwiperCards = [{
 		label: '身体指标',

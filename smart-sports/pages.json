@@ -9,8 +9,8 @@
 		{
 			"path": "pages/user-center/user-center",
 			"style": {
-				"navigationBarTitleText": "我的",
-				"enablePullDownRefresh": false
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "black"
 			}
 		}, {
 			"path": "pages/auth/login/login",
@@ -184,6 +184,47 @@
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "所有健康数据",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/user-center/daily-steps/daily-steps",
+            "style" :                                                                                    
+            {
+                "navigationStyle": "custom",
+				"navigationBarTextStyle": "black",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"pullToRefresh": {
+						"offset": "44px"
+					}
+				}
+            }
+            
+        }
+        ,{
+            "path" : "pages/user-center/daily-steps/add-friend/add-friend",
+            "style" :                                                                                    
+            {
+                "navigationStyle": "custom",
+                "navigationBarTextStyle": "black"
+            }
+        }
+        ,{
+            "path" : "pages/user-center/daily-steps/manage-friends/manage-friends",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "好友管理",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/user-center/daily-steps/new-friends/new-friends",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "好友申请",
                 "enablePullDownRefresh": false
             }
             

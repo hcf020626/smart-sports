@@ -18,7 +18,7 @@
 				<view class="content">
 					<view class="abstract" v-show="icons.currentIcon === 0">
 						<text class="row1">{{studentInfo.name}}</text>
-						<text class="row2">{{studentInfo.school + ' ' + studentInfo.className}}</text>
+						<text class="row2">{{studentInfo.school}}&nbsp;{{studentInfo.className}}</text>
 					</view>
 					<view class="details" v-show="icons.currentIcon === 1">
 						<view>姓名：{{studentInfo.name}}</view>

@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3944024 */
-  src: url('/static/iconfont/icon/iconfont.woff2?t=1681895361168') format('woff2'),
-       url('/static/iconfont/icon/iconfont.woff?t=1681895361168') format('woff'),
-       url('/static/iconfont/icon/iconfont.ttf?t=1681895361168') format('truetype');
+  src: url('/static/iconfont/icon/iconfont.woff2?t=1682321619135') format('woff2'),
+       url('/static/iconfont/icon/iconfont.woff?t=1682321619135') format('woff'),
+       url('/static/iconfont/icon/iconfont.ttf?t=1682321619135') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,46 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-search:before {
+  content: "\e652";
+}
+
+.icon-new-friends:before {
+  content: "\e62f";
+}
+
+.icon-add-friend:before {
+  content: "\e7dc";
+}
+
+.icon-manage-friends:before {
+  content: "\e612";
+}
+
+.icon-list:before {
+  content: "\e62d";
+}
+
+.icon-heart:before {
+  content: "\e601";
+}
+
+.icon-walking-steps:before {
+  content: "\e689";
+}
+
+.icon-running-steps:before {
+  content: "\e61c";
+}
+
+.icon-all-steps:before {
+  content: "\e664";
+}
+
+.icon-rating:before {
+  content: "\e613";
 }
 
 .icon-settings:before {

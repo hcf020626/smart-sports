@@ -26,8 +26,24 @@ parentRouter.post('/update-password', require('../router_handler/parentRouterHan
 // 换绑
 parentRouter.post('/change-bonding', require('../router_handler/parentRouterHandlers').changeBonding)
 
+parentRouter.post('/get-userlist-by-keyword', require('../router_handler/parentRouterHandlers').getUserListByKeyword)
+
+parentRouter.post('/create-friendship', require('../router_handler/parentRouterHandlers').createFriendship)
+
+parentRouter.post('/delete-friendship', require('../router_handler/parentRouterHandlers').deleteFriendship)
+
 // 获取最新的用户和对应的学生信息
 parentRouter.post('/get-the-latest-info', require('../router_handler/parentRouterHandlers').getTheLatestInfo)
+
+parentRouter.post('/get-friend-list-by-id', require('../router_handler/parentRouterHandlers').getFriendListById)
+
+parentRouter.post('/get-particular-steps-rating', require('../router_handler/parentRouterHandlers').getParticularStepsRating)
+
+parentRouter.post('/get-particular-steps', require('../router_handler/parentRouterHandlers').getParticularSteps)
+
+parentRouter.post('/update-steps', require('../router_handler/parentRouterHandlers').updateSteps)
+
+parentRouter.post('/update-particular-like', require('../router_handler/parentRouterHandlers').updateParticularLike)
 
 // 向外导出路由对象
 module.exports = parentRouter

@@ -88,7 +88,7 @@ exports.parentReg = async (req, resp, next) => {
 			msg: '邮箱或密码不能为空'
 		})
 	}
-	
+
 	try {
 		// 对 token 进行解密，取出其中保存的 email 和 token
 		const {
@@ -162,17 +162,17 @@ exports.parentForget = async (req, resp, next) => {
 			msg: '邮箱或密码不能为空'
 		})
 	}
-	
-	
-	console.log("req.body.token: ",req.body.token);
-	
-	if(!req.body.token){
+
+
+	console.log("req.body.token: ", req.body.token);
+
+	if (!req.body.token) {
 		return resp.json({
 			status: 1,
 			msg: '请先获取验证码'
 		})
 	}
-	
+
 	try {
 		// 对 token 进行解密，取出其中保存的 email 和 token
 		const {
@@ -192,7 +192,7 @@ exports.parentForget = async (req, resp, next) => {
 						status: 1,
 						msg: '邮箱还未注册，修改失败'
 					})
-				} else if(results.length > 1){
+				} else if (results.length > 1) {
 					return resp.json({
 						status: 1,
 						msg: '服务器出现异常，修改密码失败'
@@ -441,6 +441,108 @@ exports.changeBonding = async (req, resp, next) => {
 	}
 }
 
+exports.getUserListByKeyword = async (req, resp, next) => {
+	const {
+		keyword
+	} = req.body;
+
+	try {
+		const sql = "SELECT * FROM t_parents WHERE phone = ? OR realname LIKE CONCAT('%', ?, '%')"
+		const results = await db.exec(sql, [keyword, keyword]);
+
+		resp.json({
+			status: 0,
+			msg: '获取成功!',
+			data: {
+				userList: results
+			},
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，获取失败'
+		})
+	}
+}
+
+exports.createFriendship = async (req, resp, next) => {
+	const {
+		parent_id,
+		friend_id
+	} = req.body;
+
+	try {
+		let sql =
+			"select * from t_friendship where (first_user_id = ? and second_user_id = ?) or (first_user_id = ? and second_user_id = ?)";
+
+		let results = await db.exec(sql, [parent_id, friend_id, friend_id, parent_id]);
+
+		if (results.length !== 0) {
+			return resp.json({
+				status: 2,
+				msg: '已经添加该好友，请勿重复添加！'
+			})
+		}
+
+		sql = "insert into t_friendship(first_user_id, second_user_id, create_time) values (?, ?, ?)";
+		results = await db.exec(sql, [parent_id, friend_id, moment().format('YYYY-MM-DD HH:mm:ss')]);
+
+		if (results.affectedRows !== 1) {
+			return resp.json({
+				status: 1,
+				msg: '服务器出现异常，添加失败！'
+			})
+		}
+		resp.json({
+			status: 0,
+			msg: '添加成功！你们已经成为好友'
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，获取失败'
+		})
+	}
+}
+
+exports.deleteFriendship = async (req, resp, next) => {
+	const {
+		parent_id,
+		friend_id
+	} = req.body;
+
+	console.log(parent_id, friend_id);
+
+	try {
+		let sql =
+			"delete from t_friendship where (first_user_id = ? and second_user_id = ?) or (first_user_id = ? and second_user_id = ?)";
+
+		let results = await db.exec(sql, [parent_id, friend_id, friend_id, parent_id]);
+
+		if (results.affectedRows !== 1) {
+			return resp.json({
+				status: 1,
+				msg: '服务器出现异常，删除失败！'
+			})
+		}
+		resp.json({
+			status: 0,
+			msg: '删除成功！'
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，获取失败'
+		})
+	}
+}
+
 exports.getTheLatestInfo = async (req, resp, next) => {
 	const {
 		email
@@ -454,7 +556,6 @@ exports.getTheLatestInfo = async (req, resp, next) => {
 		let results = await db.exec(sql, [email]);
 
 		if (results.length !== 1) {
-			console.log("results: ", results);
 			return resp.json({
 				status: 1,
 				msg: '服务器出现异常，获取失败'
@@ -472,8 +573,6 @@ exports.getTheLatestInfo = async (req, resp, next) => {
 			studentInfo = results[0];
 		}
 
-		console.log("parentInfo, studentInfo: ", parentInfo, studentInfo);
-
 		resp.json({
 			status: 0,
 			msg: '获取成功!',
@@ -488,6 +587,216 @@ exports.getTheLatestInfo = async (req, resp, next) => {
 		resp.json({
 			status: 1,
 			msg: '服务器出现错误，获取失败'
+		})
+	}
+}
+
+exports.getFriendListById = async (req, resp, next) => {
+	const {
+		id
+	} = req.body;
+
+	console.log("id: ", id);
+
+	try {
+		const sql = `
+    SELECT
+      IF(f.first_user_id = ?, f.second_user_id, f.first_user_id) AS friend_id,
+      p.realname,
+      p.avatar_url,
+      p.phone
+    FROM
+      t_friendship f
+      JOIN t_parents p ON IF(f.first_user_id = ?, f.second_user_id, f.first_user_id) = p.id
+    WHERE
+      f.first_user_id = ? OR f.second_user_id = ?
+  `;
+		const results = await db.exec(sql, [id, id, id, id]);
+
+		resp.json({
+			status: 0,
+			msg: '好友列表更新成功!',
+			data: {
+				friendList: results
+			},
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，好友列表更新失败'
+		})
+	}
+}
+
+exports.getParticularStepsRating = async (req, resp, next) => {
+	const {
+		parentIds,
+		date
+	} = req.body;
+
+	console.log("parentIds, typeof parentIds: ", parentIds, typeof parentIds);
+
+	try {
+		const ids = parentIds.split(",");
+		const sql = `
+			SELECT t_parents.id, t_parents.realname, t_parents.avatar_url, IFNULL(t_steps.likes, 0) AS likes, IFNULL(t_steps.walking_steps, 0) + IFNULL(t_steps.running_steps, 0) AS total_steps 
+			FROM t_parents LEFT JOIN t_steps ON t_parents.id = t_steps.parent_id AND t_steps.measurement_date = ?
+			WHERE t_parents.id IN (${ids.map(() => '?').join(',')})
+			ORDER BY total_steps DESC
+		`;
+		const results = await db.exec(sql, [date, ...ids]);
+
+		console.log(results);
+
+		const stepsRating = results.map(result => ({
+			id: result.id,
+			realname: result.realname,
+			avatar_url: result.avatar_url,
+			likes: result.likes,
+			total_steps: result.total_steps,
+			isGiveLike: false
+		}));
+
+		resp.json({
+			status: 0,
+			msg: '获取步数排行榜成功!',
+			data: {
+				stepsRating
+			},
+		})
+	} catch (e) {
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，获取步数排行榜失败'
+		})
+	}
+}
+
+exports.getParticularSteps = async (req, resp, next) => {
+	const {
+		id,
+		date
+	} = req.body;
+
+	console.log("id, date: ", id, date);
+
+	try {
+		const sql =
+			'select walking_steps, running_steps, (walking_steps + running_steps) AS total_steps from t_steps where parent_id = ? and measurement_date = ?'
+		const results = await db.exec(sql, [id, date]);
+
+		console.log(results);
+
+		const steps = results[0] ? results[0] : {
+			walking_steps: 0,
+			running_steps: 0,
+			total_steps: 0,
+			measurement_date: date
+		};
+
+		resp.json({
+			status: 0,
+			msg: '获取步数成功!',
+			data: {
+				steps
+			},
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，获取步数失败'
+		})
+	}
+}
+
+exports.updateSteps = async (req, resp, next) => {
+	const {
+		parent_id,
+		measurement_date,
+		walking_steps,
+		running_steps
+	} = req.body;
+
+	console.log("walking_steps, running_steps: ", walking_steps, running_steps);
+
+	try {
+		let sql = 'select * from t_steps where parent_id = ? and measurement_date = ?';
+		let results = await db.exec(sql, [parent_id, measurement_date]);
+
+		if (results.length > 1) {
+			return resp.json({
+				status: 1,
+				msg: '服务器出现异常，更新步数失败'
+			})
+		}
+
+		if (results.length === 0) {
+			console.log(1);
+			sql =
+				'insert into t_steps(parent_id, likes, measurement_date, walking_steps, running_steps) values (?, 0, ?, ?, ?)';
+			results = await db.exec(sql, [parent_id, measurement_date, walking_steps, running_steps]);
+		} else {
+			console.log(2);
+			sql =
+				'update t_steps set walking_steps = ?, running_steps = ? where parent_id = ? and measurement_date = ?';
+			results = await db.exec(sql, [walking_steps, running_steps, parent_id, measurement_date]);
+		}
+
+		if (results.affectedRows !== 1) {
+			return resp.json({
+				status: 1,
+				msg: '服务器出现异常，更新步数失败'
+			})
+		}
+
+		resp.json({
+			status: 0,
+			msg: '更新步数成功!'
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，获取步数失败'
+		})
+	}
+}
+
+exports.updateParticularLike = async (req, resp, next) => {
+	const {
+		parent_id,
+		likes,
+		measurement_date
+	} = req.body;
+
+	try {
+		const sql =
+			'update t_steps set likes = ? where parent_id = ? and measurement_date = ?';
+		const results = await db.exec(sql, [likes, parent_id, measurement_date]);
+
+		if (results.affectedRows !== 1) {
+			return resp.json({
+				status: 1,
+				msg: '服务器出现异常，点赞失败'
+			})
+		}
+
+		resp.json({
+			status: 0,
+			msg: '点赞成功!'
+		})
+	} catch (e) {
+		//TODO handle the exception
+		console.log("e: ", e);
+		resp.json({
+			status: 1,
+			msg: '服务器出现错误，点赞失败'
 		})
 	}
 }

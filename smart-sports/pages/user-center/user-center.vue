@@ -1,6 +1,15 @@
 <template>
 	<!-- 整个页面的最外层容器 -->
 	<view class="container">
+		<uni-nav-bar :fixed="true" :border="false" :status-bar="true" title="我的">
+			<view slot="left" style="position: relative;">
+				<uni-icons customPrefix="iconfont" type="icon-rating" size="20" @click="goToPage('/pages/user-center/daily-steps/daily-steps')"></uni-icons>
+				<u-badge :isDot="true" type="error" absolute :offset="[-3, -3]"  :show="friendsApplicationMessages.length > 0"></u-badge>
+			</view>
+			<view class="navbar-title">
+				<text>我的</text>
+			</view>
+		</uni-nav-bar>
 		<!-- 该部分展示了用户头像、真实姓名 -->
 		<u-cell-group :border="false">
 			<u-cell :border="false">
@@ -10,7 +19,8 @@
 					<u-text :text="parentInfo.realname?parentInfo.realname:'亲，您还未设置真实姓名'"></u-text>
 				</template>
 				<!-- 标题下方的描述信息 -->
-				<u-text slot="label" :text="parentInfo.phone | phoneMask" color="#909399" size="13.5" :show-sex="true"></u-text>
+				<u-text slot="label" :text="parentInfo.phone | phoneMask" color="#909399" size="13.5" :show-sex="true">
+				</u-text>
 			</u-cell>
 		</u-cell-group>
 		<!-- 功能入口展示区域 -->
@@ -33,13 +43,11 @@
 		<view class="cell-group">
 			<u-cell-group :border="false">
 				<u-cell title="关于" :border="false" isLink url="./about/about">
-					<uni-icons slot="icon" customPrefix="iconfont" type="icon-about" color="mediumslateblue"
-						size="20">
+					<uni-icons slot="icon" customPrefix="iconfont" type="icon-about" color="mediumslateblue" size="20">
 					</uni-icons>
 				</u-cell>
 				<u-cell title="退出登录" :border="false" isLink @click="showModal">
-					<uni-icons slot="icon" customPrefix="iconfont" type="icon-exit" color="mediumslateblue"
-						size="20">
+					<uni-icons slot="icon" customPrefix="iconfont" type="icon-exit" color="mediumslateblue" size="20">
 					</uni-icons>
 				</u-cell>
 			</u-cell-group>
@@ -108,7 +116,7 @@
 		},
 		computed: {
 			// 使用mapState和mapGetters函数从Vuex store中获取parentModule模块的parentInfo状态和fullAvatarURL计算属性。
-			...mapState('parentModule', ['parentInfo']),
+			...mapState('parentModule', ['parentInfo', 'friendsApplicationMessages']),
 			...mapGetters('parentModule', ['full_avatar_url'])
 		},
 		filters: {
@@ -132,6 +140,23 @@
 		width: 100vw;
 		height: 100vh;
 		background-color: WhiteSmoke;
+	}
+
+	.navbar-title {
+		width: 90%;
+		height: 100%;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.navbar-title text {
+		font-size: 16px;
+		// #ifdef H5
+		font-weight: 700;
+		// #endif
+		font-family: sans-serif;
 	}
 
 	.grid {
