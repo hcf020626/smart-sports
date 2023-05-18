@@ -236,68 +236,53 @@ exports.parentForget = async (req, resp, next) => {
 }
 
 // 发送邮箱验证码的处理函数
-exports.sendCode = (req, resp) => {
-
+exports.sendCode = async (req, resp) => {
 	try {
-		// 接收表单数据
 		const email = req.body.email;
 
 		const {
 			transporter,
 			generateVerificationCode
-		} = require('../utils/MailTransporter')
+		} = require('../utils/MailTransporter');
+		const code = generateVerificationCode();
 
-		// 生成验证码
-		const code = generateVerificationCode()
+		const mailOptions = {
+			from: process.env.QQ_EMAIL,
+			to: email,
+			subject: '智慧体育平台注册验证码',
+			text: `你的验证码是 ${code}`
+		};
 
-		// 将 email 和 code 进行加密保存到 token 中
-		const token = jwt.encode({
-			email,
-			code,
-			exp: Date.now() + 120000
-		}, process.env.SECRET_KEY);
-		console.log("code: ", code);
+		const info = await transporter.sendMail(mailOptions);
 
-		resp.status(200).json({
-			status: 0,
-			msg: '验证码已发送',
-			token
-		})
-	} catch (e) {
-		console.log("e: ", e);
+		if (info && info.response) {
+			const token = jwt.encode({
+				email,
+				code,
+				exp: Date.now() + 120000
+			}, process.env.SECRET_KEY);
+			console.log("code: ", code);
+
+			resp.status(200).json({
+				status: 0,
+				msg: '验证码已发送',
+				token
+			});
+		} else {
+			resp.status(500).json({
+				status: 1,
+				msg: '邮件发送失败'
+			});
+		}
+	} catch (error) {
+		console.log(error);
 		resp.status(500).json({
 			status: 1,
 			msg: '服务器出现错误，验证码发送失败'
-		})
+		});
 	}
+};
 
-	// // 填写一封邮件
-	// const mailOptions = {
-	// 	from: process.env.QQ_EMAIL,
-	// 	to: email,
-	// 	subject: '智慧体育平台注册验证码',
-	// 	text: `你的验证码是 ${code}`
-	// }
-
-	// // 发送邮件
-	// transporter.sendMail(mailOptions, (error, info) => {
-	// 	if (error) {
-	// 		console.log(error);
-	// 		resp.json({
-	// 			status: 1,
-	// 			msg: '服务器故障，邮件发送失败：' + error 
-	// 		})
-	// 	} else {
-	// 		console.log('Email sent: ' + info.response);
-	// 		// 发送成功，则将验证码保存到 Session 中
-	// 		req.session.code = code
-	// 		resp.json({
-	// 			status: 0,
-	// 			msg: '验证码已发送'
-	// 		})
-	// 	}
-	// })
-}
 
 
 exports.saveParentInfo = async (req, resp, next) => {
